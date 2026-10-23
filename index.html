@@ -6,83 +6,100 @@
   <title>Tiwari & Sons Dairy Farm</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { display: flex; height: 100vh; background-color: #f4f6f9; overflow-x: hidden; }
+    body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; }
     
-    /* Overlay for mobile when sidebar is open */
+    /* Overlay for mobile */
     .overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); display: none; z-index: 9;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); display: none; z-index: 9;
     }
     .overlay.active { display: block; }
 
-    /* Sidebar Styling */
+    /* Sidebar Styling with Gradient */
     .sidebar { 
-      width: 260px; background: #1e293b; color: #fff; height: 100vh;
+      width: 270px; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: #fff; height: 100vh;
       position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10;
-      display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.2);
     }
-    .sidebar.hidden { left: -260px; }
+    .sidebar.hidden { left: -270px; }
 
     .sidebar-header {
-      padding: 20px; display: flex; justify-content: space-between; align-items: center;
-      background: #0f172a; border-bottom: 1px solid #334155;
+      padding: 22px; display: flex; justify-content: space-between; align-items: center;
+      background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-    .sidebar-header h2 { font-size: 16px; color: #38bdf8; font-weight: bold; }
+    .sidebar-header h2 { font-size: 17px; background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
     .close-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
 
-    .sidebar-menu { list-style: none; padding-top: 10px; }
-    
+    .sidebar-menu { list-style: none; padding-top: 15px; }
     .menu-item { width: 100%; }
     .menu-btn {
-      background: transparent; border: none; color: #cbd5e1; padding: 14px 20px;
+      background: transparent; border: none; color: #cbd5e1; padding: 15px 22px;
       text-align: left; font-size: 15px; cursor: pointer; width: 100%; display: flex;
-      justify-content: space-between; align-items: center; transition: 0.2s;
+      justify-content: space-between; align-items: center; transition: 0.3s;
     }
-    .menu-btn:hover, .menu-btn.active { background: #334155; color: #fff; border-left: 4px solid #38bdf8; }
+    .menu-btn:hover, .menu-btn.active { background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), transparent); color: #38bdf8; border-left: 4px solid #38bdf8; }
 
     /* Dropdown Styling */
-    .dropdown-container { display: none; background: #0f172a; }
+    .dropdown-container { display: none; background: rgba(15, 23, 42, 0.5); }
     .dropdown-container.show { display: block; }
-    .dropdown-container .menu-btn { padding-left: 35px; font-size: 14px; color: #94a3b8; }
-    .dropdown-container .menu-btn:hover, .dropdown-container .menu-btn.active { color: #fff; background: #1e293b; }
+    .dropdown-container .menu-btn { padding-left: 38px; font-size: 14px; color: #94a3b8; }
+    .dropdown-container .menu-btn:hover, .dropdown-container .menu-btn.active { color: #fff; background: rgba(51, 65, 85, 0.5); border-left: 4px solid #818cf8; }
 
-    /* Main Layout */
-    .main-wrapper { flex: 1; margin-left: 260px; transition: all 0.3s ease; display: flex; flex-direction: column; width: 100%; }
+    /* Main Wrapper */
+    .main-wrapper { flex: 1; margin-left: 270px; transition: all 0.3s ease; display: flex; flex-direction: column; width: 100%; }
     .main-wrapper.full-width { margin-left: 0; }
 
-    /* Header Navbar */
+    /* Top Bar */
     .top-bar {
-      background: #fff; padding: 15px 20px; display: flex; align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 5;
+      background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); padding: 15px 25px; display: flex; align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 5;
     }
-    .toggle-btn { background: #1e293b; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-    .page-title { margin-left: 15px; font-size: 18px; font-weight: bold; color: #1e293b; }
+    .toggle-btn { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; box-shadow: 0 2px 5px rgba(37,99,235,0.3); transition: 0.2s; }
+    .toggle-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .page-title { margin-left: 20px; font-size: 20px; font-weight: 800; background: linear-gradient(45deg, #1e293b, #475569); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    /* Main Content Pages */
-    .content { padding: 25px; overflow-y: auto; flex: 1; }
+    /* Main Content */
+    .content { padding: 30px; overflow-y: auto; flex: 1; }
     .page-section { display: none; }
-    .page-section.active { display: block; }
+    .page-section.active { display: block; animation: fadeIn 0.4s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Card Styling */
-    .card { background: #fff; border-radius: 8px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 850px; margin: 0 auto; }
-    .card h3 { margin-bottom: 20px; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+    .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 14px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; border: 1px solid rgba(255,255,255,0.8); }
+    .card h3 { margin-bottom: 22px; color: #0f172a; font-size: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; font-weight: 700; }
+
+    /* Dashboard Cards with Gradients */
+    .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 20px; }
+    .dash-card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc); padding: 22px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); border-left: 6px solid #2563eb; transition: 0.3s; }
+    .dash-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+    .dash-card.green { border-left-color: #10b981; }
+    .dash-card.amber { border-left-color: #f59e0b; }
+    .dash-card h4 { color: #64748b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 700; }
+    .dash-card p { font-size: 26px; font-weight: 800; color: #0f172a; }
+
+    /* Table Design */
+    .table-container { margin-top: 30px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    th, td { padding: 12px 15px; text-align: left; font-size: 14px; }
+    th { background: #1e293b; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+    tr:nth-child(even) { background-color: #f8fafc; }
+    tr:hover { background-color: #f1f5f9; }
+    .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+    .badge.paid { background: #d1fae5; color: #065f46; }
+    .badge.pending { background: #fef3c7; color: #92400e; }
 
     /* Form Layout */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
     .form-group { display: flex; flex-direction: column; }
-    label { font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #475569; }
-    input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 14px; }
-    input[readonly] { background-color: #f1f5f9; cursor: not-allowed; }
+    label { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #334155; }
+    input, select { padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; transition: 0.2s; background: #fff; }
+    input:focus, select:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    input[readonly] { background-color: #f8fafc; cursor: not-allowed; color: #64748b; }
 
-    .submit-btn { margin-top: 20px; width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    .submit-btn:hover { background: #1d4ed8; }
-
-    /* Dashboard Cards */
-    .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 20px; }
-    .dash-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 5px solid #2563eb; }
-    .dash-card h4 { color: #64748b; font-size: 14px; margin-bottom: 8px; }
-    .dash-card p { font-size: 22px; font-weight: bold; color: #0f172a; }
+    .submit-btn { margin-top: 25px; width: 100%; padding: 14px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.3); transition: 0.3s; }
+    .submit-btn:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); box-shadow: 0 6px 15px rgba(37,99,235,0.4); }
   </style>
 </head>
 <body>
@@ -132,22 +149,44 @@
       <section id="dashboard" class="page-section active">
         <div class="card">
           <h3>Welcome to Tiwari & Sons Dairy Farm</h3>
-          <p style="color: #64748b;">यहाँ आपके डेयरी फ़ार्म का मुख्य फ़्रंट डैशबोर्ड स्क्रीन है।</p>
+          <p style="color: #64748b; font-size: 15px;">Google Sheet se live sync kiya gaya data yahan dikh raha hai:</p>
           
           <div class="dashboard-cards">
             <div class="dash-card">
-              <h4>Total Sales Today</h4>
-              <p>₹ 0.00</p>
+              <h4>Total Sales Amount</h4>
+              <p id="dashTotalSales">₹ 0.00</p>
             </div>
-            <div class="dash-card" style="border-left-color: #10b981;">
-              <h4>Milk Quantity Today</h4>
-              <p>0 Liters</p>
+            <div class="dash-card green">
+              <h4>Total Milk Quantity</h4>
+              <p id="dashTotalQty">0 Liters</p>
             </div>
-            <div class="dash-card" style="border-left-color: #f59e0b;">
+            <div class="dash-card amber">
               <h4>Pending Payments</h4>
-              <p>₹ 0.00</p>
+              <p id="dashPendingAmount">₹ 0.00</p>
             </div>
           </div>
+
+          <!-- Live Entries Table from Sheet -->
+          <div class="table-container">
+            <h3 style="font-size: 16px; border:none; margin-bottom: 10px;">Recent Bulk Milk Entries (Live)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Shift</th>
+                  <th>Party Name</th>
+                  <th>Milk Type</th>
+                  <th>Qty (Ltr)</th>
+                  <th>Amount (₹)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="liveEntriesTable">
+                <tr><td colspan="7" style="text-align: center; color: #64748b;">Loading live data from sheet...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
         </div>
       </section>
 
@@ -237,7 +276,7 @@
 
             </div>
 
-            <button type="submit" class="submit-btn">Submit Entry</button>
+            <button type="submit" class="submit-btn">Submit Entry to Google Sheet</button>
           </form>
         </div>
       </section>
@@ -246,15 +285,12 @@
   </div>
 
   <script>
-    // Updated Web App URL
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx48iu0T_atUTNHUC6SU-6BQMNO3CZ1UYdKODdKJVGZ/dev";
 
     let partyData = {};
 
-    // Auto set Today's Date
     document.getElementById('entryDate').valueAsDate = new Date();
 
-    // Toggle Sidebar & Overlay
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const mainWrapper = document.getElementById('mainWrapper');
@@ -268,51 +304,95 @@
       }
     }
 
-    // Toggle Dropdown Menu
     function toggleDropdown(id) {
       const dropdown = document.getElementById(id);
       dropdown.classList.toggle('show');
     }
 
-    // Switch View / Pages and Auto-Hide Sidebar
     function switchPage(pageId, element) {
-      // Hide all pages
       document.querySelectorAll('.page-section').forEach(section => {
         section.classList.remove('active');
       });
 
-      // Show selected page
       document.getElementById(pageId).classList.add('active');
 
-      // Update Header Title
       if (pageId === 'dashboard') {
         document.getElementById('pageTitle').innerText = "Dashboard";
+        fetchDashboardData(); // Refresh data on clicking dashboard
       } else if (pageId === 'bulkMilk') {
         document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
       }
 
-      // Update Active Menu Class
       document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
       if (element) element.classList.add('active');
 
-      // Auto Hide Sidebar after selecting option
       if (window.innerWidth <= 768 || document.getElementById('sidebar').classList.contains('hidden') === false) {
         toggleSidebar();
       }
     }
 
-    // Fetch existing Parties on load
+    // Load data from Google Sheet on startup
     window.onload = function() {
+      fetchDashboardData();
+    };
+
+    function fetchDashboardData() {
       fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
-          if (data && data.parties) {
-            partyData = data.parties;
-            populatePartyDropdown();
+          if (data) {
+            if (data.parties) {
+              partyData = data.parties;
+              populatePartyDropdown();
+            }
+            if (data.entries) {
+              updateDashboardUI(data.entries);
+            }
           }
         })
-        .catch(err => console.log("Error loading parties:", err));
-    };
+        .catch(err => console.log("Error loading data:", err));
+    }
+
+    function updateDashboardUI(entries) {
+      let totalSales = 0;
+      let totalQty = 0;
+      let pendingAmount = 0;
+      let tableHtml = "";
+
+      if (entries.length === 0) {
+        tableHtml = '<tr><td colspan="7" style="text-align: center; color: #64748b;">No entries found in sheet.</td></tr>';
+      } else {
+        // Reverse loop to show latest entries on top
+        for (let i = entries.length - 1; i >= 0; i--) {
+          let e = entries[i];
+          let amt = parseFloat(e.totalAmount) || 0;
+          let qty = parseFloat(e.quantity) || 0;
+          
+          totalSales += amt;
+          totalQty += qty;
+          if (e.paymentStatus === "Pending") {
+            pendingAmount += amt;
+          }
+
+          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+
+          tableHtml += `<tr>
+            <td>${formattedDate}</td>
+            <td>${e.shift || ''}</td>
+            <td><b>${e.partyName || ''}</b></td>
+            <td>${e.milkType || ''}</td>
+            <td>${qty.toFixed(2)} L</td>
+            <td>₹ ${amt.toFixed(2)}</td>
+            <td><span class="badge ${e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
+          </tr>`;
+        }
+      }
+
+      document.getElementById('dashTotalSales').innerText = "₹ " + totalSales.toFixed(2);
+      document.getElementById('dashTotalQty').innerText = totalQty.toFixed(2) + " Liters";
+      document.getElementById('dashPendingAmount').innerText = "₹ " + pendingAmount.toFixed(2);
+      document.getElementById('liveEntriesTable').innerHTML = tableHtml;
+    }
 
     function populatePartyDropdown() {
       const partySelect = document.getElementById('partySelect');
@@ -346,11 +426,10 @@
       }
     }
 
-    // Calculations
     function calculateRateAndAmount() {
       const qty = parseFloat(document.getElementById('quantity').value) || 0;
       const fat = parseFloat(document.getElementById('fat').value) || 0;
-      const fatRate = parseFloat(document.getElementById('fatRate').value) || 0;
+      const fatRate = parseFloat(document.getElementById('fatRate'].value) || 0;
 
       const ratePerLiter = fat * fatRate;
       const totalAmount = qty * ratePerLiter;
@@ -359,7 +438,6 @@
       document.getElementById('totalAmount').value = totalAmount.toFixed(2);
     }
 
-    // Submit Form Data to Google Sheet
     document.getElementById('bulkMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -395,11 +473,14 @@
       .then(res => res.json())
       .then(res => {
         alert("Entry successfully Google Sheet me save ho gayi!");
-        partyData[partyName] = payload.mobileNumber;
-        populatePartyDropdown();
         document.getElementById('bulkMilkForm').reset();
         document.getElementById('entryDate').valueAsDate = new Date();
         document.getElementById('newPartyGroup').style.display = "none";
+        
+        // Refresh Dashboard Data instantly
+        fetchDashboardData();
+        // Switch back to dashboard to see live entry
+        switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
       })
       .catch(err => {
         alert("Error: " + err);

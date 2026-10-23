@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiwari & Sons Dairy Farm</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { margin: 0; display: flex; height: 100vh; background-color: #f4f6f9; }
+    
+    /* Sidebar */
+    .sidebar { width: 250px; background: #1e293b; color: #fff; padding: 20px 0; display: flex; flex-direction: column; }
+    .sidebar h2 { text-align: center; font-size: 18px; margin-bottom: 30px; color: #38bdf8; padding: 0 10px; }
+    .menu-btn { background: transparent; border: none; color: #cbd5e1; padding: 15px 25px; text-align: left; font-size: 16px; cursor: pointer; width: 100%; transition: 0.3s; }
+    .menu-btn:hover, .menu-btn.active { background: #334155; color: #fff; border-left: 4px solid #38bdf8; }
+
+    /* Main Content */
+    .content { flex: 1; padding: 30px; overflow-y: auto; }
+    .card { background: #fff; border-radius: 8px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 800px; margin: 0 auto; }
+    .card h3 { margin-top: 0; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full-width { grid-column: span 2; }
+    label { font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+    input, select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 15px; }
+    input[readonly] { background-color: #f1f5f9; cursor: not-allowed; }
+
+    .submit-btn { margin-top: 20px; width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .submit-btn:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Menu -->
+  <div class="sidebar">
+    <h2>Tiwari & Sons Dairy Farm</h2>
+    <button class="menu-btn active">Bulk Selling Milk</button>
+  </div>
+
+  <!-- Main Section -->
+  <div class="content">
+    <div class="card">
+      <h3>Bulk Selling Milk Entry</h3>
+      <form id="bulkMilkForm">
+        <div class="form-grid">
+          
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="entryDate" required>
+          </div>
+
+          <div class="form-group">
+            <label>Shift</label>
+            <select id="shift" required>
+              <option value="Morning">Morning</option>
+              <option value="Evening">Evening</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Milk Type</label>
+            <select id="milkType" required>
+              <option value="Cow">Cow</option>
+              <option value="Buffalo">Buffalo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Quantity (Liters)</label>
+            <input type="number" step="0.01" id="quantity" oninput="calculateRateAndAmount()" required>
+          </div>
+
+          <div class="form-group">
+            <label>FAT %</label>
+            <input type="number" step="0.1" id="fat" oninput="calculateRateAndAmount()" required>
+          </div>
+
+          <div class="form-group">
+            <label>Fat Rate (₹)</label>
+            <input type="number" step="0.1" id="fatRate" placeholder="e.g. 7.5" oninput="calculateRateAndAmount()" required>
+          </div>
+
+          <div class="form-group">
+            <label>SNF / CLR</label>
+            <input type="number" step="0.1" id="snfClr" required>
+          </div>
+
+          <div class="form-group">
+            <label>Rate per Liter (Auto)</label>
+            <input type="number" id="ratePerLiter" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Total Amount (Auto)</label>
+            <input type="number" id="totalAmount" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Dairy / Party Name</label>
+            <select id="partySelect" onchange="handlePartyChange()" required>
+              <option value="">-- Select Party --</option>
+              <option value="ADD_NEW">+ Add New Dairy / Party</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="newPartyGroup" style="display:none;">
+            <label>New Dairy Name</label>
+            <input type="text" id="newPartyName" placeholder="Enter New Dairy Name">
+          </div>
+
+          <div class="form-group">
+            <label>Mobile Number (Auto)</label>
+            <input type="tel" id="mobileNumber" placeholder="Mobile Number" required>
+          </div>
+
+          <div class="form-group">
+            <label>Payment Status</label>
+            <select id="paymentStatus" required>
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+            </select>
+          </div>
+
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Entry</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // यहाँ अपना Apps Script Web App URL डालें
+    const SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    let partyData = {};
+
+    // Auto set Today's Date
+    document.getElementById('entryDate').valueAsDate = new Date();
+
+    // Page Load पर Existing Parties Fetch करें
+    window.onload = function() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          if (data.parties) {
+            partyData = data.parties;
+            populatePartyDropdown();
+          }
+        })
+        .catch(err => console.log("Error loading parties:", err));
+    };
+
+    function populatePartyDropdown() {
+      const partySelect = document.getElementById('partySelect');
+      partySelect.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';
+      
+      for (let party in partyData) {
+        let option = document.createElement('option');
+        option.value = party;
+        option.textContent = party;
+        partySelect.appendChild(option);
+      }
+    }
+
+    function handlePartyChange() {
+      const partySelect = document.getElementById('partySelect').value;
+      const newPartyGroup = document.getElementById('newPartyGroup');
+      const mobileInput = document.getElementById('mobileNumber');
+
+      if (partySelect === "ADD_NEW") {
+        newPartyGroup.style.display = "flex";
+        mobileInput.value = "";
+        mobileInput.readOnly = false;
+      } else if (partySelect !== "") {
+        newPartyGroup.style.display = "none";
+        mobileInput.value = partyData[partySelect] || "";
+        mobileInput.readOnly = true;
+      } else {
+        newPartyGroup.style.display = "none";
+        mobileInput.value = "";
+        mobileInput.readOnly = false;
+      }
+    }
+
+    // Calculation Logic
+    function calculateRateAndAmount() {
+      const qty = parseFloat(document.getElementById('quantity').value) || 0;
+      const fat = parseFloat(document.getElementById('fat').value) || 0;
+      const fatRate = parseFloat(document.getElementById('fatRate').value) || 0;
+
+      // Rate per Liter = FAT * Fat Rate
+      const ratePerLiter = fat * fatRate;
+      const totalAmount = qty * ratePerLiter;
+
+      document.getElementById('ratePerLiter').value = ratePerLiter.toFixed(2);
+      document.getElementById('totalAmount').value = totalAmount.toFixed(2);
+    }
+
+    // Submit Form
+    document.getElementById('bulkMilkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      let partyName = document.getElementById('partySelect').value;
+      if (partyName === "ADD_NEW") {
+        partyName = document.getElementById('newPartyName').value.trim();
+        if (!partyName) {
+          alert("कृपया New Dairy Name दर्ज करें");
+          return;
+        }
+      }
+
+      const payload = {
+        action: "addBulkMilk",
+        date: document.getElementById('entryDate').value,
+        shift: document.getElementById('shift').value,
+        milkType: document.getElementById('milkType').value,
+        quantity: document.getElementById('quantity').value,
+        fat: document.getElementById('fat').value,
+        fatRate: document.getElementById('fatRate').value,
+        snfClr: document.getElementById('snfClr').value,
+        ratePerLiter: document.getElementById('ratePerLiter').value,
+        totalAmount: document.getElementById('totalAmount').value,
+        partyName: partyName,
+        mobileNumber: document.getElementById('mobileNumber').value,
+        paymentStatus: document.getElementById('paymentStatus').value
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert("Entry successfully Google Sheet me save ho gayi!");
+        // Save local copy of party for quick update
+        partyData[partyName] = payload.mobileNumber;
+        populatePartyDropdown();
+        document.getElementById('bulkMilkForm').reset();
+        document.getElementById('entryDate').valueAsDate = new Date();
+        document.getElementById('newPartyGroup').style.display = "none";
+      })
+      .catch(err => {
+        alert("Error: " + err);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -55,9 +55,24 @@
     .page-section { display: none; }
     .page-section.active { display: block; }
 
+    /* Card Styling */
     .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; text-align: center; }
-    .card h3 { color: #0f172a; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
-    .dairy-address { font-size: 13px; color: #64748b; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; line-height: 1.4; }
+
+    /* Vibrant Gradient Company Header Banner */
+    .company-banner {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      padding: 25px 20px; border-radius: 12px; color: #fff; margin-bottom: 22px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .company-banner h3 {
+      font-size: 24px; font-weight: 900; margin-bottom: 8px;
+      background: linear-gradient(45deg, #38bdf8, #818cf8, #f43f5e);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+    .dairy-address {
+      font-size: 13px; color: #cbd5e1; line-height: 1.5; font-weight: 500; max-width: 800px; margin: 0 auto;
+    }
 
     /* Gradient Dashboard Cards */
     .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; text-align: left; }
@@ -148,9 +163,11 @@
       <!-- DASHBOARD PAGE -->
       <section id="dashboard" class="page-section active">
         <div class="card">
-          <h3>Tiwari & Sons Dairy Farm</h3>
-          <div class="dairy-address">
-            Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227
+          <div class="company-banner">
+            <h3>Tiwari & Sons Dairy Farm</h3>
+            <div class="dairy-address">
+              Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227
+            </div>
           </div>
 
           <div class="dashboard-cards">
@@ -173,8 +190,10 @@
       <!-- BULK SELLING MILK PAGE -->
       <section id="bulkMilk" class="page-section">
         <div class="card">
-          <h3 style="text-align: left;">Bulk Selling Milk Entry</h3>
-          <div class="dairy-address" style="text-align: left;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          <div class="company-banner" style="text-align: left;">
+            <h3>Bulk Selling Milk Entry</h3>
+            <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          </div>
           
           <form id="bulkMilkForm">
             <div class="form-grid">
@@ -265,8 +284,10 @@
       <!-- BULK DAIRY LEDGER STATEMENT PAGE -->
       <section id="bulkLedger" class="page-section">
         <div class="card" id="printableLedgerCard">
-          <h3 style="text-align: left;">Bulk Dairy Ledger Statement</h3>
-          <div class="dairy-address" style="text-align: left;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          <div class="company-banner" style="text-align: left;">
+            <h3>Bulk Dairy Ledger Statement</h3>
+            <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          </div>
           
           <div class="form-grid" style="margin-bottom: 20px;">
             <div class="form-group">
@@ -322,7 +343,8 @@
   </main>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx48iu0T_atUTNHUC6SU-6BQMNO3CZ1UYdKODdKJVGZ/exec";
+    // Aapka New Exec URL:
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXQmng0qdf1PhQ5UJBzzxOYYMdaloK4Ay4fjJHj_5tBHnGzWnkzCJME-hPWR3JjlMPgw/exec";
 
     let partyData = {};
     let allEntriesGlobal = [];
@@ -372,7 +394,6 @@
     };
 
     function fetchDashboardData() {
-      // Set spinners inside boxes while loading
       document.getElementById('dashTotalSales').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashTotalQty').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashPendingAmount').innerHTML = '<span class="mini-spinner"></span>';

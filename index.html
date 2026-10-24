@@ -298,13 +298,15 @@
           </div>
 
           <div id="ledgerContent" style="display: none;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; text-align: left;">
+            <!-- Sequence Fixed: Party Name, Mobile and Total Pending Amount in proper layout -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; text-align: left;">
               <div>
                 <p><strong>Party Name:</strong> <span id="lblPartyName">-</span></p>
                 <p><strong>Mobile:</strong> <span id="lblPartyMobile">-</span></p>
               </div>
-              <div>
-                <p><strong>Total Pending Amount:</strong> <span id="lblPendingAmount" style="color: #b45309; font-weight: bold;">₹ 0.00</span></p>
+              <div style="text-align: right;">
+                <p style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold;">Total Pending Amount</p>
+                <p id="lblPendingAmount" style="color: #b45309; font-weight: 900; font-size: 20px;">₹ 0.00</p>
               </div>
             </div>
 
@@ -438,15 +440,18 @@
             totalSales += amt;
             totalQty += qty;
           }
+          // Pending calculation considers pending sales minus deposits
           if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
             pendingAmount += amt;
+          } else if (e.shift === "Payment") {
+            pendingAmount += amt; // amt is negative for deposit, so it reduces pending
           }
         }
       }
 
       document.getElementById('dashTotalSales').innerText = "₹ " + totalSales.toFixed(2);
       document.getElementById('dashTotalQty').innerText = totalQty.toFixed(2) + " Liters";
-      document.getElementById('dashPendingAmount').innerText = "₹ " + pendingAmount.toFixed(2);
+      document.getElementById('dashPendingAmount').innerText = "₹ " + (pendingAmount < 0 ? 0 : pendingAmount).toFixed(2);
     }
 
     function populatePartyDropdown() {
@@ -499,6 +504,7 @@
       if (partyEntries.length === 0) {
         tableHtml = '<tr><td colspan="5" style="text-align: center; color: #64748b;">No entries found for this party.</td></tr>';
       } else {
+        // Show oldest to newest or newest to oldest as required
         for (let i = partyEntries.length - 1; i >= 0; i--) {
           let e = partyEntries[i];
           let amt = parseFloat(e.totalAmount) || 0;
@@ -506,6 +512,8 @@
 
           if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
             pendingTotal += amt;
+          } else if (e.shift === "Payment") {
+            pendingTotal += amt; // Negative amount reduces pending total
           }
 
           let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
@@ -520,7 +528,7 @@
         }
       }
 
-      document.getElementById('lblPendingAmount').innerText = "₹ " + pendingTotal.toFixed(2);
+      document.getElementById('lblPendingAmount').innerText = "₹ " + (pendingTotal < 0 ? 0 : pendingTotal).toFixed(2);
       document.getElementById('ledgerTableBody').innerHTML = tableHtml;
     }
 
@@ -537,7 +545,7 @@
       document.body.innerHTML = printContents;
       window.print();
       document.body.innerHTML = originalContents;
-      location.reload(); // Reload to restore event listeners
+      location.reload();
     }
 
     function submitDeposit() {

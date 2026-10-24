@@ -48,8 +48,10 @@
     .dash-card.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
     .dash-card.green { background: linear-gradient(135deg, #10b981, #047857); }
     .dash-card.amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
+    .dash-card.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+    .dash-card.teal { background: linear-gradient(135deg, #06b6d4, #0e7490); }
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 700; }
-    .dash-card p { font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .dash-card p { font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
     .mini-spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 22px; height: 22px; animation: spin 0.8s linear infinite; display: inline-block; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -79,7 +81,6 @@
     .action-btn { padding: 8px 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; margin-top: 10px; }
     .action-btn:hover { background: #059669; }
 
-    /* PROFESSIONAL PRINT / PDF STYLING */
     @media print {
       body * { visibility: hidden; }
       .page-section.active .card.printable-card, 
@@ -106,15 +107,14 @@
     </div>
     
     <ul class="sidebar-menu">
-      <li class="menu-item">
-        <button class="menu-btn active" onclick="switchPage('dashboard', this)">📊 Dashboard</button>
-      </li>
+      <li class="menu-item"><button class="menu-btn active" onclick="switchPage('dashboard', this)">📊 Dashboard</button></li>
       
       <li class="menu-item">
         <button class="menu-btn" onclick="toggleDropdown(event, 'billingDropdown')">📄 Billing Invoice <span>▼</span></button>
         <div class="dropdown-container" id="billingDropdown">
           <button class="menu-btn" onclick="switchPage('bulkMilk', this)">🥛 Bulk Selling Milk</button>
           <button class="menu-btn" onclick="switchPage('retailMilk', this)">🥛 Retail Milk Sales</button>
+          <button class="menu-btn" onclick="switchPage('cattleMgmt', this)">🐂 Cattle Purchase & Sell</button>
         </div>
       </li>
 
@@ -123,6 +123,7 @@
         <div class="dropdown-container" id="ledgerDropdown">
           <button class="menu-btn" onclick="switchPage('bulkLedger', this)">📋 Bulk Dairy Ledger</button>
           <button class="menu-btn" onclick="switchPage('retailLedger', this)">📋 Retail Milk Statement</button>
+          <button class="menu-btn" onclick="switchPage('cattleLedger', this)">📋 Cattle Ledger</button>
         </div>
       </li>
     </ul>
@@ -152,12 +153,20 @@
               <p id="dashTotalSales"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card green">
-              <h4>Total Milk Production (Bulk + Retail)</h4>
+              <h4>Total Milk Production</h4>
               <p id="dashTotalQty"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card amber">
               <h4>Pending Payments</h4>
               <p id="dashPendingAmount"><span class="mini-spinner"></span></p>
+            </div>
+            <div class="dash-card purple">
+              <h4>Cattle Investment</h4>
+              <p id="dashCattleInvestment"><span class="mini-spinner"></span></p>
+            </div>
+            <div class="dash-card teal" style="grid-column: span auto;">
+              <h4>Live Cattle Count</h4>
+              <p id="dashCattleCount" style="font-size: 16px; font-weight: 600; line-height: 1.4;"><span class="mini-spinner"></span></p>
             </div>
           </div>
         </div>
@@ -228,6 +237,63 @@
               </div>
             </div>
             <button type="submit" class="submit-btn" id="retailSubmitBtn">Submit Retail Entry</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- CATTLE PURCHASE & SELL MANAGEMENT PAGE -->
+      <section id="cattleMgmt" class="page-section">
+        <div class="card">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Cattle Purchase & Sell Management</h3>
+            <div class="dairy-address" style="margin: 0;">Record cattle buying and selling details with tag number and pricing.</div>
+          </div>
+
+          <form id="cattleForm">
+            <div class="form-grid">
+              <div class="form-group"><label>Date:</label><input type="date" id="cattleDate" required></div>
+              <div class="form-group">
+                <label>Transaction Type:</label>
+                <select id="cattleTxType" required>
+                  <option value="Purchase">Purchase</option>
+                  <option value="Sell">Sell</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Cattle Breed / Category:</label>
+                <select id="cattleCategory" required>
+                  <option value="Milking Cow">Milking Cow</option>
+                  <option value="Milking Buffalo">Milking Buffalo</option>
+                  <option value="Heifer">Heifer</option>
+                  <option value="Calf">Calf</option>
+                  <option value="Bull">Bull</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Tag Number / Identification:</label><input type="text" id="cattleTag" placeholder="e.g. TAG-405" required></div>
+              <div class="form-group">
+                <label>Party Name (Dealer/Farmer):</label>
+                <select id="cattlePartySelect" onchange="handleCattlePartyChange()" required>
+                  <option value="">Select Party</option>
+                  <option value="ADD_NEW">+ Add New Party</option>
+                </select>
+              </div>
+              <div class="form-group" id="newCattlePartyGroup" style="display:none;"><label>New Party Name</label><input type="text" id="newCattlePartyName" placeholder="Enter Party Name"></div>
+              <div class="form-group"><label>Party Mobile Number:</label><input type="tel" id="cattleMobile" placeholder="Enter Mobile Number" required></div>
+              <div class="form-group"><label>Amount (₹):</label><input type="number" id="cattleAmount" placeholder="e.g. 65000" required></div>
+              <div class="form-group">
+                <label>Payment Status:</label>
+                <select id="cattleStatus" required>
+                  <option value="Paid">Paid</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Cattle Date Of Birth (Optional):</label><input type="date" id="cattleDob" onchange="calculateCattleAge()"></div>
+              <div class="form-group"><label>Age (Auto calculated):</label><input type="text" id="cattleAge" readonly placeholder="Auto Years, Months & Days"></div>
+              <div class="form-group"><label>Calving Count (Kitni baar jan chuki hai):</label><input type="number" id="cattleCalving" placeholder="e.g. 2" value="0"></div>
+              <div class="form-group"><label>Pregnancy Date (Yadi pregnant hai):</label><input type="date" id="cattlePregDate" onchange="calculatePregnancyDuration()"></div>
+              <div class="form-group"><label>Pregnancy Duration (Auto calculated):</label><input type="text" id="cattlePregDuration" readonly placeholder="Auto Months & Days"></div>
+            </div>
+            <button type="submit" class="submit-btn" id="cattleSubmitBtn" style="background: linear-gradient(135deg, #ea580c, #c2410c);">💾 Save Cattle Record</button>
           </form>
         </div>
       </section>
@@ -328,6 +394,44 @@
         </div>
       </section>
 
+      <!-- CATTLE LEDGER STATEMENT PAGE -->
+      <section id="cattleLedger" class="page-section">
+        <div class="card printable-card">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Cattle Ledger & Statement</h3>
+            <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          </div>
+          
+          <div class="form-grid no-print" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>Select View / Party</label>
+              <select id="cattleLedgerSelect" onchange="loadCattleLedger()">
+                <option value="ALL">📊 All Cattle Statement (Full Record)</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
+            </div>
+          </div>
+
+          <div id="cattleLedgerContent" style="display: block;">
+            <div class="party-info-box">
+              <div class="party-info-item"><span class="title">Selected View</span><span class="value" id="lblCattlePartyName">All Cattle Records</span></div>
+              <div class="party-info-item"><span class="title">Total Records</span><span class="value" id="lblCattleTotalRecords">0</span></div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr><th>Date</th><th>Type</th><th>Category</th><th>Tag No.</th><th>Party</th><th>Amount (₹)</th><th>Status</th></tr>
+                </thead>
+                <tbody id="cattleLedgerTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -336,13 +440,16 @@
 
     let partyData = {};
     let retailCustomerData = {};
+    let cattlePartyData = {};
     let allEntriesGlobal = [];
     let allRetailEntriesGlobal = [];
+    let allCattleEntriesGlobal = [];
 
     document.getElementById('entryDate').valueAsDate = new Date();
     document.getElementById('depositDate').valueAsDate = new Date();
     document.getElementById('retailEntryDate').valueAsDate = new Date();
     document.getElementById('retailDepositDate').valueAsDate = new Date();
+    document.getElementById('cattleDate').valueAsDate = new Date();
 
     function openSidebar() { document.getElementById('sidebar').classList.remove('hidden'); document.getElementById('overlay').classList.add('active'); }
     function closeSidebar() { document.getElementById('sidebar').classList.add('hidden'); document.getElementById('overlay').classList.remove('active'); }
@@ -355,8 +462,10 @@
       if (pageId === 'dashboard') document.getElementById('pageTitle').innerText = "Dashboard";
       else if (pageId === 'bulkMilk') document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
       else if (pageId === 'retailMilk') document.getElementById('pageTitle').innerText = "Retail Milk Sales";
+      else if (pageId === 'cattleMgmt') document.getElementById('pageTitle').innerText = "Cattle Purchase & Sell Management";
       else if (pageId === 'bulkLedger') { document.getElementById('pageTitle').innerText = "Bulk Dairy Ledger Statement"; populateLedgerPartyDropdown(); }
       else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
+      else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
 
       document.querySelectorAll('.sidebar-menu .menu-btn').forEach(btn => btn.classList.remove('active'));
       if (element) element.classList.add('active');
@@ -365,10 +474,47 @@
 
     window.onload = function() { fetchDashboardData(); };
 
+    function calculateCattleAge() {
+      const dobVal = document.getElementById('cattleDob').value;
+      if (!dobVal) { document.getElementById('cattleAge').value = ""; return; }
+      const dob = new Date(dobVal);
+      const today = new Date();
+      let years = today.getFullYear() - dob.getFullYear();
+      let months = today.getMonth() - dob.getMonth();
+      let days = today.getDate() - dob.getDate();
+      if (days < 0) {
+        months--;
+        let prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+      if (months < 0) { years--; months += 12; }
+      document.getElementById('cattleAge').value = `${years} Yrs, ${months} Mos, ${days} Days`;
+    }
+
+    function calculatePregnancyDuration() {
+      const pregVal = document.getElementById('cattlePregDate').value;
+      if (!pregVal) { document.getElementById('cattlePregDuration').value = ""; return; }
+      const pregDate = new Date(pregVal);
+      const today = new Date();
+      let years = today.getFullYear() - pregDate.getFullYear();
+      let months = today.getMonth() - pregDate.getMonth();
+      let days = today.getDate() - pregDate.getDate();
+      if (days < 0) {
+        months--;
+        let prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+      if (months < 0) { years--; months += 12; }
+      let totalMonths = (years * 12) + months;
+      document.getElementById('cattlePregDuration').value = `${totalMonths} Months, ${days} Days`;
+    }
+
     function fetchDashboardData() {
       document.getElementById('dashTotalSales').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashTotalQty').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashPendingAmount').innerHTML = '<span class="mini-spinner"></span>';
+      document.getElementById('dashCattleInvestment').innerHTML = '<span class="mini-spinner"></span>';
+      document.getElementById('dashCattleCount').innerHTML = '<span class="mini-spinner"></span>';
 
       fetch(SCRIPT_URL)
         .then(res => res.json())
@@ -376,49 +522,55 @@
           if (data) {
             if (data.parties) { partyData = data.parties; populatePartyDropdown(); }
             if (data.retailCustomers) { retailCustomerData = data.retailCustomers; populateRetailCustomerDropdown(); }
+            if (data.cattleParties) { cattlePartyData = data.cattleParties; populateCattlePartyDropdown(); }
             if (data.entries) allEntriesGlobal = data.entries;
             if (data.retailEntries) allRetailEntriesGlobal = data.retailEntries;
+            if (data.cattleEntries) allCattleEntriesGlobal = data.cattleEntries;
             
-            updateDashboardUI(allEntriesGlobal, allRetailEntriesGlobal);
+            updateDashboardUI(allEntriesGlobal, allRetailEntriesGlobal, allCattleEntriesGlobal);
           }
         })
         .catch(err => {
           document.getElementById('dashTotalSales').innerText = "₹ 0.00";
           document.getElementById('dashTotalQty').innerText = "0 Liters";
           document.getElementById('dashPendingAmount').innerText = "₹ 0.00";
+          document.getElementById('dashCattleInvestment').innerText = "₹ 0.00";
+          document.getElementById('dashCattleCount').innerText = "No Cattles";
         });
     }
 
-    function updateDashboardUI(bulkEntries, retailEntries) {
-      let totalSales = 0;
-      let totalQty = 0;
-      let totalPending = 0;
-      let totalDeposited = 0;
+    function updateDashboardUI(bulkEntries, retailEntries, cattleEntries) {
+      let totalSales = 0, totalQty = 0, totalPending = 0, totalDeposited = 0;
+      let cattleInvestment = 0;
+      let cattleCounts = { "Milking Cow": 0, "Milking Buffalo": 0, "Heifer": 0, "Calf": 0, "Bull": 0 };
 
-      if (bulkEntries && bulkEntries.length > 0) {
+      if (bulkEntries) {
         bulkEntries.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
-          if (!e.shift || e.shift !== "Payment") {
-            totalSales += amt;
-            totalQty += qty;
-            if (e.paymentStatus && e.paymentStatus.includes("Pending")) totalPending += amt;
-          } else {
-            totalDeposited += amt;
-          }
+          if (!e.shift || e.shift !== "Payment") { totalSales += amt; totalQty += qty; if (e.paymentStatus && e.paymentStatus.includes("Pending")) totalPending += amt; }
+          else totalDeposited += amt;
         });
       }
 
-      if (retailEntries && retailEntries.length > 0) {
+      if (retailEntries) {
         retailEntries.forEach(r => {
           let amt = parseFloat(r.totalAmount) || 0;
           let qty = parseFloat(r.quantity) || 0;
-          if (r.amountStatus !== "Deposit") {
-            totalSales += amt;
-            totalQty += qty;
-            if (r.amountStatus && r.amountStatus.includes("Pending")) totalPending += amt;
-          } else {
-            totalDeposited += amt;
+          if (r.amountStatus !== "Deposit") { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus.includes("Pending")) totalPending += amt; }
+          else totalDeposited += amt;
+        });
+      }
+
+      if (cattleEntries) {
+        cattleEntries.forEach(c => {
+          let amt = parseFloat(c.amount) || 0;
+          if (c.transactionType === "Purchase") {
+            cattleInvestment += amt;
+            if (cattleCounts[c.category] !== undefined) cattleCounts[c.category]++;
+          } else if (c.transactionType === "Sell") {
+            cattleInvestment -= amt;
+            if (cattleCounts[c.category] !== undefined && cattleCounts[c.category] > 0) cattleCounts[c.category]--;
           }
         });
       }
@@ -429,67 +581,129 @@
       document.getElementById('dashTotalSales').innerText = "₹ " + totalSales.toFixed(2);
       document.getElementById('dashTotalQty').innerText = totalQty.toFixed(2) + " Liters";
       document.getElementById('dashPendingAmount').innerText = "₹ " + netPending.toFixed(2);
+      document.getElementById('dashCattleInvestment').innerText = "₹ " + cattleInvestment.toFixed(2);
+
+      let countStr = "";
+      for (let cat in cattleCounts) {
+        if (cattleCounts[cat] > 0) countStr += `${cat}: ${cattleCounts[cat]} | `;
+      }
+      document.getElementById('dashCattleCount').innerText = countStr ? countStr.slice(0, -3) : "No live cattles available";
     }
 
     function populatePartyDropdown() {
-      const partySelect = document.getElementById('partySelect');
-      partySelect.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';
-      for (let party in partyData) {
-        let option = document.createElement('option');
-        option.value = party; option.textContent = party;
-        partySelect.appendChild(option);
-      }
+      const p = document.getElementById('partySelect');
+      p.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';
+      for (let k in partyData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
     }
-
     function populateRetailCustomerDropdown() {
-      const custSelect = document.getElementById('retailCustomerSelect');
-      custSelect.innerHTML = '<option value="">-- Select Customer --</option><option value="ADD_NEW">+ Add New Member / Customer</option>';
-      for (let c in retailCustomerData) {
-        let option = document.createElement('option');
-        option.value = c; option.textContent = c;
-        custSelect.appendChild(option);
-      }
+      const p = document.getElementById('retailCustomerSelect');
+      p.innerHTML = '<option value="">-- Select Customer --</option><option value="ADD_NEW">+ Add New Member / Customer</option>';
+      for (let k in retailCustomerData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
     }
-
+    function populateCattlePartyDropdown() {
+      const p = document.getElementById('cattlePartySelect');
+      p.innerHTML = '<option value="">Select Party</option><option value="ADD_NEW">+ Add New Party</option>';
+      for (let k in cattlePartyData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
+    }
     function populateLedgerPartyDropdown() {
-      const ledgerSelect = document.getElementById('ledgerPartySelect');
-      ledgerSelect.innerHTML = '<option value="">-- Select Party --</option>';
-      for (let party in partyData) {
-        let option = document.createElement('option');
-        option.value = party; option.textContent = party;
-        ledgerSelect.appendChild(option);
-      }
+      const p = document.getElementById('ledgerPartySelect');
+      p.innerHTML = '<option value="">-- Select Party --</option>';
+      for (let k in partyData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
+    }
+    function populateRetailLedgerCustomerDropdown() {
+      const p = document.getElementById('ledgerRetailCustomerSelect');
+      p.innerHTML = '<option value="">-- Select Customer --</option>';
+      for (let k in retailCustomerData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
+    }
+    function populateCattleLedgerDropdown() {
+      const p = document.getElementById('cattleLedgerSelect');
+      p.innerHTML = '<option value="ALL">📊 All Cattle Statement (Full Record)</option>';
+      for (let k in cattlePartyData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
     }
 
-    function populateRetailLedgerCustomerDropdown() {
-      const ledgerSelect = document.getElementById('ledgerRetailCustomerSelect');
-      ledgerSelect.innerHTML = '<option value="">-- Select Customer --</option>';
-      for (let c in retailCustomerData) {
-        let option = document.createElement('option');
-        option.value = c; option.textContent = c;
-        ledgerSelect.appendChild(option);
-      }
+    function handleCattlePartyChange() {
+      const sel = document.getElementById('cattlePartySelect').value;
+      const grp = document.getElementById('newCattlePartyGroup');
+      const mob = document.getElementById('cattleMobile');
+      if (sel === "ADD_NEW") { grp.style.display = "flex"; mob.value = ""; mob.readOnly = false; }
+      else if (sel !== "") { grp.style.display = "none"; mob.value = cattlePartyData[sel] || ""; mob.readOnly = true; }
+      else { grp.style.display = "none"; mob.value = ""; mob.readOnly = false; }
     }
+
+    function loadCattleLedger() {
+      const sel = document.getElementById('cattleLedgerSelect').value;
+      let entries = allCattleEntriesGlobal;
+      if (sel !== "ALL") {
+        entries = entries.filter(c => c.partyName === sel);
+        document.getElementById('lblCattlePartyName').innerText = sel;
+      } else {
+        document.getElementById('lblCattlePartyName').innerText = "All Cattle Records";
+      }
+
+      document.getElementById('lblCattleTotalRecords').innerText = entries.length;
+      let html = "";
+      if (entries.length === 0) html = '<tr><td colspan="7" style="text-align: center;">No records found.</td></tr>';
+      else {
+        for (let i = entries.length - 1; i >= 0; i--) {
+          let c = entries[i];
+          let formattedDate = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
+          html += `<tr><td>${formattedDate}</td><td>${c.transactionType}</td><td>${c.category}</td><td>${c.tagNumber}</td><td>${c.partyName}</td><td>₹ ${parseFloat(c.amount || 0).toFixed(2)}</td><td><span class="badge ${c.status === 'Paid' ? 'paid' : 'pending'}">${c.status}</span></td></tr>`;
+        }
+      }
+      document.getElementById('cattleLedgerTableBody').innerHTML = html;
+    }
+
+    document.getElementById('cattleForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let partyName = document.getElementById('cattlePartySelect').value;
+      if (partyName === "ADD_NEW") {
+        partyName = document.getElementById('newCattlePartyName').value.trim();
+        if (!partyName) { alert("Kripya Party Name darj karein"); return; }
+      }
+
+      const btn = document.getElementById('cattleSubmitBtn');
+      btn.innerText = "Saving Record..."; btn.disabled = true;
+
+      const payload = {
+        action: "addCattleRecord",
+        date: document.getElementById('cattleDate').value,
+        transactionType: document.getElementById('cattleTxType').value,
+        category: document.getElementById('cattleCategory').value,
+        tagNumber: document.getElementById('cattleTag').value,
+        partyName: partyName,
+        mobile: document.getElementById('cattleMobile').value,
+        amount: document.getElementById('cattleAmount').value,
+        status: document.getElementById('cattleStatus').value,
+        dob: document.getElementById('cattleDob').value,
+        age: document.getElementById('cattleAge').value,
+        calvingCount: document.getElementById('cattleCalving').value,
+        pregnancyDate: document.getElementById('cattlePregDate').value
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "💾 Save Cattle Record"; btn.disabled = false;
+        if(res.result === "success") {
+          alert("Cattle Record successfully save ho gaya!");
+          cattlePartyData[partyName] = payload.mobile;
+          populateCattlePartyDropdown();
+          document.getElementById('cattleForm').reset();
+          document.getElementById('cattleDate').valueAsDate = new Date();
+          document.getElementById('newCattlePartyGroup').style.display = "none";
+          fetchDashboardData();
+          switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        }
+      });
+    });
 
     function handleRetailCustomerChange() {
       const selected = document.getElementById('retailCustomerSelect').value;
       const group = document.getElementById('newRetailCustomerGroup');
       const mob = document.getElementById('retailMobileNumber');
       const addr = document.getElementById('retailAddress');
-
-      if (selected === "ADD_NEW") {
-        group.style.display = "flex";
-        mob.value = ""; mob.readOnly = false;
-        addr.value = ""; addr.readOnly = false;
-      } else if (selected !== "") {
-        group.style.display = "none";
-        mob.value = retailCustomerData[selected]?.mobile || ""; mob.readOnly = true;
-        addr.value = retailCustomerData[selected]?.address || ""; addr.readOnly = true;
-      } else {
-        group.style.display = "none";
-        mob.value = ""; mob.readOnly = false;
-        addr.value = ""; addr.readOnly = false;
-      }
+      if (selected === "ADD_NEW") { group.style.display = "flex"; mob.value = ""; mob.readOnly = false; addr.value = ""; addr.readOnly = false; }
+      else if (selected !== "") { group.style.display = "none"; mob.value = retailCustomerData[selected]?.mobile || ""; mob.readOnly = true; addr.value = retailCustomerData[selected]?.address || ""; addr.readOnly = true; }
+      else { group.style.display = "none"; mob.value = ""; mob.readOnly = false; addr.value = ""; addr.readOnly = false; }
     }
 
     function calculateRetailTotal() {
@@ -502,24 +716,19 @@
       const selectedParty = document.getElementById('ledgerPartySelect').value;
       const ledgerContent = document.getElementById('ledgerContent');
       if (!selectedParty) { ledgerContent.style.display = 'none'; return; }
-
       ledgerContent.style.display = 'block';
       document.getElementById('lblPartyName').innerText = selectedParty;
       document.getElementById('lblPartyMobile').innerText = partyData[selectedParty] || '-';
-
       let partyEntries = allEntriesGlobal.filter(e => e.partyName === selectedParty);
       let milkPending = 0, deposits = 0, tableHtml = "";
-
       if (partyEntries.length === 0) tableHtml = '<tr><td colspan="5" style="text-align: center;">No entries found.</td></tr>';
       else {
         for (let i = partyEntries.length - 1; i >= 0; i--) {
           let e = partyEntries[i];
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
-
           if (e.shift === "Payment") deposits += amt;
           else if (e.paymentStatus && e.paymentStatus.includes("Pending")) milkPending += amt;
-
           tableHtml += `<tr><td>${e.date ? new Date(e.date).toLocaleDateString('en-GB') : ''}</td><td>${e.shift || ''} (${e.milkType || ''})</td><td>${qty.toFixed(2)} L</td><td>₹ ${amt.toFixed(2)}</td><td><span class="badge ${e.shift === 'Payment' || e.paymentStatus.includes('Paid') ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td></tr>`;
         }
       }
@@ -532,24 +741,19 @@
       const selectedCust = document.getElementById('ledgerRetailCustomerSelect').value;
       const content = document.getElementById('retailLedgerContent');
       if (!selectedCust) { content.style.display = 'none'; return; }
-
       content.style.display = 'block';
       document.getElementById('lblRetailCustomerName').innerText = selectedCust;
       document.getElementById('lblRetailCustomerMobile').innerText = retailCustomerData[selectedCust]?.mobile || '-';
-
       let cEntries = allRetailEntriesGlobal.filter(r => r.customerName === selectedCust);
       let pending = 0, deposits = 0, tableHtml = "";
-
       if (cEntries.length === 0) tableHtml = '<tr><td colspan="5" style="text-align: center;">No entries found.</td></tr>';
       else {
         for (let i = cEntries.length - 1; i >= 0; i--) {
           let r = cEntries[i];
           let amt = parseFloat(r.totalAmount) || 0;
           let qty = parseFloat(r.quantity) || 0;
-
           if (r.amountStatus === "Deposit") deposits += amt;
           else if (r.amountStatus && r.amountStatus.includes("Pending")) pending += amt;
-
           tableHtml += `<tr><td>${r.date ? new Date(r.date).toLocaleDateString('en-GB') : ''}</td><td>${qty > 0 ? qty.toFixed(2) + ' L' : 'Payment'}</td><td>₹ ${parseFloat(r.ratePerLiter || 0).toFixed(2)}</td><td>₹ ${amt.toFixed(2)}</td><td><span class="badge ${r.amountStatus === 'Deposit' || r.amountStatus.includes('Paid') ? 'paid' : 'pending'}">${r.amountStatus || 'Pending'}</span></td></tr>`;
         }
       }
@@ -558,15 +762,24 @@
       document.getElementById('retailLedgerTableBody').innerHTML = tableHtml;
     }
 
+    function submitDeposit() {
+      const selectedParty = document.getElementById('ledgerPartySelect').value;
+      const depositAmt = document.getElementById('depositAmount').value;
+      const depositDate = document.getElementById('depositDate').value;
+      if (!selectedParty || !depositAmt || parseFloat(depositAmt) <= 0 || !depositDate) { alert("Kripya date aur amount sahi se darj karein!"); return; }
+      const payload = { action: "updatePayment", partyName: selectedParty, mobileNumber: partyData[selectedParty] || "", amount: depositAmt, date: depositDate };
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        if(res.result === "success") { alert("Payment deposit ho gaya!"); document.getElementById('depositAmount').value = ""; fetchDashboardData(); setTimeout(() => loadLedgerForParty(), 1000); }
+      });
+    }
+
     function submitRetailDeposit() {
       const cust = document.getElementById('ledgerRetailCustomerSelect').value;
       const amt = document.getElementById('retailDepositAmount').value;
       const date = document.getElementById('retailDepositDate').value;
-
       if (!cust || !amt || parseFloat(amt) <= 0 || !date) { alert("Kripya date aur amount sahi se darj karein!"); return; }
-
       const payload = { action: "updateRetailPayment", customerName: cust, mobileNumber: retailCustomerData[cust]?.mobile || "", amount: amt, date: date };
-
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
       .then(res => res.json()).then(res => {
         if(res.result === "success") { alert("Payment deposit ho gaya!"); document.getElementById('retailDepositAmount').value = ""; fetchDashboardData(); setTimeout(() => loadRetailLedgerForCustomer(), 1000); }
@@ -576,36 +789,20 @@
     document.getElementById('retailMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
       let custName = document.getElementById('retailCustomerSelect').value;
-      if (custName === "ADD_NEW") {
-        custName = document.getElementById('newRetailCustomerName').value.trim();
-        if (!custName) { alert("Kripya New Customer Name darj karein"); return; }
-      }
-
-      const btn = document.getElementById('retailSubmitBtn');
-      btn.innerText = "Submitting..."; btn.disabled = true;
-
+      if (custName === "ADD_NEW") { custName = document.getElementById('newRetailCustomerName').value.trim(); if (!custName) { alert("Customer Name darj karein"); return; } }
+      const btn = document.getElementById('retailSubmitBtn'); btn.innerText = "Submitting..."; btn.disabled = true;
       const payload = {
-        action: "addRetailMilk",
-        date: document.getElementById('retailEntryDate').value,
-        customerName: custName,
-        mobileNumber: document.getElementById('retailMobileNumber').value,
-        address: document.getElementById('retailAddress').value,
-        quantity: document.getElementById('retailQuantity').value,
-        ratePerLiter: document.getElementById('retailRatePerLiter').value,
-        totalAmount: document.getElementById('retailTotalAmount').value,
-        amountStatus: document.getElementById('retailAmountStatus').value
+        action: "addRetailMilk", date: document.getElementById('retailEntryDate').value, customerName: custName,
+        mobileNumber: document.getElementById('retailMobileNumber').value, address: document.getElementById('retailAddress').value,
+        quantity: document.getElementById('retailQuantity').value, ratePerLiter: document.getElementById('retailRatePerLiter').value,
+        totalAmount: document.getElementById('retailTotalAmount').value, amountStatus: document.getElementById('retailAmountStatus').value
       };
-
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
       .then(res => res.json()).then(res => {
         btn.innerText = "Submit Retail Entry"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Retail Milk Entry Google Sheet me save ho gayi!");
-          retailCustomerData[custName] = { mobile: payload.mobileNumber, address: payload.address };
-          populateRetailCustomerDropdown();
-          document.getElementById('retailMilkForm').reset();
-          fetchDashboardData();
-          switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+          alert("Retail Entry save ho gayi!"); retailCustomerData[custName] = { mobile: payload.mobileNumber, address: payload.address };
+          populateRetailCustomerDropdown(); document.getElementById('retailMilkForm').reset(); fetchDashboardData(); switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }
       });
     });
@@ -630,21 +827,18 @@
     document.getElementById('bulkMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
       let partyName = document.getElementById('partySelect').value;
-      if (partyName === "ADD_NEW") { partyName = document.getElementById('newPartyName').value.trim(); if (!partyName) { alert("New Dairy Name darj karein"); return; } }
-
+      if (partyName === "ADD_NEW") { partyName = document.getElementById('newPartyName').value.trim(); if (!partyName) { alert("Dairy Name darj karein"); return; } }
       const btn = document.getElementById('submitBtn'); btn.innerText = "Submitting..."; btn.disabled = true;
-
       const payload = {
         action: "addBulkMilk", date: document.getElementById('entryDate').value, shift: document.getElementById('shift').value, milkType: document.getElementById('milkType').value,
         quantity: document.getElementById('quantity').value, fat: document.getElementById('fat').value, fatRate: document.getElementById('fatRate').value, snfClr: document.getElementById('snfClr').value,
         ratePerLiter: document.getElementById('ratePerLiter').value, totalAmount: document.getElementById('totalAmount').value, partyName: partyName, mobileNumber: document.getElementById('mobileNumber').value, paymentStatus: document.getElementById('paymentStatus').value
       };
-
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
       .then(res => res.json()).then(res => {
         btn.innerText = "Submit Entry to Google Sheet"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Entry Google Sheet me save ho gayi!"); partyData[partyName] = payload.mobileNumber; populatePartyDropdown(); document.getElementById('bulkMilkForm').reset(); fetchDashboardData(); switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+          alert("Entry save ho gayi!"); partyData[partyName] = payload.mobileNumber; populatePartyDropdown(); document.getElementById('bulkMilkForm').reset(); fetchDashboardData(); switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }
       });
     });

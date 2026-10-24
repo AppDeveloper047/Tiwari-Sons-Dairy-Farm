@@ -105,6 +105,22 @@
     .submit-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .action-btn { padding: 8px 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; margin-top: 10px; }
     .action-btn:hover { background: #059669; }
+
+    /* PROFESSIONAL PDF PRINT STYLING */
+    @media print {
+      body * { visibility: hidden; }
+      #printableLedgerCard, #printableLedgerCard * { visibility: visible; }
+      #printableLedgerCard {
+        position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; box-shadow: none; background: #fff;
+      }
+      .no-print, select, button, .form-grid, div[style*="background: #f1f5f9"] {
+        display: none !important;
+      }
+      .company-banner { background: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      table { border: 1px solid #cbd5e1; width: 100%; }
+      th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      td, th { border: 1px solid #cbd5e1; padding: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -149,7 +165,7 @@
   </aside>
 
   <main class="main-wrapper full-width" id="mainWrapper">
-    <header class="top-bar">
+    <header class="top-bar no-print">
       <button class="toggle-btn" onclick="openSidebar()">☰ Menu</button>
       <div class="page-title" id="pageTitle">Dashboard</div>
     </header>
@@ -285,7 +301,7 @@
             <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
           </div>
           
-          <div class="form-grid" style="margin-bottom: 20px;">
+          <div class="form-grid no-print" style="margin-bottom: 20px;">
             <div class="form-group">
               <label>Select Dairy / Party</label>
               <select id="ledgerPartySelect" onchange="loadLedgerForParty()">
@@ -293,12 +309,11 @@
               </select>
             </div>
             <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button type="button" class="action-btn" onclick="downloadPDF()" style="background: #2563eb;">📥 Download Statement PDF</button>
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
             </div>
           </div>
 
           <div id="ledgerContent" style="display: none;">
-            <!-- Sequence Fixed: Party Name, Mobile and Total Pending Amount in proper layout -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; text-align: left;">
               <div>
                 <p><strong>Party Name:</strong> <span id="lblPartyName">-</span></p>
@@ -310,7 +325,7 @@
               </div>
             </div>
 
-            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+            <div class="no-print" style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
               <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
               <div class="form-grid" style="align-items: flex-end;">
                 <div class="form-group">
@@ -440,11 +455,10 @@
             totalSales += amt;
             totalQty += qty;
           }
-          // Pending calculation considers pending sales minus deposits
           if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
             pendingAmount += amt;
           } else if (e.shift === "Payment") {
-            pendingAmount += amt; // amt is negative for deposit, so it reduces pending
+            pendingAmount += amt;
           }
         }
       }
@@ -504,7 +518,6 @@
       if (partyEntries.length === 0) {
         tableHtml = '<tr><td colspan="5" style="text-align: center; color: #64748b;">No entries found for this party.</td></tr>';
       } else {
-        // Show oldest to newest or newest to oldest as required
         for (let i = partyEntries.length - 1; i >= 0; i--) {
           let e = partyEntries[i];
           let amt = parseFloat(e.totalAmount) || 0;
@@ -513,7 +526,7 @@
           if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
             pendingTotal += amt;
           } else if (e.shift === "Payment") {
-            pendingTotal += amt; // Negative amount reduces pending total
+            pendingTotal += amt;
           }
 
           let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
@@ -530,22 +543,6 @@
 
       document.getElementById('lblPendingAmount').innerText = "₹ " + (pendingTotal < 0 ? 0 : pendingTotal).toFixed(2);
       document.getElementById('ledgerTableBody').innerHTML = tableHtml;
-    }
-
-    function downloadPDF() {
-      const selectedParty = document.getElementById('ledgerPartySelect').value;
-      if (!selectedParty) {
-        alert("Kripya pehle Dairy / Party select karein!");
-        return;
-      }
-      
-      const printContents = document.getElementById('printableLedgerCard').innerHTML;
-      const originalContents = document.body.innerHTML;
-
-      document.body.innerHTML = printContents;
-      window.print();
-      document.body.innerHTML = originalContents;
-      location.reload();
     }
 
     function submitDeposit() {

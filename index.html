@@ -8,33 +8,18 @@
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; }
     
-    .overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9;
-    }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9; }
     .overlay.active { display: block; }
 
-    .sidebar { 
-      width: 270px; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: #fff; height: 100vh;
-      position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10;
-      display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.2);
-    }
+    .sidebar { width: 270px; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: #fff; height: 100vh; position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
     .sidebar.hidden { left: -270px; }
-
-    .sidebar-header {
-      padding: 22px; display: flex; justify-content: space-between; align-items: center;
-      background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
+    .sidebar-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
     .sidebar-header h2 { font-size: 17px; background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
     .close-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
 
     .sidebar-menu { list-style: none; padding-top: 15px; }
     .menu-item { width: 100%; }
-    .menu-btn {
-      background: transparent; border: none; color: #cbd5e1; padding: 15px 22px;
-      text-align: left; font-size: 15px; cursor: pointer; width: 100%; display: flex;
-      justify-content: space-between; align-items: center; transition: 0.3s;
-    }
+    .menu-btn { background: transparent; border: none; color: #cbd5e1; padding: 15px 22px; text-align: left; font-size: 15px; cursor: pointer; width: 100%; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
     .menu-btn:hover, .menu-btn.active { background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), transparent); color: #38bdf8; border-left: 4px solid #38bdf8; }
 
     .dropdown-container { display: none; background: rgba(15, 23, 42, 0.8); flex-direction: column; }
@@ -44,10 +29,7 @@
     .main-wrapper { flex: 1; margin-left: 270px; transition: all 0.3s ease; display: flex; flex-direction: column; width: 100%; }
     .main-wrapper.full-width { margin-left: 0; }
 
-    .top-bar {
-      background: rgba(255, 255, 255, 0.95); padding: 15px 25px; display: flex; align-items: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 5;
-    }
+    .top-bar { background: rgba(255, 255, 255, 0.95); padding: 15px 25px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 5; }
     .toggle-btn { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; }
     .page-title { margin-left: 20px; font-size: 20px; font-weight: 800; color: #1e293b; }
 
@@ -57,20 +39,9 @@
 
     .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; text-align: center; }
 
-    .company-banner {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      padding: 25px 20px; border-radius: 12px; color: #fff; margin-bottom: 22px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1);
-    }
-    .company-banner h3 {
-      font-size: 24px; font-weight: 900; margin-bottom: 8px;
-      background: linear-gradient(45deg, #38bdf8, #818cf8, #f43f5e);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      letter-spacing: 0.5px; text-transform: uppercase;
-    }
-    .dairy-address {
-      font-size: 13px; color: #cbd5e1; line-height: 1.5; font-weight: 500; max-width: 800px; margin: 0 auto;
-    }
+    .company-banner { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 25px 20px; border-radius: 12px; color: #fff; margin-bottom: 22px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1); }
+    .company-banner h3 { font-size: 24px; font-weight: 900; margin-bottom: 8px; background: linear-gradient(45deg, #38bdf8, #818cf8, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px; text-transform: uppercase; }
+    .dairy-address { font-size: 13px; color: #cbd5e1; line-height: 1.5; font-weight: 500; max-width: 800px; margin: 0 auto; }
 
     .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; text-align: left; }
     .dash-card { padding: 22px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; min-height: 105px; display: flex; flex-direction: column; justify-content: center; }
@@ -80,11 +51,13 @@
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 700; }
     .dash-card p { font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
-    .mini-spinner {
-      border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%;
-      width: 22px; height: 22px; animation: spin 0.8s linear infinite; display: inline-block;
-    }
+    .mini-spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 22px; height: 22px; animation: spin 0.8s linear infinite; display: inline-block; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .party-info-box { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px; text-align: left; }
+    .party-info-item { display: flex; flex-direction: column; gap: 2px; }
+    .party-info-item span.title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .party-info-item span.value { font-size: 15px; font-weight: 800; color: #0f172a; }
 
     .table-container { margin-top: 25px; overflow-x: auto; text-align: left; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; }
@@ -105,22 +78,6 @@
     .submit-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .action-btn { padding: 8px 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; margin-top: 10px; }
     .action-btn:hover { background: #059669; }
-
-    /* PROFESSIONAL PDF PRINT STYLING */
-    @media print {
-      body * { visibility: hidden; }
-      #printableLedgerCard, #printableLedgerCard * { visibility: visible; }
-      #printableLedgerCard {
-        position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; box-shadow: none; background: #fff;
-      }
-      .no-print, select, button, .form-grid, div[style*="background: #f1f5f9"] {
-        display: none !important;
-      }
-      .company-banner { background: #1e293b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      table { border: 1px solid #cbd5e1; width: 100%; }
-      th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      td, th { border: 1px solid #cbd5e1; padding: 8px; }
-    }
   </style>
 </head>
 <body>
@@ -135,37 +92,31 @@
     
     <ul class="sidebar-menu">
       <li class="menu-item">
-        <button class="menu-btn active" onclick="switchPage('dashboard', this)">
-          📊 Dashboard
-        </button>
+        <button class="menu-btn active" onclick="switchPage('dashboard', this)">📊 Dashboard</button>
       </li>
       
+      <!-- Billing Invoice Menu -->
       <li class="menu-item">
-        <button class="menu-btn" onclick="toggleDropdown(event, 'billingDropdown')">
-          📄 Billing Invoice <span>▼</span>
-        </button>
+        <button class="menu-btn" onclick="toggleDropdown(event, 'billingDropdown')">📄 Billing Invoice <span>▼</span></button>
         <div class="dropdown-container" id="billingDropdown">
-          <button class="menu-btn" onclick="switchPage('bulkMilk', this)">
-            🥛 Bulk Selling Milk
-          </button>
+          <button class="menu-btn" onclick="switchPage('bulkMilk', this)">🥛 Bulk Selling Milk</button>
+          <button class="menu-btn" onclick="switchPage('retailMilk', this)">🥛 Retail Milk Sales</button>
         </div>
       </li>
 
+      <!-- Ledger Statement Menu -->
       <li class="menu-item">
-        <button class="menu-btn" onclick="toggleDropdown(event, 'ledgerDropdown')">
-          📁 Ledger Statement <span>▼</span>
-        </button>
+        <button class="menu-btn" onclick="toggleDropdown(event, 'ledgerDropdown')">📁 Ledger Statement <span>▼</span></button>
         <div class="dropdown-container" id="ledgerDropdown">
-          <button class="menu-btn" onclick="switchPage('bulkLedger', this)">
-            📋 Bulk Dairy Ledger
-          </button>
+          <button class="menu-btn" onclick="switchPage('bulkLedger', this)">📋 Bulk Dairy Ledger</button>
+          <button class="menu-btn" onclick="switchPage('retailLedger', this)">📋 Retail Milk Statement</button>
         </div>
       </li>
     </ul>
   </aside>
 
   <main class="main-wrapper full-width" id="mainWrapper">
-    <header class="top-bar no-print">
+    <header class="top-bar">
       <button class="toggle-btn" onclick="openSidebar()">☰ Menu</button>
       <div class="page-title" id="pageTitle">Dashboard</div>
     </header>
@@ -188,7 +139,7 @@
               <p id="dashTotalSales"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card green">
-              <h4>Total Milk Quantity</h4>
+              <h4>Total Milk Production (Bulk + Retail)</h4>
               <p id="dashTotalQty"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card amber">
@@ -209,91 +160,66 @@
           
           <form id="bulkMilkForm">
             <div class="form-grid">
-              <div class="form-group">
-                <label>Date</label>
-                <input type="date" id="entryDate" required>
-              </div>
-
-              <div class="form-group">
-                <label>Shift</label>
-                <select id="shift" required>
-                  <option value="Morning">Morning</option>
-                  <option value="Evening">Evening</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>Milk Type</label>
-                <select id="milkType" required>
-                  <option value="Cow">Cow</option>
-                  <option value="Buffalo">Buffalo</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>Quantity (Liters)</label>
-                <input type="number" step="0.01" id="quantity" oninput="calculateRateAndAmount()" required>
-              </div>
-
-              <div class="form-group">
-                <label>FAT %</label>
-                <input type="number" step="0.1" id="fat" oninput="calculateRateAndAmount()" required>
-              </div>
-
-              <div class="form-group">
-                <label>Fat Rate (₹)</label>
-                <input type="number" step="0.1" id="fatRate" placeholder="e.g. 7.5" oninput="calculateRateAndAmount()" required>
-              </div>
-
-              <div class="form-group">
-                <label>SNF / CLR</label>
-                <input type="number" step="0.1" id="snfClr" required>
-              </div>
-
-              <div class="form-group">
-                <label>Rate per Liter (Auto)</label>
-                <input type="number" id="ratePerLiter" readonly>
-              </div>
-
-              <div class="form-group">
-                <label>Total Amount (Auto)</label>
-                <input type="number" id="totalAmount" readonly>
-              </div>
-
-              <div class="form-group">
-                <label>Dairy / Party Name</label>
-                <select id="partySelect" onchange="handlePartyChange()" required>
-                  <option value="">-- Select Party --</option>
-                  <option value="ADD_NEW">+ Add New Dairy / Party</option>
-                </select>
-              </div>
-
-              <div class="form-group" id="newPartyGroup" style="display:none;">
-                <label>New Dairy Name</label>
-                <input type="text" id="newPartyName" placeholder="Enter New Dairy Name">
-              </div>
-
-              <div class="form-group">
-                <label>Mobile Number (Auto)</label>
-                <input type="tel" id="mobileNumber" placeholder="Mobile Number" required>
-              </div>
-
-              <div class="form-group">
-                <label>Payment Status</label>
-                <select id="paymentStatus" required>
-                  <option value="Pending">Pending</option>
-                  <option value="Paid">Paid</option>
-                </select>
-              </div>
-
+              <div class="form-group"><label>Date</label><input type="date" id="entryDate" required></div>
+              <div class="form-group"><label>Shift</label><select id="shift" required><option value="Morning">Morning</option><option value="Evening">Evening</option></select></div>
+              <div class="form-group"><label>Milk Type</label><select id="milkType" required><option value="Cow">Cow</option><option value="Buffalo">Buffalo</option></select></div>
+              <div class="form-group"><label>Quantity (Liters)</label><input type="number" step="0.01" id="quantity" oninput="calculateRateAndAmount()" required></div>
+              <div class="form-group"><label>FAT %</label><input type="number" step="0.1" id="fat" oninput="calculateRateAndAmount()" required></div>
+              <div class="form-group"><label>Fat Rate (₹)</label><input type="number" step="0.1" id="fatRate" placeholder="e.g. 7.5" oninput="calculateRateAndAmount()" required></div>
+              <div class="form-group"><label>SNF / CLR</label><input type="number" step="0.1" id="snfClr" required></div>
+              <div class="form-group"><label>Rate per Liter (Auto)</label><input type="number" id="ratePerLiter" readonly></div>
+              <div class="form-group"><label>Total Amount (Auto)</label><input type="number" id="totalAmount" readonly></div>
+              <div class="form-group"><label>Dairy / Party Name</label><select id="partySelect" onchange="handlePartyChange()" required><option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option></select></div>
+              <div class="form-group" id="newPartyGroup" style="display:none;"><label>New Dairy Name</label><input type="text" id="newPartyName" placeholder="Enter New Dairy Name"></div>
+              <div class="form-group"><label>Mobile Number (Auto)</label><input type="tel" id="mobileNumber" placeholder="Mobile Number" required></div>
+              <div class="form-group"><label>Payment Status</label><select id="paymentStatus" required><option value="Pending">Pending</option><option value="Paid">Paid</option></select></div>
             </div>
-
             <button type="submit" class="submit-btn" id="submitBtn">Submit Entry to Google Sheet</button>
           </form>
         </div>
       </section>
 
-      <!-- BULK DAIRY LEDGER STATEMENT PAGE -->
+      <!-- RETAIL MILK SALES PAGE -->
+      <section id="retailMilk" class="page-section">
+        <div class="card">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Retail Milk Sales Entry</h3>
+            <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          </div>
+
+          <form id="retailMilkForm">
+            <div class="form-grid">
+              <div class="form-group"><label>Date</label><input type="date" id="retailEntryDate" required></div>
+              <div class="form-group">
+                <label>Customer Name</label>
+                <select id="retailCustomerSelect" onchange="handleRetailCustomerChange()" required>
+                  <option value="">-- Select Customer --</option>
+                  <option value="ADD_NEW">+ Add New Member / Customer</option>
+                </select>
+              </div>
+              <div class="form-group" id="newRetailCustomerGroup" style="display:none;">
+                <label>New Customer Name</label>
+                <input type="text" id="newRetailCustomerName" placeholder="Enter Customer Name">
+              </div>
+              <div class="form-group"><label>Mobile Number</label><input type="tel" id="retailMobileNumber" placeholder="Mobile Number" required></div>
+              <div class="form-group" style="grid-column: span 2;"><label>Full Address</label><input type="text" id="retailAddress" placeholder="Full Address" required></div>
+              <div class="form-group"><label>Milk In Liters</label><input type="number" step="0.01" id="retailQuantity" oninput="calculateRetailTotal()" required></div>
+              <div class="form-group"><label>Per Liter Rate (₹)</label><input type="number" step="0.1" id="retailRatePerLiter" oninput="calculateRetailTotal()" required></div>
+              <div class="form-group"><label>Total Amount (Auto)</label><input type="number" id="retailTotalAmount" readonly></div>
+              <div class="form-group">
+                <label>Amount Status</label>
+                <select id="retailAmountStatus" required>
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn" id="retailSubmitBtn">Submit Retail Entry</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- BULK DAIRY LEDGER PAGE -->
       <section id="bulkLedger" class="page-section">
         <div class="card" id="printableLedgerCard">
           <div class="company-banner" style="text-align: left;">
@@ -301,7 +227,7 @@
             <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
           </div>
           
-          <div class="form-grid no-print" style="margin-bottom: 20px;">
+          <div class="form-grid" style="margin-bottom: 20px;">
             <div class="form-group">
               <label>Select Dairy / Party</label>
               <select id="ledgerPartySelect" onchange="loadLedgerForParty()">
@@ -309,33 +235,22 @@
               </select>
             </div>
             <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
+              <button type="button" class="action-btn" onclick="downloadPDF('printableLedgerCard')" style="background: #2563eb;">📥 Download Statement PDF</button>
             </div>
           </div>
 
           <div id="ledgerContent" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; text-align: left;">
-              <div>
-                <p><strong>Party Name:</strong> <span id="lblPartyName">-</span></p>
-                <p><strong>Mobile:</strong> <span id="lblPartyMobile">-</span></p>
-              </div>
-              <div style="text-align: right;">
-                <p style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: bold;">Total Pending Amount</p>
-                <p id="lblPendingAmount" style="color: #b45309; font-weight: 900; font-size: 20px;">₹ 0.00</p>
-              </div>
+            <div class="party-info-box">
+              <div class="party-info-item"><span class="title">Party Name</span><span class="value" id="lblPartyName">-</span></div>
+              <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblPartyMobile">-</span></div>
+              <div class="party-info-item"><span class="title">Total Pending Amount</span><span class="value" id="lblPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
             </div>
 
-            <div class="no-print" style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
               <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
               <div class="form-grid" style="align-items: flex-end;">
-                <div class="form-group">
-                  <label>Payment Date</label>
-                  <input type="date" id="depositDate">
-                </div>
-                <div class="form-group">
-                  <label>Amount (₹)</label>
-                  <input type="number" id="depositAmount" placeholder="Enter Amount">
-                </div>
+                <div class="form-group"><label>Payment Date</label><input type="date" id="depositDate"></div>
+                <div class="form-group"><label>Amount (₹)</label><input type="number" id="depositAmount" placeholder="Enter Amount"></div>
               </div>
               <button type="button" class="action-btn" onclick="submitDeposit()" style="margin-top: 12px; width: 100%;">Save Payment</button>
             </div>
@@ -343,19 +258,60 @@
             <div class="table-container">
               <table>
                 <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Shift / Type</th>
-                    <th>Qty (Ltr)</th>
-                    <th>Amount (₹)</th>
-                    <th>Status</th>
-                  </tr>
+                  <tr><th>Date</th><th>Shift / Type</th><th>Qty (Ltr)</th><th>Amount (₹)</th><th>Status</th></tr>
                 </thead>
                 <tbody id="ledgerTableBody"></tbody>
               </table>
             </div>
           </div>
+        </div>
+      </section>
 
+      <!-- RETAIL MILK STATEMENT PAGE -->
+      <section id="retailLedger" class="page-section">
+        <div class="card" id="printableRetailLedgerCard">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Retail Milk Customer Statement</h3>
+            <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          </div>
+          
+          <div class="form-grid" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>Select Customer</label>
+              <select id="ledgerRetailCustomerSelect" onchange="loadRetailLedgerForCustomer()">
+                <option value="">-- Select Customer --</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="button" class="action-btn" onclick="downloadPDF('printableRetailLedgerCard')" style="background: #2563eb;">📥 Download Statement PDF</button>
+            </div>
+          </div>
+
+          <div id="retailLedgerContent" style="display: none;">
+            <div class="party-info-box">
+              <div class="party-info-item"><span class="title">Customer Name</span><span class="value" id="lblRetailCustomerName">-</span></div>
+              <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblRetailCustomerMobile">-</span></div>
+              <div class="party-info-item"><span class="title">Total Pending Amount</span><span class="value" id="lblRetailPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
+            </div>
+
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+              <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
+              <div class="form-grid" style="align-items: flex-end;">
+                <div class="form-group"><label>Payment Date</label><input type="date" id="retailDepositDate"></div>
+                <div class="form-group"><label>Amount (₹)</label><input type="number" id="retailDepositAmount" placeholder="Enter Amount"></div>
+              </div>
+              <button type="button" class="action-btn" onclick="submitRetailDeposit()" style="margin-top: 12px; width: 100%;">Save Payment</button>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr><th>Date</th><th>Qty (Ltr)</th><th>Rate/Ltr (₹)</th><th>Total Amount (₹)</th><th>Status</th></tr>
+                </thead>
+                <tbody id="retailLedgerTableBody"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -366,52 +322,35 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXQmng0qdf1PhQ5UJBzzxOYYMdaloK4Ay4fjJHj_5tBHnGzWnkzCJME-hPWR3JjlMPgw/exec";
 
     let partyData = {};
+    let retailCustomerData = {};
     let allEntriesGlobal = [];
+    let allRetailEntriesGlobal = [];
 
     document.getElementById('entryDate').valueAsDate = new Date();
     document.getElementById('depositDate').valueAsDate = new Date();
+    document.getElementById('retailEntryDate').valueAsDate = new Date();
+    document.getElementById('retailDepositDate').valueAsDate = new Date();
 
-    function openSidebar() {
-      document.getElementById('sidebar').classList.remove('hidden');
-      document.getElementById('overlay').classList.add('active');
-    }
-
-    function closeSidebar() {
-      document.getElementById('sidebar').classList.add('hidden');
-      document.getElementById('overlay').classList.remove('active');
-    }
-
-    function toggleDropdown(event, id) {
-      event.stopPropagation();
-      const dropdown = document.getElementById(id);
-      dropdown.classList.toggle('show');
-    }
+    function openSidebar() { document.getElementById('sidebar').classList.remove('hidden'); document.getElementById('overlay').classList.add('active'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.add('hidden'); document.getElementById('overlay').classList.remove('active'); }
+    function toggleDropdown(event, id) { event.stopPropagation(); document.getElementById(id).classList.toggle('show'); }
 
     function switchPage(pageId, element) {
-      document.querySelectorAll('.page-section').forEach(section => {
-        section.classList.remove('active');
-      });
-
+      document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
 
-      if (pageId === 'dashboard') {
-        document.getElementById('pageTitle').innerText = "Dashboard";
-      } else if (pageId === 'bulkMilk') {
-        document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
-      } else if (pageId === 'bulkLedger') {
-        document.getElementById('pageTitle').innerText = "Bulk Dairy Ledger Statement";
-        populateLedgerPartyDropdown();
-      }
+      if (pageId === 'dashboard') document.getElementById('pageTitle').innerText = "Dashboard";
+      else if (pageId === 'bulkMilk') document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
+      else if (pageId === 'retailMilk') document.getElementById('pageTitle').innerText = "Retail Milk Sales";
+      else if (pageId === 'bulkLedger') { document.getElementById('pageTitle').innerText = "Bulk Dairy Ledger Statement"; populateLedgerPartyDropdown(); }
+      else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
 
       document.querySelectorAll('.sidebar-menu .menu-btn').forEach(btn => btn.classList.remove('active'));
       if (element) element.classList.add('active');
-
       closeSidebar();
     }
 
-    window.onload = function() {
-      fetchDashboardData();
-    };
+    window.onload = function() { fetchDashboardData(); };
 
     function fetchDashboardData() {
       document.getElementById('dashTotalSales').innerHTML = '<span class="mini-spinner"></span>';
@@ -422,260 +361,291 @@
         .then(res => res.json())
         .then(data => {
           if (data) {
-            if (data.parties) {
-              partyData = data.parties;
-              populatePartyDropdown();
-            }
-            if (data.entries) {
-              allEntriesGlobal = data.entries;
-              updateDashboardUI(data.entries);
-            }
+            if (data.parties) { partyData = data.parties; populatePartyDropdown(); }
+            if (data.retailCustomers) { retailCustomerData = data.retailCustomers; populateRetailCustomerDropdown(); }
+            if (data.entries) allEntriesGlobal = data.entries;
+            if (data.retailEntries) allRetailEntriesGlobal = data.retailEntries;
+            
+            updateDashboardUI(allEntriesGlobal, allRetailEntriesGlobal);
           }
         })
         .catch(err => {
           document.getElementById('dashTotalSales').innerText = "₹ 0.00";
           document.getElementById('dashTotalQty').innerText = "0 Liters";
           document.getElementById('dashPendingAmount').innerText = "₹ 0.00";
-          console.log("Error loading data:", err);
         });
     }
 
-    function updateDashboardUI(entries) {
+    function updateDashboardUI(bulkEntries, retailEntries) {
       let totalSales = 0;
       let totalQty = 0;
-      let pendingAmount = 0;
+      let totalPending = 0;
+      let totalDeposited = 0;
 
-      if (entries && entries.length > 0) {
-        for (let i = 0; i < entries.length; i++) {
-          let e = entries[i];
+      // Bulk Calculations
+      if (bulkEntries && bulkEntries.length > 0) {
+        bulkEntries.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
-          
           if (!e.shift || e.shift !== "Payment") {
             totalSales += amt;
             totalQty += qty;
+            if (e.paymentStatus && e.paymentStatus.includes("Pending")) totalPending += amt;
+          } else {
+            totalDeposited += amt;
           }
-          if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
-            pendingAmount += amt;
-          } else if (e.shift === "Payment") {
-            pendingAmount += amt;
-          }
-        }
+        });
       }
+
+      // Retail Calculations (Combined in Production)
+      if (retailEntries && retailEntries.length > 0) {
+        retailEntries.forEach(r => {
+          let amt = parseFloat(r.totalAmount) || 0;
+          let qty = parseFloat(r.quantity) || 0;
+          if (r.amountStatus !== "Deposit") {
+            totalSales += amt;
+            totalQty += qty; // Total Production includes Retail Liters
+            if (r.amountStatus && r.amountStatus.includes("Pending")) totalPending += amt;
+          } else {
+            totalDeposited += amt;
+          }
+        });
+      }
+
+      let netPending = totalPending - totalDeposited;
+      if (netPending < 0) netPending = 0;
 
       document.getElementById('dashTotalSales').innerText = "₹ " + totalSales.toFixed(2);
       document.getElementById('dashTotalQty').innerText = totalQty.toFixed(2) + " Liters";
-      document.getElementById('dashPendingAmount').innerText = "₹ " + (pendingAmount < 0 ? 0 : pendingAmount).toFixed(2);
+      document.getElementById('dashPendingAmount').innerText = "₹ " + netPending.toFixed(2);
     }
 
     function populatePartyDropdown() {
       const partySelect = document.getElementById('partySelect');
-      const currentSelected = partySelect.value;
-      
       partySelect.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';
-      
       for (let party in partyData) {
         let option = document.createElement('option');
-        option.value = party;
-        option.textContent = party;
+        option.value = party; option.textContent = party;
         partySelect.appendChild(option);
       }
-      
-      if (currentSelected && currentSelected !== "ADD_NEW") {
-        partySelect.value = currentSelected;
+    }
+
+    function populateRetailCustomerDropdown() {
+      const custSelect = document.getElementById('retailCustomerSelect');
+      custSelect.innerHTML = '<option value="">-- Select Customer --</option><option value="ADD_NEW">+ Add New Member / Customer</option>';
+      for (let c in retailCustomerData) {
+        let option = document.createElement('option');
+        option.value = c; option.textContent = c;
+        custSelect.appendChild(option);
       }
     }
 
     function populateLedgerPartyDropdown() {
       const ledgerSelect = document.getElementById('ledgerPartySelect');
       ledgerSelect.innerHTML = '<option value="">-- Select Party --</option>';
-      
       for (let party in partyData) {
         let option = document.createElement('option');
-        option.value = party;
-        option.textContent = party;
+        option.value = party; option.textContent = party;
         ledgerSelect.appendChild(option);
       }
+    }
+
+    function populateRetailLedgerCustomerDropdown() {
+      const ledgerSelect = document.getElementById('ledgerRetailCustomerSelect');
+      ledgerSelect.innerHTML = '<option value="">-- Select Customer --</option>';
+      for (let c in retailCustomerData) {
+        let option = document.createElement('option');
+        option.value = c; option.textContent = c;
+        ledgerSelect.appendChild(option);
+      }
+    }
+
+    function handleRetailCustomerChange() {
+      const selected = document.getElementById('retailCustomerSelect').value;
+      const group = document.getElementById('newRetailCustomerGroup');
+      const mob = document.getElementById('retailMobileNumber');
+      const addr = document.getElementById('retailAddress');
+
+      if (selected === "ADD_NEW") {
+        group.style.display = "flex";
+        mob.value = ""; mob.readOnly = false;
+        addr.value = ""; addr.readOnly = false;
+      } else if (selected !== "") {
+        group.style.display = "none";
+        mob.value = retailCustomerData[selected]?.mobile || ""; mob.readOnly = true;
+        addr.value = retailCustomerData[selected]?.address || ""; addr.readOnly = true;
+      } else {
+        group.style.display = "none";
+        mob.value = ""; mob.readOnly = false;
+        addr.value = ""; addr.readOnly = false;
+      }
+    }
+
+    function calculateRetailTotal() {
+      const qty = parseFloat(document.getElementById('retailQuantity').value) || 0;
+      const rate = parseFloat(document.getElementById('retailRatePerLiter').value) || 0;
+      document.getElementById('retailTotalAmount').value = (qty * rate).toFixed(2);
     }
 
     function loadLedgerForParty() {
       const selectedParty = document.getElementById('ledgerPartySelect').value;
       const ledgerContent = document.getElementById('ledgerContent');
-      
-      if (!selectedParty) {
-        ledgerContent.style.display = 'none';
-        return;
-      }
+      if (!selectedParty) { ledgerContent.style.display = 'none'; return; }
 
       ledgerContent.style.display = 'block';
       document.getElementById('lblPartyName').innerText = selectedParty;
       document.getElementById('lblPartyMobile').innerText = partyData[selectedParty] || '-';
 
       let partyEntries = allEntriesGlobal.filter(e => e.partyName === selectedParty);
-      let pendingTotal = 0;
-      let tableHtml = "";
+      let milkPending = 0, deposits = 0, tableHtml = "";
 
-      if (partyEntries.length === 0) {
-        tableHtml = '<tr><td colspan="5" style="text-align: center; color: #64748b;">No entries found for this party.</td></tr>';
-      } else {
+      if (partyEntries.length === 0) tableHtml = '<tr><td colspan="5" style="text-align: center;">No entries found.</td></tr>';
+      else {
         for (let i = partyEntries.length - 1; i >= 0; i--) {
           let e = partyEntries[i];
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
 
-          if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
-            pendingTotal += amt;
-          } else if (e.shift === "Payment") {
-            pendingTotal += amt;
-          }
+          if (e.shift === "Payment") deposits += amt;
+          else if (e.paymentStatus && e.paymentStatus.includes("Pending")) milkPending += amt;
 
-          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-
-          tableHtml += `<tr>
-            <td>${formattedDate}</td>
-            <td>${e.shift || ''} (${e.milkType || ''})</td>
-            <td>${qty.toFixed(2)} L</td>
-            <td>₹ ${amt.toFixed(2)}</td>
-            <td><span class="badge ${e.paymentStatus && e.paymentStatus.includes('Paid') ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
-          </tr>`;
+          tableHtml += `<tr><td>${e.date ? new Date(e.date).toLocaleDateString('en-GB') : ''}</td><td>${e.shift || ''} (${e.milkType || ''})</td><td>${qty.toFixed(2)} L</td><td>₹ ${amt.toFixed(2)}</td><td><span class="badge ${e.shift === 'Payment' || e.paymentStatus.includes('Paid') ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td></tr>`;
         }
       }
-
-      document.getElementById('lblPendingAmount').innerText = "₹ " + (pendingTotal < 0 ? 0 : pendingTotal).toFixed(2);
+      let netPending = milkPending - deposits;
+      document.getElementById('lblPendingAmount').innerText = "₹ " + (netPending < 0 ? 0 : netPending).toFixed(2);
       document.getElementById('ledgerTableBody').innerHTML = tableHtml;
     }
 
-    function submitDeposit() {
-      const selectedParty = document.getElementById('ledgerPartySelect').value;
-      const depositAmt = document.getElementById('depositAmount').value;
-      const depositDate = document.getElementById('depositDate').value;
+    function loadRetailLedgerForCustomer() {
+      const selectedCust = document.getElementById('ledgerRetailCustomerSelect').value;
+      const content = document.getElementById('retailLedgerContent');
+      if (!selectedCust) { content.style.display = 'none'; return; }
 
-      if (!selectedParty || !depositAmt || parseFloat(depositAmt) <= 0 || !depositDate) {
-        alert("Kripya date aur sahi amount darj karein!");
-        return;
-      }
+      content.style.display = 'block';
+      document.getElementById('lblRetailCustomerName').innerText = selectedCust;
+      document.getElementById('lblRetailCustomerMobile').innerText = retailCustomerData[selectedCust]?.mobile || '-';
 
-      const payload = {
-        action: "updatePayment",
-        partyName: selectedParty,
-        mobileNumber: partyData[selectedParty] || "",
-        amount: depositAmt,
-        date: depositDate
-      };
+      let cEntries = allRetailEntriesGlobal.filter(r => r.customerName === selectedCust);
+      let pending = 0, deposits = 0, tableHtml = "";
 
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res.result === "success") {
-          alert("Payment successfully deposit ho gaya!");
-          document.getElementById('depositAmount').value = "";
-          document.getElementById('depositDate').valueAsDate = new Date();
-          fetchDashboardData();
-          setTimeout(() => loadLedgerForParty(), 1000);
-        } else {
-          alert("Error: " + (res.message || "Kuch galat ho gaya"));
+      if (cEntries.length === 0) tableHtml = '<tr><td colspan="5" style="text-align: center;">No entries found.</td></tr>';
+      else {
+        for (let i = cEntries.length - 1; i >= 0; i--) {
+          let r = cEntries[i];
+          let amt = parseFloat(r.totalAmount) || 0;
+          let qty = parseFloat(r.quantity) || 0;
+
+          if (r.amountStatus === "Deposit") deposits += amt;
+          else if (r.amountStatus && r.amountStatus.includes("Pending")) pending += amt;
+
+          tableHtml += `<tr><td>${r.date ? new Date(r.date).toLocaleDateString('en-GB') : ''}</td><td>${qty > 0 ? qty.toFixed(2) + ' L' : 'Payment'}</td><td>₹ ${parseFloat(r.ratePerLiter || 0).toFixed(2)}</td><td>₹ ${amt.toFixed(2)}</td><td><span class="badge ${r.amountStatus === 'Deposit' || r.amountStatus.includes('Paid') ? 'paid' : 'pending'}">${r.amountStatus || 'Pending'}</span></td></tr>`;
         }
-      })
-      .catch(err => alert("Fetch Error: " + err));
+      }
+      let netPending = pending - deposits;
+      document.getElementById('lblRetailPendingAmount').innerText = "₹ " + (netPending < 0 ? 0 : netPending).toFixed(2);
+      document.getElementById('retailLedgerTableBody').innerHTML = tableHtml;
     }
 
+    function submitRetailDeposit() {
+      const cust = document.getElementById('ledgerRetailCustomerSelect').value;
+      const amt = document.getElementById('retailDepositAmount').value;
+      const date = document.getElementById('retailDepositDate').value;
+
+      if (!cust || !amt || parseFloat(amt) <= 0 || !date) { alert("Kripya date aur amount sahi se darj karein!"); return; }
+
+      const payload = { action: "updateRetailPayment", customerName: cust, mobileNumber: retailCustomerData[cust]?.mobile || "", amount: amt, date: date };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        if(res.result === "success") { alert("Payment deposit ho gaya!"); document.getElementById('retailDepositAmount').value = ""; fetchDashboardData(); setTimeout(() => loadRetailLedgerForCustomer(), 1000); }
+      });
+    }
+
+    function downloadPDF(cardId) {
+      const printContents = document.getElementById(cardId).innerHTML;
+      const originalContents = document.body.innerHTML;
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
+    }
+
+    // Submit Retail Entry Form
+    document.getElementById('retailMilkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let custName = document.getElementById('retailCustomerSelect').value;
+      if (custName === "ADD_NEW") {
+        custName = document.getElementById('newRetailCustomerName').value.trim();
+        if (!custName) { alert("Kripya New Customer Name darj karein"); return; }
+      }
+
+      const btn = document.getElementById('retailSubmitBtn');
+      btn.innerText = "Submitting..."; btn.disabled = true;
+
+      const payload = {
+        action: "addRetailMilk",
+        date: document.getElementById('retailEntryDate').value,
+        customerName: custName,
+        mobileNumber: document.getElementById('retailMobileNumber').value,
+        address: document.getElementById('retailAddress').value,
+        quantity: document.getElementById('retailQuantity').value,
+        ratePerLiter: document.getElementById('retailRatePerLiter').value,
+        totalAmount: document.getElementById('retailTotalAmount').value,
+        amountStatus: document.getElementById('retailAmountStatus').value
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "Submit Retail Entry"; btn.disabled = false;
+        if(res.result === "success") {
+          alert("Retail Milk Entry Google Sheet me save ho gayi!");
+          retailCustomerData[custName] = { mobile: payload.mobileNumber, address: payload.address };
+          populateRetailCustomerDropdown();
+          document.getElementById('retailMilkForm').reset();
+          fetchDashboardData();
+          switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        }
+      });
+    });
+
+    // Bulk Form Submit (Same)
     function handlePartyChange() {
       const partySelect = document.getElementById('partySelect').value;
       const newPartyGroup = document.getElementById('newPartyGroup');
       const mobileInput = document.getElementById('mobileNumber');
-
-      if (partySelect === "ADD_NEW") {
-        newPartyGroup.style.display = "flex";
-        mobileInput.value = "";
-        mobileInput.readOnly = false;
-      } else if (partySelect !== "") {
-        newPartyGroup.style.display = "none";
-        mobileInput.value = partyData[partySelect] || "";
-        mobileInput.readOnly = true;
-      } else {
-        newPartyGroup.style.display = "none";
-        mobileInput.value = "";
-        mobileInput.readOnly = false;
-      }
+      if (partySelect === "ADD_NEW") { newPartyGroup.style.display = "flex"; mobileInput.value = ""; mobileInput.readOnly = false; }
+      else if (partySelect !== "") { newPartyGroup.style.display = "none"; mobileInput.value = partyData[partySelect] || ""; mobileInput.readOnly = true; }
+      else { newPartyGroup.style.display = "none"; mobileInput.value = ""; mobileInput.readOnly = false; }
     }
 
     function calculateRateAndAmount() {
       const qty = parseFloat(document.getElementById('quantity').value) || 0;
       const fat = parseFloat(document.getElementById('fat').value) || 0;
       const fatRate = parseFloat(document.getElementById('fatRate').value) || 0;
-
-      const ratePerLiter = fat * fatRate;
-      const totalAmount = qty * ratePerLiter;
-
-      document.getElementById('ratePerLiter').value = ratePerLiter.toFixed(2);
-      document.getElementById('totalAmount').value = totalAmount.toFixed(2);
+      document.getElementById('ratePerLiter').value = (fat * fatRate).toFixed(2);
+      document.getElementById('totalAmount').value = (qty * fat * fatRate).toFixed(2);
     }
 
     document.getElementById('bulkMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
-
       let partyName = document.getElementById('partySelect').value;
-      if (partyName === "ADD_NEW") {
-        partyName = document.getElementById('newPartyName').value.trim();
-        if (!partyName) {
-          alert("Kripya New Dairy Name darj karein");
-          return;
-        }
-      }
+      if (partyName === "ADD_NEW") { partyName = document.getElementById('newPartyName').value.trim(); if (!partyName) { alert("New Dairy Name darj karein"); return; } }
 
-      const btn = document.getElementById('submitBtn');
-      btn.innerText = "Submitting...";
-      btn.disabled = true;
+      const btn = document.getElementById('submitBtn'); btn.innerText = "Submitting..."; btn.disabled = true;
 
       const payload = {
-        action: "addBulkMilk",
-        date: document.getElementById('entryDate').value,
-        shift: document.getElementById('shift').value,
-        milkType: document.getElementById('milkType').value,
-        quantity: document.getElementById('quantity').value,
-        fat: document.getElementById('fat').value,
-        fatRate: document.getElementById('fatRate').value,
-        snfClr: document.getElementById('snfClr').value,
-        ratePerLiter: document.getElementById('ratePerLiter').value,
-        totalAmount: document.getElementById('totalAmount').value,
-        partyName: partyName,
-        mobileNumber: document.getElementById('mobileNumber').value,
-        paymentStatus: document.getElementById('paymentStatus').value
+        action: "addBulkMilk", date: document.getElementById('entryDate').value, shift: document.getElementById('shift').value, milkType: document.getElementById('milkType').value,
+        quantity: document.getElementById('quantity').value, fat: document.getElementById('fat').value, fatRate: document.getElementById('fatRate').value, snfClr: document.getElementById('snfClr').value,
+        ratePerLiter: document.getElementById('ratePerLiter').value, totalAmount: document.getElementById('totalAmount').value, partyName: partyName, mobileNumber: document.getElementById('mobileNumber').value, paymentStatus: document.getElementById('paymentStatus').value
       };
 
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(res => {
-        btn.innerText = "Submit Entry to Google Sheet";
-        btn.disabled = false;
-
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "Submit Entry to Google Sheet"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Entry successfully Google Sheet me save ho gayi!");
-          partyData[partyName] = payload.mobileNumber;
-          populatePartyDropdown();
-
-          document.getElementById('bulkMilkForm').reset();
-          document.getElementById('entryDate').valueAsDate = new Date();
-          document.getElementById('newPartyGroup').style.display = "none";
-          
-          fetchDashboardData();
-          switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
-        } else {
-          alert("Sheet Error: " + (res.message || "Kuch galat ho gaya"));
+          alert("Entry Google Sheet me save ho gayi!"); partyData[partyName] = payload.mobileNumber; populatePartyDropdown(); document.getElementById('bulkMilkForm').reset(); fetchDashboardData(); switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }
-      })
-      .catch(err => {
-        btn.innerText = "Submit Entry to Google Sheet";
-        btn.disabled = false;
-        alert("Fetch Error: " + err);
       });
     });
   </script>

@@ -55,10 +55,8 @@
     .page-section { display: none; }
     .page-section.active { display: block; }
 
-    /* Card Styling */
     .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; text-align: center; }
 
-    /* Vibrant Gradient Company Header Banner */
     .company-banner {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       padding: 25px 20px; border-radius: 12px; color: #fff; margin-bottom: 22px;
@@ -74,7 +72,6 @@
       font-size: 13px; color: #cbd5e1; line-height: 1.5; font-weight: 500; max-width: 800px; margin: 0 auto;
     }
 
-    /* Gradient Dashboard Cards */
     .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; text-align: left; }
     .dash-card { padding: 22px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; min-height: 105px; display: flex; flex-direction: column; justify-content: center; }
     .dash-card.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -83,7 +80,6 @@
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 700; }
     .dash-card p { font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
-    /* In-Box Spinner */
     .mini-spinner {
       border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%;
       width: 22px; height: 22px; animation: spin 0.8s linear infinite; display: inline-block;
@@ -297,7 +293,7 @@
               </select>
             </div>
             <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download / Print PDF</button>
+              <button type="button" class="action-btn" onclick="downloadPDF()" style="background: #2563eb;">📥 Download Statement PDF</button>
             </div>
           </div>
 
@@ -314,10 +310,17 @@
 
             <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
               <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
-              <div style="display: flex; gap: 10px;">
-                <input type="number" id="depositAmount" placeholder="Enter Amount to Deposit (₹)" style="flex: 1;">
-                <button type="button" class="action-btn" onclick="submitDeposit()" style="margin-top:0;">Save Payment</button>
+              <div class="form-grid" style="align-items: flex-end;">
+                <div class="form-group">
+                  <label>Payment Date</label>
+                  <input type="date" id="depositDate">
+                </div>
+                <div class="form-group">
+                  <label>Amount (₹)</label>
+                  <input type="number" id="depositAmount" placeholder="Enter Amount">
+                </div>
               </div>
+              <button type="button" class="action-btn" onclick="submitDeposit()" style="margin-top: 12px; width: 100%;">Save Payment</button>
             </div>
 
             <div class="table-container">
@@ -343,13 +346,13 @@
   </main>
 
   <script>
-    // Aapka New Exec URL:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXQmng0qdf1PhQ5UJBzzxOYYMdaloK4Ay4fjJHj_5tBHnGzWnkzCJME-hPWR3JjlMPgw/exec";
 
     let partyData = {};
     let allEntriesGlobal = [];
 
     document.getElementById('entryDate').valueAsDate = new Date();
+    document.getElementById('depositDate').valueAsDate = new Date();
 
     function openSidebar() {
       document.getElementById('sidebar').classList.remove('hidden');
@@ -431,8 +434,10 @@
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
           
-          totalSales += amt;
-          totalQty += qty;
+          if (!e.shift || e.shift !== "Payment") {
+            totalSales += amt;
+            totalQty += qty;
+          }
           if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
             pendingAmount += amt;
           }
@@ -519,12 +524,29 @@
       document.getElementById('ledgerTableBody').innerHTML = tableHtml;
     }
 
+    function downloadPDF() {
+      const selectedParty = document.getElementById('ledgerPartySelect').value;
+      if (!selectedParty) {
+        alert("Kripya pehle Dairy / Party select karein!");
+        return;
+      }
+      
+      const printContents = document.getElementById('printableLedgerCard').innerHTML;
+      const originalContents = document.body.innerHTML;
+
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload(); // Reload to restore event listeners
+    }
+
     function submitDeposit() {
       const selectedParty = document.getElementById('ledgerPartySelect').value;
       const depositAmt = document.getElementById('depositAmount').value;
+      const depositDate = document.getElementById('depositDate').value;
 
-      if (!selectedParty || !depositAmt || parseFloat(depositAmt) <= 0) {
-        alert("Kripya sahi amount aur party select karein!");
+      if (!selectedParty || !depositAmt || parseFloat(depositAmt) <= 0 || !depositDate) {
+        alert("Kripya date aur sahi amount darj karein!");
         return;
       }
 
@@ -533,7 +555,7 @@
         partyName: selectedParty,
         mobileNumber: partyData[selectedParty] || "",
         amount: depositAmt,
-        date: new Date().toISOString().split('T')[0]
+        date: depositDate
       };
 
       fetch(SCRIPT_URL, {
@@ -546,6 +568,7 @@
         if(res.result === "success") {
           alert("Payment successfully deposit ho gaya!");
           document.getElementById('depositAmount').value = "";
+          document.getElementById('depositDate').valueAsDate = new Date();
           fetchDashboardData();
           setTimeout(() => loadLedgerForParty(), 1000);
         } else {

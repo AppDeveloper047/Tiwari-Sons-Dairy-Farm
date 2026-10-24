@@ -59,22 +59,19 @@
     .card h3 { color: #0f172a; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
     .dairy-address { font-size: 13px; color: #64748b; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; line-height: 1.4; }
 
+    /* Gradient Dashboard Cards */
     .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; text-align: left; }
-    .dash-card { padding: 22px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; }
+    .dash-card { padding: 22px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; min-height: 105px; display: flex; flex-direction: column; justify-content: center; }
     .dash-card.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
     .dash-card.green { background: linear-gradient(135deg, #10b981, #047857); }
     .dash-card.amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 700; }
-    .dash-card p { font-size: 26px; font-weight: 800; }
+    .dash-card p { font-size: 26px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
-    /* Loading Spinner Styles */
-    #loadingOverlay {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 40px; color: #475569; font-weight: 600; font-size: 15px;
-    }
-    .spinner {
-      border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%;
-      width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 12px;
+    /* In-Box Spinner */
+    .mini-spinner {
+      border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%;
+      width: 22px; height: 22px; animation: spin 0.8s linear infinite; display: inline-block;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -153,29 +150,21 @@
         <div class="card">
           <h3>Tiwari & Sons Dairy Farm</h3>
           <div class="dairy-address">
-            Tingajur-Madana Road 01 Peer Ki Bawdi Vill- Tingajur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227
-          </div>
-          
-          <!-- Loading Spinner -->
-          <div id="loadingOverlay">
-            <div class="spinner"></div>
-            <p>Data Loading, Kripya Pratiksha Karein...</p>
+            Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227
           </div>
 
-          <div id="dashboardDataContainer" style="display: none;">
-            <div class="dashboard-cards">
-              <div class="dash-card blue">
-                <h4>Total Sales Amount</h4>
-                <p id="dashTotalSales">₹ 0.00</p>
-              </div>
-              <div class="dash-card green">
-                <h4>Total Milk Quantity</h4>
-                <p id="dashTotalQty">0 Liters</p>
-              </div>
-              <div class="dash-card amber">
-                <h4>Pending Payments</h4>
-                <p id="dashPendingAmount">₹ 0.00</p>
-              </div>
+          <div class="dashboard-cards">
+            <div class="dash-card blue">
+              <h4>Total Sales Amount</h4>
+              <p id="dashTotalSales"><span class="mini-spinner"></span></p>
+            </div>
+            <div class="dash-card green">
+              <h4>Total Milk Quantity</h4>
+              <p id="dashTotalQty"><span class="mini-spinner"></span></p>
+            </div>
+            <div class="dash-card amber">
+              <h4>Pending Payments</h4>
+              <p id="dashPendingAmount"><span class="mini-spinner"></span></p>
             </div>
           </div>
         </div>
@@ -185,7 +174,7 @@
       <section id="bulkMilk" class="page-section">
         <div class="card">
           <h3 style="text-align: left;">Bulk Selling Milk Entry</h3>
-          <div class="dairy-address" style="text-align: left;">Tingajur-Madana Road 01 Peer Ki Bawdi, Shajapur (M.P)</div>
+          <div class="dairy-address" style="text-align: left;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
           
           <form id="bulkMilkForm">
             <div class="form-grid">
@@ -277,7 +266,7 @@
       <section id="bulkLedger" class="page-section">
         <div class="card" id="printableLedgerCard">
           <h3 style="text-align: left;">Bulk Dairy Ledger Statement</h3>
-          <div class="dairy-address" style="text-align: left;">Tingajur-Madana Road 01 Peer Ki Bawdi, Shajapur (M.P)</div>
+          <div class="dairy-address" style="text-align: left;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
           
           <div class="form-grid" style="margin-bottom: 20px;">
             <div class="form-group">
@@ -383,17 +372,14 @@
     };
 
     function fetchDashboardData() {
-      // Show loading spinner
-      document.getElementById('loadingOverlay').style.display = 'flex';
-      document.getElementById('dashboardDataContainer').style.display = 'none';
+      // Set spinners inside boxes while loading
+      document.getElementById('dashTotalSales').innerHTML = '<span class="mini-spinner"></span>';
+      document.getElementById('dashTotalQty').innerHTML = '<span class="mini-spinner"></span>';
+      document.getElementById('dashPendingAmount').innerHTML = '<span class="mini-spinner"></span>';
 
       fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
-          // Hide loading spinner
-          document.getElementById('loadingOverlay').style.display = 'none';
-          document.getElementById('dashboardDataContainer').style.display = 'block';
-
           if (data) {
             if (data.parties) {
               partyData = data.parties;
@@ -406,7 +392,9 @@
           }
         })
         .catch(err => {
-          document.getElementById('loadingOverlay').innerHTML = "<p style='color:red;'>Data load karne me error aayi. Refresh karein.</p>";
+          document.getElementById('dashTotalSales').innerText = "₹ 0.00";
+          document.getElementById('dashTotalQty').innerText = "0 Liters";
+          document.getElementById('dashPendingAmount').innerText = "₹ 0.00";
           console.log("Error loading data:", err);
         });
     }

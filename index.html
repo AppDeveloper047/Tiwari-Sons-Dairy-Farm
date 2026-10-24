@@ -8,14 +8,12 @@
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; }
     
-    /* Overlay Fixed */
     .overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9;
     }
     .overlay.active { display: block; }
 
-    /* Sidebar Styling */
     .sidebar { 
       width: 270px; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: #fff; height: 100vh;
       position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10;
@@ -43,11 +41,9 @@
     .dropdown-container.show { display: flex !important; }
     .dropdown-container .menu-btn { padding-left: 38px; font-size: 14px; color: #94a3b8; }
 
-    /* Main Wrapper */
     .main-wrapper { flex: 1; margin-left: 270px; transition: all 0.3s ease; display: flex; flex-direction: column; width: 100%; }
     .main-wrapper.full-width { margin-left: 0; }
 
-    /* Top Bar */
     .top-bar {
       background: rgba(255, 255, 255, 0.95); padding: 15px 25px; display: flex; align-items: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 5;
@@ -55,16 +51,13 @@
     .toggle-btn { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; }
     .page-title { margin-left: 20px; font-size: 20px; font-weight: 800; color: #1e293b; }
 
-    /* Main Content */
     .content { padding: 25px; overflow-y: auto; flex: 1; }
     .page-section { display: none; }
     .page-section.active { display: block; }
 
-    /* Card Styling */
     .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; }
     .card h3 { margin-bottom: 20px; color: #0f172a; font-size: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
 
-    /* Fully Gradient Dashboard Cards */
     .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; }
     .dash-card { padding: 22px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; }
     .dash-card.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -73,7 +66,6 @@
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 700; }
     .dash-card p { font-size: 26px; font-weight: 800; }
 
-    /* Table Design */
     .table-container { margin-top: 25px; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; }
     th, td { padding: 12px; text-align: left; font-size: 13px; }
@@ -83,7 +75,6 @@
     .badge.paid { background: #d1fae5; color: #065f46; }
     .badge.pending { background: #fef3c7; color: #92400e; }
 
-    /* Form Layout */
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
     .form-group { display: flex; flex-direction: column; }
@@ -98,7 +89,6 @@
 
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-  <!-- Sidebar -->
   <aside class="sidebar hidden" id="sidebar">
     <div class="sidebar-header">
       <h2>Tiwari & Sons Dairy</h2>
@@ -125,7 +115,6 @@
     </ul>
   </aside>
 
-  <!-- Main Wrapper -->
   <main class="main-wrapper full-width" id="mainWrapper">
     <header class="top-bar">
       <button class="toggle-btn" onclick="openSidebar()">☰ Menu</button>
@@ -134,7 +123,6 @@
 
     <div class="content">
       
-      <!-- DASHBOARD PAGE -->
       <section id="dashboard" class="page-section active">
         <div class="card">
           <h3>Welcome to Tiwari & Sons Dairy Farm</h3>
@@ -177,7 +165,6 @@
         </div>
       </section>
 
-      <!-- BULK SELLING MILK PAGE -->
       <section id="bulkMilk" class="page-section">
         <div class="card">
           <h3>Bulk Selling Milk Entry</h3>
@@ -272,8 +259,8 @@
   </main>
 
   <script>
-    // NEW DEPLOYMENT Exec URL DAALEN HERE:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx48iu0T_atUTNHUC6SU-6BQMNO3CZ1UYdKODdKJVGZ/exec";
+    // Yahan apna Google Apps Script ka naya exec URL dalein:
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXQmng0qdf1PhQ5UJBzzxOYYMdaloK4Ay4fjJHj_5tBHnGzWnkzCJME-hPWR3JjlMPgw/exec";
 
     let partyData = {};
 
@@ -378,6 +365,8 @@
 
     function populatePartyDropdown() {
       const partySelect = document.getElementById('partySelect');
+      const currentSelected = partySelect.value;
+      
       partySelect.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';
       
       for (let party in partyData) {
@@ -385,6 +374,10 @@
         option.value = party;
         option.textContent = party;
         partySelect.appendChild(option);
+      }
+      
+      if (currentSelected && currentSelected !== "ADD_NEW") {
+        partySelect.value = currentSelected;
       }
     }
 
@@ -427,7 +420,7 @@
       if (partyName === "ADD_NEW") {
         partyName = document.getElementById('newPartyName').value.trim();
         if (!partyName) {
-          alert("कृपया New Dairy Name दर्ज करें");
+          alert("Kripya New Dairy Name darj karein");
           return;
         }
       }
@@ -464,6 +457,11 @@
 
         if(res.result === "success") {
           alert("Entry successfully Google Sheet me save ho gayi!");
+          
+          // Turant local list mein dairy add kar dein taaki dobara add na karni pade
+          partyData[partyName] = payload.mobileNumber;
+          populatePartyDropdown();
+
           document.getElementById('bulkMilkForm').reset();
           document.getElementById('entryDate').valueAsDate = new Date();
           document.getElementById('newPartyGroup').style.display = "none";
@@ -471,7 +469,7 @@
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         } else {
-          alert("Sheet Error: " + (res.message || "Something went wrong"));
+          alert("Sheet Error: " + (res.message || "Kuch galat ho gaya"));
         }
       })
       .catch(err => {

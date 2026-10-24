@@ -61,7 +61,7 @@
 
     .table-container { margin-top: 25px; overflow-x: auto; text-align: left; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; }
-    th, td { padding: 12px; text-align: left; font-size: 13px; }
+    th, td { padding: 12px; text-align: left; font-size: 13px; border-bottom: 1px solid #e2e8f0; }
     th { background: #1e293b; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 11px; }
     tr:nth-child(even) { background-color: #f8fafc; }
     .badge { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
@@ -78,6 +78,21 @@
     .submit-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
     .action-btn { padding: 8px 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; margin-top: 10px; }
     .action-btn:hover { background: #059669; }
+
+    /* PROFESSIONAL PRINT / PDF STYLING */
+    @media print {
+      body * { visibility: hidden; }
+      .page-section.active .card.printable-card, 
+      .page-section.active .card.printable-card * { visibility: visible; }
+      .page-section.active .card.printable-card {
+        position: absolute; left: 0; top: 0; width: 100%; max-width: 100%;
+        box-shadow: none; border: none; padding: 10px; background: #fff !important;
+      }
+      .no-print { display: none !important; }
+      .company-banner { background: #1e293b !important; -webkit-print-color-adjust: exact; }
+      .company-banner h3 { -webkit-text-fill-color: #fff !important; }
+      th { background: #1e293b !important; color: #fff !important; -webkit-print-color-adjust: exact; }
+    }
   </style>
 </head>
 <body>
@@ -95,7 +110,6 @@
         <button class="menu-btn active" onclick="switchPage('dashboard', this)">📊 Dashboard</button>
       </li>
       
-      <!-- Billing Invoice Menu -->
       <li class="menu-item">
         <button class="menu-btn" onclick="toggleDropdown(event, 'billingDropdown')">📄 Billing Invoice <span>▼</span></button>
         <div class="dropdown-container" id="billingDropdown">
@@ -104,7 +118,6 @@
         </div>
       </li>
 
-      <!-- Ledger Statement Menu -->
       <li class="menu-item">
         <button class="menu-btn" onclick="toggleDropdown(event, 'ledgerDropdown')">📁 Ledger Statement <span>▼</span></button>
         <div class="dropdown-container" id="ledgerDropdown">
@@ -116,7 +129,7 @@
   </aside>
 
   <main class="main-wrapper full-width" id="mainWrapper">
-    <header class="top-bar">
+    <header class="top-bar no-print">
       <button class="toggle-btn" onclick="openSidebar()">☰ Menu</button>
       <div class="page-title" id="pageTitle">Dashboard</div>
     </header>
@@ -221,13 +234,13 @@
 
       <!-- BULK DAIRY LEDGER PAGE -->
       <section id="bulkLedger" class="page-section">
-        <div class="card" id="printableLedgerCard">
+        <div class="card printable-card">
           <div class="company-banner" style="text-align: left;">
             <h3>Bulk Dairy Ledger Statement</h3>
             <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
           </div>
           
-          <div class="form-grid" style="margin-bottom: 20px;">
+          <div class="form-grid no-print" style="margin-bottom: 20px;">
             <div class="form-group">
               <label>Select Dairy / Party</label>
               <select id="ledgerPartySelect" onchange="loadLedgerForParty()">
@@ -235,7 +248,7 @@
               </select>
             </div>
             <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button type="button" class="action-btn" onclick="downloadPDF('printableLedgerCard')" style="background: #2563eb;">📥 Download Statement PDF</button>
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
             </div>
           </div>
 
@@ -246,7 +259,7 @@
               <div class="party-info-item"><span class="title">Total Pending Amount</span><span class="value" id="lblPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
             </div>
 
-            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+            <div class="no-print" style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
               <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
               <div class="form-grid" style="align-items: flex-end;">
                 <div class="form-group"><label>Payment Date</label><input type="date" id="depositDate"></div>
@@ -269,13 +282,13 @@
 
       <!-- RETAIL MILK STATEMENT PAGE -->
       <section id="retailLedger" class="page-section">
-        <div class="card" id="printableRetailLedgerCard">
+        <div class="card printable-card">
           <div class="company-banner" style="text-align: left;">
             <h3>Retail Milk Customer Statement</h3>
             <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
           </div>
           
-          <div class="form-grid" style="margin-bottom: 20px;">
+          <div class="form-grid no-print" style="margin-bottom: 20px;">
             <div class="form-group">
               <label>Select Customer</label>
               <select id="ledgerRetailCustomerSelect" onchange="loadRetailLedgerForCustomer()">
@@ -283,7 +296,7 @@
               </select>
             </div>
             <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button type="button" class="action-btn" onclick="downloadPDF('printableRetailLedgerCard')" style="background: #2563eb;">📥 Download Statement PDF</button>
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
             </div>
           </div>
 
@@ -294,7 +307,7 @@
               <div class="party-info-item"><span class="title">Total Pending Amount</span><span class="value" id="lblRetailPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
             </div>
 
-            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+            <div class="no-print" style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
               <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
               <div class="form-grid" style="align-items: flex-end;">
                 <div class="form-group"><label>Payment Date</label><input type="date" id="retailDepositDate"></div>
@@ -382,7 +395,6 @@
       let totalPending = 0;
       let totalDeposited = 0;
 
-      // Bulk Calculations
       if (bulkEntries && bulkEntries.length > 0) {
         bulkEntries.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
@@ -397,14 +409,13 @@
         });
       }
 
-      // Retail Calculations (Combined in Production)
       if (retailEntries && retailEntries.length > 0) {
         retailEntries.forEach(r => {
           let amt = parseFloat(r.totalAmount) || 0;
           let qty = parseFloat(r.quantity) || 0;
           if (r.amountStatus !== "Deposit") {
             totalSales += amt;
-            totalQty += qty; // Total Production includes Retail Liters
+            totalQty += qty;
             if (r.amountStatus && r.amountStatus.includes("Pending")) totalPending += amt;
           } else {
             totalDeposited += amt;
@@ -562,16 +573,6 @@
       });
     }
 
-    function downloadPDF(cardId) {
-      const printContents = document.getElementById(cardId).innerHTML;
-      const originalContents = document.body.innerHTML;
-      document.body.innerHTML = printContents;
-      window.print();
-      document.body.innerHTML = originalContents;
-      location.reload();
-    }
-
-    // Submit Retail Entry Form
     document.getElementById('retailMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
       let custName = document.getElementById('retailCustomerSelect').value;
@@ -609,7 +610,6 @@
       });
     });
 
-    // Bulk Form Submit (Same)
     function handlePartyChange() {
       const partySelect = document.getElementById('partySelect').value;
       const newPartyGroup = document.getElementById('newPartyGroup');

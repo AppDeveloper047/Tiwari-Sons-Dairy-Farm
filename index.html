@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tiwari & Sons Dairy Farm</title>
-  <!-- Print & PDF styling -->
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; }
@@ -56,10 +55,11 @@
     .page-section { display: none; }
     .page-section.active { display: block; }
 
-    .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; }
-    .card h3 { margin-bottom: 20px; color: #0f172a; font-size: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+    .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; text-align: center; }
+    .card h3 { color: #0f172a; font-size: 22px; font-weight: 800; margin-bottom: 5px; }
+    .dairy-address { font-size: 13px; color: #64748b; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; line-height: 1.4; }
 
-    .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; }
+    .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; text-align: left; }
     .dash-card { padding: 22px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; }
     .dash-card.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
     .dash-card.green { background: linear-gradient(135deg, #10b981, #047857); }
@@ -67,7 +67,18 @@
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 700; }
     .dash-card p { font-size: 26px; font-weight: 800; }
 
-    .table-container { margin-top: 25px; overflow-x: auto; }
+    /* Loading Spinner Styles */
+    #loadingOverlay {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px; color: #475569; font-weight: 600; font-size: 15px;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%;
+      width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 12px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .table-container { margin-top: 25px; overflow-x: auto; text-align: left; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; }
     th, td { padding: 12px; text-align: left; font-size: 13px; }
     th { background: #1e293b; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 11px; }
@@ -76,7 +87,7 @@
     .badge.paid { background: #d1fae5; color: #065f46; }
     .badge.pending { background: #fef3c7; color: #92400e; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
     @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
     .form-group { display: flex; flex-direction: column; }
     label { font-size: 13px; font-weight: 700; margin-bottom: 5px; color: #334155; }
@@ -105,7 +116,6 @@
         </button>
       </li>
       
-      <!-- Billing Invoice Dropdown -->
       <li class="menu-item">
         <button class="menu-btn" onclick="toggleDropdown(event, 'billingDropdown')">
           📄 Billing Invoice <span>▼</span>
@@ -117,7 +127,6 @@
         </div>
       </li>
 
-      <!-- Ledger Statement Dropdown -->
       <li class="menu-item">
         <button class="menu-btn" onclick="toggleDropdown(event, 'ledgerDropdown')">
           📁 Ledger Statement <span>▼</span>
@@ -142,20 +151,31 @@
       <!-- DASHBOARD PAGE -->
       <section id="dashboard" class="page-section active">
         <div class="card">
-          <h3>Welcome to Tiwari & Sons Dairy Farm</h3>
+          <h3>Tiwari & Sons Dairy Farm</h3>
+          <div class="dairy-address">
+            Tingajur-Madana Road 01 Peer Ki Bawdi Vill- Tingajur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227
+          </div>
           
-          <div class="dashboard-cards">
-            <div class="dash-card blue">
-              <h4>Total Sales Amount</h4>
-              <p id="dashTotalSales">₹ 0.00</p>
-            </div>
-            <div class="dash-card green">
-              <h4>Total Milk Quantity</h4>
-              <p id="dashTotalQty">0 Liters</p>
-            </div>
-            <div class="dash-card amber">
-              <h4>Pending Payments</h4>
-              <p id="dashPendingAmount">₹ 0.00</p>
+          <!-- Loading Spinner -->
+          <div id="loadingOverlay">
+            <div class="spinner"></div>
+            <p>Data Loading, Kripya Pratiksha Karein...</p>
+          </div>
+
+          <div id="dashboardDataContainer" style="display: none;">
+            <div class="dashboard-cards">
+              <div class="dash-card blue">
+                <h4>Total Sales Amount</h4>
+                <p id="dashTotalSales">₹ 0.00</p>
+              </div>
+              <div class="dash-card green">
+                <h4>Total Milk Quantity</h4>
+                <p id="dashTotalQty">0 Liters</p>
+              </div>
+              <div class="dash-card amber">
+                <h4>Pending Payments</h4>
+                <p id="dashPendingAmount">₹ 0.00</p>
+              </div>
             </div>
           </div>
         </div>
@@ -164,10 +184,11 @@
       <!-- BULK SELLING MILK PAGE -->
       <section id="bulkMilk" class="page-section">
         <div class="card">
-          <h3>Bulk Selling Milk Entry</h3>
+          <h3 style="text-align: left;">Bulk Selling Milk Entry</h3>
+          <div class="dairy-address" style="text-align: left;">Tingajur-Madana Road 01 Peer Ki Bawdi, Shajapur (M.P)</div>
+          
           <form id="bulkMilkForm">
             <div class="form-grid">
-              
               <div class="form-group">
                 <label>Date</label>
                 <input type="date" id="entryDate" required>
@@ -255,7 +276,8 @@
       <!-- BULK DAIRY LEDGER STATEMENT PAGE -->
       <section id="bulkLedger" class="page-section">
         <div class="card" id="printableLedgerCard">
-          <h3>Bulk Dairy Ledger Statement</h3>
+          <h3 style="text-align: left;">Bulk Dairy Ledger Statement</h3>
+          <div class="dairy-address" style="text-align: left;">Tingajur-Madana Road 01 Peer Ki Bawdi, Shajapur (M.P)</div>
           
           <div class="form-grid" style="margin-bottom: 20px;">
             <div class="form-group">
@@ -270,7 +292,7 @@
           </div>
 
           <div id="ledgerContent" style="display: none;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; text-align: left;">
               <div>
                 <p><strong>Party Name:</strong> <span id="lblPartyName">-</span></p>
                 <p><strong>Mobile:</strong> <span id="lblPartyMobile">-</span></p>
@@ -280,8 +302,7 @@
               </div>
             </div>
 
-            <!-- Deposit Payment Box -->
-            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
               <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
               <div style="display: flex; gap: 10px;">
                 <input type="number" id="depositAmount" placeholder="Enter Amount to Deposit (₹)" style="flex: 1;">
@@ -300,9 +321,7 @@
                     <th>Status</th>
                   </tr>
                 </thead>
-                <tbody id="ledgerTableBody">
-                  <!-- Entries will load here -->
-                </tbody>
+                <tbody id="ledgerTableBody"></tbody>
               </table>
             </div>
           </div>
@@ -314,7 +333,6 @@
   </main>
 
   <script>
-    // Yahan apna naya /exec wala Google Apps Script URL dalein:
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx48iu0T_atUTNHUC6SU-6BQMNO3CZ1UYdKODdKJVGZ/exec";
 
     let partyData = {};
@@ -365,9 +383,17 @@
     };
 
     function fetchDashboardData() {
+      // Show loading spinner
+      document.getElementById('loadingOverlay').style.display = 'flex';
+      document.getElementById('dashboardDataContainer').style.display = 'none';
+
       fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
+          // Hide loading spinner
+          document.getElementById('loadingOverlay').style.display = 'none';
+          document.getElementById('dashboardDataContainer').style.display = 'block';
+
           if (data) {
             if (data.parties) {
               partyData = data.parties;
@@ -379,7 +405,10 @@
             }
           }
         })
-        .catch(err => console.log("Error loading data:", err));
+        .catch(err => {
+          document.getElementById('loadingOverlay').innerHTML = "<p style='color:red;'>Data load karne me error aayi. Refresh karein.</p>";
+          console.log("Error loading data:", err);
+        });
     }
 
     function updateDashboardUI(entries) {

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tiwari & Sons Dairy Farm</title>
+  <!-- Print & PDF styling -->
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
     body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; }
@@ -83,6 +84,8 @@
     input[readonly] { background-color: #f8fafc; cursor: not-allowed; }
 
     .submit-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
+    .action-btn { padding: 8px 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; margin-top: 10px; }
+    .action-btn:hover { background: #059669; }
   </style>
 </head>
 <body>
@@ -102,6 +105,7 @@
         </button>
       </li>
       
+      <!-- Billing Invoice Dropdown -->
       <li class="menu-item">
         <button class="menu-btn" onclick="toggleDropdown(event, 'billingDropdown')">
           📄 Billing Invoice <span>▼</span>
@@ -109,6 +113,18 @@
         <div class="dropdown-container" id="billingDropdown">
           <button class="menu-btn" onclick="switchPage('bulkMilk', this)">
             🥛 Bulk Selling Milk
+          </button>
+        </div>
+      </li>
+
+      <!-- Ledger Statement Dropdown -->
+      <li class="menu-item">
+        <button class="menu-btn" onclick="toggleDropdown(event, 'ledgerDropdown')">
+          📁 Ledger Statement <span>▼</span>
+        </button>
+        <div class="dropdown-container" id="ledgerDropdown">
+          <button class="menu-btn" onclick="switchPage('bulkLedger', this)">
+            📋 Bulk Dairy Ledger
           </button>
         </div>
       </li>
@@ -123,6 +139,7 @@
 
     <div class="content">
       
+      <!-- DASHBOARD PAGE -->
       <section id="dashboard" class="page-section active">
         <div class="card">
           <h3>Welcome to Tiwari & Sons Dairy Farm</h3>
@@ -141,30 +158,10 @@
               <p id="dashPendingAmount">₹ 0.00</p>
             </div>
           </div>
-
-          <div class="table-container">
-            <h3 style="font-size: 15px; border:none; margin-top: 20px; margin-bottom: 10px;">Recent Bulk Milk Entries (Live)</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Shift</th>
-                  <th>Party Name</th>
-                  <th>Milk Type</th>
-                  <th>Qty (Ltr)</th>
-                  <th>Amount (₹)</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="liveEntriesTable">
-                <tr><td colspan="7" style="text-align: center; color: #64748b;">Loading live data...</td></tr>
-              </tbody>
-            </table>
-          </div>
-
         </div>
       </section>
 
+      <!-- BULK SELLING MILK PAGE -->
       <section id="bulkMilk" class="page-section">
         <div class="card">
           <h3>Bulk Selling Milk Entry</h3>
@@ -255,14 +252,73 @@
         </div>
       </section>
 
+      <!-- BULK DAIRY LEDGER STATEMENT PAGE -->
+      <section id="bulkLedger" class="page-section">
+        <div class="card" id="printableLedgerCard">
+          <h3>Bulk Dairy Ledger Statement</h3>
+          
+          <div class="form-grid" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>Select Dairy / Party</label>
+              <select id="ledgerPartySelect" onchange="loadLedgerForParty()">
+                <option value="">-- Select Party --</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download / Print PDF</button>
+            </div>
+          </div>
+
+          <div id="ledgerContent" style="display: none;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; background: #f8fafc; padding: 15px; border-radius: 8px;">
+              <div>
+                <p><strong>Party Name:</strong> <span id="lblPartyName">-</span></p>
+                <p><strong>Mobile:</strong> <span id="lblPartyMobile">-</span></p>
+              </div>
+              <div>
+                <p><strong>Total Pending Amount:</strong> <span id="lblPendingAmount" style="color: #b45309; font-weight: bold;">₹ 0.00</span></p>
+              </div>
+            </div>
+
+            <!-- Deposit Payment Box -->
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+              <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Record Payment</h4>
+              <div style="display: flex; gap: 10px;">
+                <input type="number" id="depositAmount" placeholder="Enter Amount to Deposit (₹)" style="flex: 1;">
+                <button type="button" class="action-btn" onclick="submitDeposit()" style="margin-top:0;">Save Payment</button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Shift / Type</th>
+                    <th>Qty (Ltr)</th>
+                    <th>Amount (₹)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerTableBody">
+                  <!-- Entries will load here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </div>
   </main>
 
   <script>
-    // Yahan apna Google Apps Script ka naya exec URL dalein:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXQmng0qdf1PhQ5UJBzzxOYYMdaloK4Ay4fjJHj_5tBHnGzWnkzCJME-hPWR3JjlMPgw/exec";
+    // Yahan apna naya /exec wala Google Apps Script URL dalein:
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx48iu0T_atUTNHUC6SU-6BQMNO3CZ1UYdKODdKJVGZ/exec";
 
     let partyData = {};
+    let allEntriesGlobal = [];
 
     document.getElementById('entryDate').valueAsDate = new Date();
 
@@ -291,9 +347,11 @@
 
       if (pageId === 'dashboard') {
         document.getElementById('pageTitle').innerText = "Dashboard";
-        fetchDashboardData();
       } else if (pageId === 'bulkMilk') {
         document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
+      } else if (pageId === 'bulkLedger') {
+        document.getElementById('pageTitle').innerText = "Bulk Dairy Ledger Statement";
+        populateLedgerPartyDropdown();
       }
 
       document.querySelectorAll('.sidebar-menu .menu-btn').forEach(btn => btn.classList.remove('active'));
@@ -316,6 +374,7 @@
               populatePartyDropdown();
             }
             if (data.entries) {
+              allEntriesGlobal = data.entries;
               updateDashboardUI(data.entries);
             }
           }
@@ -327,40 +386,24 @@
       let totalSales = 0;
       let totalQty = 0;
       let pendingAmount = 0;
-      let tableHtml = "";
 
-      if (!entries || entries.length === 0) {
-        tableHtml = '<tr><td colspan="7" style="text-align: center; color: #64748b;">No entries found in sheet.</td></tr>';
-      } else {
-        for (let i = entries.length - 1; i >= 0; i--) {
+      if (entries && entries.length > 0) {
+        for (let i = 0; i < entries.length; i++) {
           let e = entries[i];
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
           
           totalSales += amt;
           totalQty += qty;
-          if (e.paymentStatus === "Pending") {
+          if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
             pendingAmount += amt;
           }
-
-          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-
-          tableHtml += `<tr>
-            <td>${formattedDate}</td>
-            <td>${e.shift || ''}</td>
-            <td><b>${e.partyName || ''}</b></td>
-            <td>${e.milkType || ''}</td>
-            <td>${qty.toFixed(2)} L</td>
-            <td>₹ ${amt.toFixed(2)}</td>
-            <td><span class="badge ${e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
-          </tr>`;
         }
       }
 
       document.getElementById('dashTotalSales').innerText = "₹ " + totalSales.toFixed(2);
       document.getElementById('dashTotalQty').innerText = totalQty.toFixed(2) + " Liters";
       document.getElementById('dashPendingAmount').innerText = "₹ " + pendingAmount.toFixed(2);
-      document.getElementById('liveEntriesTable').innerHTML = tableHtml;
     }
 
     function populatePartyDropdown() {
@@ -379,6 +422,99 @@
       if (currentSelected && currentSelected !== "ADD_NEW") {
         partySelect.value = currentSelected;
       }
+    }
+
+    function populateLedgerPartyDropdown() {
+      const ledgerSelect = document.getElementById('ledgerPartySelect');
+      ledgerSelect.innerHTML = '<option value="">-- Select Party --</option>';
+      
+      for (let party in partyData) {
+        let option = document.createElement('option');
+        option.value = party;
+        option.textContent = party;
+        ledgerSelect.appendChild(option);
+      }
+    }
+
+    function loadLedgerForParty() {
+      const selectedParty = document.getElementById('ledgerPartySelect').value;
+      const ledgerContent = document.getElementById('ledgerContent');
+      
+      if (!selectedParty) {
+        ledgerContent.style.display = 'none';
+        return;
+      }
+
+      ledgerContent.style.display = 'block';
+      document.getElementById('lblPartyName').innerText = selectedParty;
+      document.getElementById('lblPartyMobile').innerText = partyData[selectedParty] || '-';
+
+      let partyEntries = allEntriesGlobal.filter(e => e.partyName === selectedParty);
+      let pendingTotal = 0;
+      let tableHtml = "";
+
+      if (partyEntries.length === 0) {
+        tableHtml = '<tr><td colspan="5" style="text-align: center; color: #64748b;">No entries found for this party.</td></tr>';
+      } else {
+        for (let i = partyEntries.length - 1; i >= 0; i--) {
+          let e = partyEntries[i];
+          let amt = parseFloat(e.totalAmount) || 0;
+          let qty = parseFloat(e.quantity) || 0;
+
+          if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
+            pendingTotal += amt;
+          }
+
+          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+
+          tableHtml += `<tr>
+            <td>${formattedDate}</td>
+            <td>${e.shift || ''} (${e.milkType || ''})</td>
+            <td>${qty.toFixed(2)} L</td>
+            <td>₹ ${amt.toFixed(2)}</td>
+            <td><span class="badge ${e.paymentStatus && e.paymentStatus.includes('Paid') ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
+          </tr>`;
+        }
+      }
+
+      document.getElementById('lblPendingAmount').innerText = "₹ " + pendingTotal.toFixed(2);
+      document.getElementById('ledgerTableBody').innerHTML = tableHtml;
+    }
+
+    function submitDeposit() {
+      const selectedParty = document.getElementById('ledgerPartySelect').value;
+      const depositAmt = document.getElementById('depositAmount').value;
+
+      if (!selectedParty || !depositAmt || parseFloat(depositAmt) <= 0) {
+        alert("Kripya sahi amount aur party select karein!");
+        return;
+      }
+
+      const payload = {
+        action: "updatePayment",
+        partyName: selectedParty,
+        mobileNumber: partyData[selectedParty] || "",
+        amount: depositAmt,
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.result === "success") {
+          alert("Payment successfully deposit ho gaya!");
+          document.getElementById('depositAmount').value = "";
+          fetchDashboardData();
+          setTimeout(() => loadLedgerForParty(), 1000);
+        } else {
+          alert("Error: " + (res.message || "Kuch galat ho gaya"));
+        }
+      })
+      .catch(err => alert("Fetch Error: " + err));
     }
 
     function handlePartyChange() {
@@ -457,8 +593,6 @@
 
         if(res.result === "success") {
           alert("Entry successfully Google Sheet me save ho gayi!");
-          
-          // Turant local list mein dairy add kar dein taaki dobara add na karni pade
           partyData[partyName] = payload.mobileNumber;
           populatePartyDropdown();
 

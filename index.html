@@ -277,6 +277,16 @@
                 </select>
               </div>
               <div class="form-group" id="newCattleTagGroup" style="display:none;"><label>New Tag Number</label><input type="text" id="newCattleTag" placeholder="e.g. TAG-405"></div>
+              
+              <!-- Purchase Fields Container -->
+              <div id="purchaseFieldsContainer" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group"><label>Purchase Amount (₹):</label><input type="number" id="cattlePurchaseAmount" placeholder="e.g. 60000"></div>
+                <div class="form-group"><label>Selling Price (₹) [Future Sell]:</label><input type="number" id="cattleSellingPrice" placeholder="e.g. 70000"></div>
+              </div>
+
+              <!-- Sell Amount Field (Shown only on Sell mode) -->
+              <div class="form-group" id="sellAmountGroup" style="display:none;"><label>Actual Selling Price (₹):</label><input type="number" id="cattleSellAmount" placeholder="e.g. 70000"></div>
+
               <div class="form-group">
                 <label>Party Name (Dealer/Farmer):</label>
                 <select id="cattlePartySelect" onchange="handleCattlePartyChange()" required>
@@ -286,7 +296,6 @@
               </div>
               <div class="form-group" id="newCattlePartyGroup" style="display:none;"><label>New Party Name</label><input type="text" id="newCattlePartyName" placeholder="Enter Party Name"></div>
               <div class="form-group"><label>Party Mobile Number:</label><input type="tel" id="cattleMobile" placeholder="Enter Mobile Number" required></div>
-              <div class="form-group"><label>Amount (₹):</label><input type="number" id="cattleAmount" placeholder="e.g. 65000" required></div>
               <div class="form-group">
                 <label>Payment Status:</label>
                 <select id="cattleStatus" required>
@@ -430,7 +439,16 @@
             <div class="table-container">
               <table>
                 <thead>
-                  <tr><th>Date</th><th>Type</th><th>Category</th><th>Tag No.</th><th>Party</th><th>Selling / Amount (₹)</th><th>Status</th></tr>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Tag No.</th>
+                    <th>Party</th>
+                    <th>Selling Price (₹)</th>
+                    <th>Age / DOB / Calving</th>
+                    <th>Status</th>
+                  </tr>
                 </thead>
                 <tbody id="cattleLedgerTableBody"></tbody>
               </table>
@@ -637,10 +655,24 @@
 
     function handleCattleTxTypeChange() {
       const tx = document.getElementById('cattleTxType').value;
+      const purchaseFields = document.getElementById('purchaseFieldsContainer');
+      const sellGroup = document.getElementById('sellAmountGroup');
+
       if (tx === "Sell") {
-        document.getElementById('cattleTagSelect').value = "";
-        document.getElementById('newCattleTagGroup').style.display = "none";
+        purchaseFields.style.display = "none";
+        sellGroup.style.display = "flex";
+        document.getElementById('cattlePurchaseAmount').required = false;
+        document.getElementById('cattleSellingPrice').required = false;
+        document.getElementById('cattleSellAmount').required = true;
+      } else {
+        purchaseFields.style.display = "grid";
+        sellGroup.style.display = "none";
+        document.getElementById('cattlePurchaseAmount').required = true;
+        document.getElementById('cattleSellingPrice').required = true;
+        document.getElementById('cattleSellAmount').required = false;
       }
+      document.getElementById('cattleTagSelect').value = "";
+      document.getElementById('newCattleTagGroup').style.display = "none";
     }
 
     function handleCattleTagChange() {
@@ -651,13 +683,20 @@
       if (tag === "ADD_NEW") {
         grp.style.display = "flex";
         document.getElementById('cattleCategory').value = "Milking Cow";
-        document.getElementById('cattleAmount').value = "";
+        if (tx === "Sell") document.getElementById('cattleSellAmount').value = "";
       } else if (tag !== "") {
         grp.style.display = "none";
         if (cattleMapData[tag]) {
-          document.getElementById('cattleCategory').value = cattleMapData[tag].category;
+          let info = cattleMapData[tag];
+          document.getElementById('cattleCategory').value = info.category;
           if (tx === "Sell") {
-            document.getElementById('cattleAmount').value = cattleMapData[tag].amount; // Auto fill purchase price as base selling price suggestion
+            // Auto fill selling price, calving count, and DOB/Age
+            document.getElementById('cattleSellAmount').value = info.sellingPrice || "";
+            document.getElementById('cattleCalving').value = info.calvingCount || 0;
+            if (info.dob) {
+              document.getElementById('cattleDob').value = info.dob.split('T')[0];
+              calculateCattleAge();
+            }
           }
         }
       } else {
@@ -686,12 +725,25 @@
 
       document.getElementById('lblCattleTotalRecords').innerText = entries.length;
       let html = "";
-      if (entries.length === 0) html = '<tr><td colspan="7" style="text-align: center;">No records found.</td></tr>';
+      if (entries.length === 0) html = '<tr><td colspan="8" style="text-align: center;">No records found.</td></tr>';
       else {
         for (let i = entries.length - 1; i >= 0; i--) {
           let c = entries[i];
           let formattedDate = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
-          html += `<tr><td>${formattedDate}</td><td>${c.transactionType}</td><td>${c.category}</td><td>${c.tagNumber}</td><td>${c.partyName}</td><td>₹ ${parseFloat(c.amount || 0).toFixed(2)}</td><td><span class="badge ${c.status === 'Paid' ? 'paid' : 'pending'}">${c.status}</span></td></tr>`;
+          let formattedDob = c.dob ? new Date(c.dob).toLocaleDateString('en-GB') : 'N/A';
+          let sellingDisplay = c.sellingPrice ? "₹ " + parseFloat(c.sellingPrice).toFixed(2) : (c.transactionType === "Sell" && c.amount ? "₹ " + parseFloat(c.amount).toFixed(2) : "-");
+          let detailsText = `Age: ${c.age || 'N/A'}<br>DOB: ${formattedDob}<br>Calving Count: ${c.calvingCount || 0}`;
+          
+          html += `<tr>
+            <td>${formattedDate}</td>
+            <td>${c.transactionType}</td>
+            <td>${c.category}</td>
+            <td>${c.tagNumber}</td>
+            <td>${c.partyName}</td>
+            <td style="color: #047857; font-weight: 700;">${sellingDisplay}</td>
+            <td><small>${detailsText}</small></td>
+            <td><span class="badge ${c.status === 'Paid' ? 'paid' : 'pending'}">${c.status}</span></td>
+          </tr>`;
         }
       }
       document.getElementById('cattleLedgerTableBody').innerHTML = html;
@@ -711,23 +763,36 @@
         if (!tagNumber) { alert("Kripya Tag Number darj karein"); return; }
       }
 
+      const txType = document.getElementById('cattleTxType').value;
+      let finalAmount = "";
+      let finalSellingPrice = "";
+
+      if (txType === "Purchase") {
+        finalAmount = document.getElementById('cattlePurchaseAmount').value;
+        finalSellingPrice = document.getElementById('cattleSellingPrice').value;
+      } else {
+        finalAmount = document.getElementById('cattleSellAmount').value;
+        finalSellingPrice = finalAmount;
+      }
+
       const btn = document.getElementById('cattleSubmitBtn');
       btn.innerText = "Saving Record..."; btn.disabled = true;
 
       const payload = {
         action: "addCattleRecord",
         date: document.getElementById('cattleDate').value,
-        transactionType: document.getElementById('cattleTxType').value,
+        transactionType: txType,
         category: document.getElementById('cattleCategory').value,
         tagNumber: tagNumber,
         partyName: partyName,
         mobile: document.getElementById('cattleMobile').value,
-        amount: document.getElementById('cattleAmount').value,
+        amount: finalAmount,
         status: document.getElementById('cattleStatus').value,
         dob: document.getElementById('cattleDob').value,
         age: document.getElementById('cattleAge').value,
         calvingCount: document.getElementById('cattleCalving').value,
-        pregnancyDate: document.getElementById('cattlePregDate').value
+        pregnancyDate: document.getElementById('cattlePregDate').value,
+        sellingPrice: finalSellingPrice
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
@@ -741,6 +806,7 @@
           document.getElementById('cattleDate').valueAsDate = new Date();
           document.getElementById('newCattlePartyGroup').style.display = "none";
           document.getElementById('newCattleTagGroup').style.display = "none";
+          handleCattleTxTypeChange();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }

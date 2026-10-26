@@ -71,12 +71,13 @@
     .badge { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
     .badge.paid { background: #d1fae5; color: #065f46; }
     .badge.pending { background: #fef3c7; color: #92400e; }
+    .badge.deposit { background: #e0f2fe; color: #0369a1; }
 
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; width: 100%; }
     @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
     .form-group { display: flex; flex-direction: column; width: 100%; }
     label { font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #334155; }
-    input, select { padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: #fff; width: 100%; }
+    input, select, textarea { padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: #fff; width: 100%; }
     input[readonly] { background-color: #f8fafc; cursor: not-allowed; }
 
     .submit-btn { margin-top: 15px; width: 100%; padding: 12px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
@@ -375,6 +376,7 @@
               </div>
               <div class="form-group" id="newExpVendorGroup" style="display:none;"><label>New Vendor Name</label><input type="text" id="newExpVendorName" placeholder="Enter Vendor Name"></div>
               <div class="form-group"><label>Vendor Contact Number:</label><input type="tel" id="expVendorMobile" placeholder="Mobile Number" required></div>
+              <div class="form-group"><label>Note / Message (Optional):</label><input type="text" id="expNote" placeholder="e.g. Order note or details"></div>
               <div class="form-group">
                 <label>Payment Status:</label>
                 <select id="expPaymentStatus" required>
@@ -563,6 +565,7 @@
               <div class="form-grid" style="align-items: flex-end;">
                 <div class="form-group"><label>Payment Date</label><input type="date" id="expDepositDate"></div>
                 <div class="form-group"><label>Amount (₹)</label><input type="number" id="expDepositAmount" placeholder="Enter Amount"></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Note / Message (Kahan ya kaise diya)</label><input type="text" id="expDepositNote" placeholder="e.g. Cash diya ya Online transfer kiya"></div>
               </div>
               <button type="button" class="action-btn" onclick="submitCattleExpDeposit()" style="margin-top: 12px; width: 100%;">Save Payment to Vendor</button>
             </div>
@@ -576,6 +579,7 @@
                     <th>Qty / Unit</th>
                     <th>Rate (₹)</th>
                     <th>Total Amount (₹)</th>
+                    <th>Note / Details</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -591,7 +595,7 @@
         <div class="card printable-card">
           <div class="company-banner" style="text-align: left;">
             <h3>Debt Statement (Kisko Dena Hai)</h3>
-            <div class="dairy-address" style="margin: 0;">View outstanding payables to vendors and suppliers.</div>
+            <div class="dairy-address" style="margin: 0;">View outstanding payables to vendors, suppliers and cattle dealers.</div>
           </div>
           
           <div class="form-grid no-print" style="margin-bottom: 20px;">
@@ -608,9 +612,9 @@
 
           <div id="debtStatementContent" style="display: block;">
             <div class="party-info-box">
-              <div class="party-info-item"><span class="title">Selected Vendor</span><span class="value" id="lblDebtVendorName">All Vendors</span></div>
+              <div class="party-info-item"><span class="title">Selected Vendor / Dealer</span><span class="value" id="lblDebtVendorName">All Vendors</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblDebtVendorMobile">-</span></div>
-              <div class="party-info-item"><span class="title">Total Debt (Dena Hai)</span><span class="value" id="lblDebtTotalAmount" style="color: #6366f1;">₹ 0.00</span></div>
+              <div class="party-info-item"><span class="title">Total Remaining Balance (Dena Hai)</span><span class="value" id="lblDebtTotalAmount" style="color: #6366f1;">₹ 0.00</span></div>
             </div>
 
             <div class="table-container">
@@ -618,11 +622,10 @@
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Vendor Name</th>
-                    <th>Product / Item</th>
-                    <th>Qty / Unit</th>
-                    <th>Rate (₹)</th>
-                    <th>Total Debt Amount (₹)</th>
+                    <th>Vendor / Dealer</th>
+                    <th>Description / Item</th>
+                    <th>Amount (₹)</th>
+                    <th>Note / Details</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -763,12 +766,10 @@
 
     function updateDashboardUI(bulkEntries, retailEntries, cattleEntries, cattleExpenses) {
       let totalSales = 0, totalQty = 0, milkPending = 0, milkDeposited = 0;
-      let cattleInvestment = 0, totalExpenses = 0, expenseDeposited = 0;
+      let cattleInvestment = 0, totalExpenses = 0;
       let cattleCounts = { "Milking Cow": 0, "Milking Buffalo": 0, "Heifer": 0, "Calf": 0, "Bull": 0 };
       
-      // Vendor-wise expense and payment tracking for Debt calculation (Kisko Dena Hai)
-      let vendorExpenses = {};
-      let vendorPayments = {};
+      let allPayables = {}; // name -> { total: 0, paid: 0, mobile: '' }
 
       if (bulkEntries) {
         bulkEntries.forEach(e => {
@@ -791,9 +792,18 @@
       if (cattleEntries) {
         cattleEntries.forEach(c => {
           let amt = parseFloat(c.amount) || 0;
+          let pName = c.partyName || "Unknown";
           if (c.transactionType === "Purchase") {
             cattleInvestment += amt;
             if (cattleCounts[c.category] !== undefined) cattleCounts[c.category]++;
+            
+            if (!allPayables[pName]) allPayables[pName] = { total: 0, paid: 0, mobile: c.mobile || "" };
+            if (c.status !== "Paid") {
+              allPayables[pName].total += amt;
+            } else {
+              allPayables[pName].total += amt;
+              allPayables[pName].paid += amt;
+            }
           } else if (c.transactionType === "Sell") {
             cattleInvestment -= amt;
             if (cattleCounts[c.category] !== undefined && cattleCounts[c.category] > 0) cattleCounts[c.category]--;
@@ -805,12 +815,16 @@
         cattleExpenses.forEach(ex => {
           let amt = parseFloat(ex.totalAmount) || 0;
           let vName = ex.vendorName || "Unknown";
+          if (!allPayables[vName]) allPayables[vName] = { total: 0, paid: 0, mobile: ex.vendorMobile || "" };
+          
           if (ex.productName !== "Payment Deposit") {
             totalExpenses += amt;
-            vendorExpenses[vName] = (vendorExpenses[vName] || 0) + amt;
+            allPayables[vName].total += amt;
+            if (ex.paymentStatus === "Paid") {
+              allPayables[vName].paid += amt;
+            }
           } else {
-            expenseDeposited += amt;
-            vendorPayments[vName] = (vendorPayments[vName] || 0) + amt;
+            allPayables[vName].paid += amt;
           }
         });
       }
@@ -818,13 +832,10 @@
       let netPendingLenaHai = milkPending - milkDeposited;
       if (netPendingLenaHai < 0) netPendingLenaHai = 0;
 
-      // Calculate total debt (Dena Hai) across all vendors
       let totalDebtDenaHai = 0;
-      for (let v in vendorExpenses) {
-        let vExp = vendorExpenses[v] || 0;
-        let vPay = vendorPayments[v] || 0;
-        let vDiff = vExp - vPay;
-        if (vDiff > 0) totalDebtDenaHai += vDiff;
+      for (let name in allPayables) {
+        let diff = allPayables[name].total - allPayables[name].paid;
+        if (diff > 0) totalDebtDenaHai += diff;
       }
 
       document.getElementById('dashTotalSales').innerText = "₹ " + totalSales.toFixed(2);
@@ -888,49 +899,97 @@
     }
     function populateDebtStatementDropdown() {
       const p = document.getElementById('debtStatementSelect');
+      let combinedVendors = {...cattleVendorData};
+      // Include cattle purchase parties as well
+      allCattleEntriesGlobal.forEach(c => {
+        if (c.transactionType === "Purchase" && c.partyName) {
+          combinedVendors[c.partyName] = c.mobile || "";
+        }
+      });
+
       p.innerHTML = '<option value="ALL">📊 All Debt Statement (Full Record)</option>';
-      for (let k in cattleVendorData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
+      for (let k in combinedVendors) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
     }
 
     function loadDebtStatement() {
       const sel = document.getElementById('debtStatementSelect').value;
-      let entries = allCattleExpensesGlobal;
+      
+      // Collect all payables from Cattle Expenses + Cattle Purchases
+      let allRecords = [];
+      
+      allCattleExpensesGlobal.forEach(e => {
+        allRecords.push({
+          date: e.date,
+          name: e.vendorName,
+          mobile: e.vendorMobile,
+          desc: e.productName === "Payment Deposit" ? "Payment Deposit" : `${e.productName} (${e.quantity} ${e.unit || ''})`,
+          amount: parseFloat(e.totalAmount) || 0,
+          isDeposit: e.productName === "Payment Deposit",
+          note: e.note || (e.productName === "Payment Deposit" ? "Payment given" : "Expense pending")
+        });
+      });
 
+      allCattleEntriesGlobal.forEach(c => {
+        if (c.transactionType === "Purchase") {
+          allRecords.push({
+            date: c.date,
+            name: c.partyName,
+            mobile: c.mobile,
+            desc: `Cattle Purchase [${c.category} - Tag: ${c.tagNumber}]`,
+            amount: parseFloat(c.amount) || 0,
+            isDeposit: false,
+            note: c.status === "Paid" ? "Paid at purchase" : "Pending purchase amount"
+          });
+        }
+      });
+
+      let filtered = allRecords;
+      let targetMobile = "-";
       if (sel !== "ALL") {
-        entries = entries.filter(e => e.vendorName === sel);
+        filtered = allRecords.filter(r => r.name === sel);
         document.getElementById('lblDebtVendorName').innerText = sel;
-        document.getElementById('lblDebtVendorMobile').innerText = cattleVendorData[sel] || '-';
+        if (filtered.length > 0 && filtered[0].mobile) targetMobile = filtered[0].mobile;
+        document.getElementById('lblDebtVendorMobile').innerText = targetMobile;
       } else {
-        document.getElementById('lblDebtVendorName').innerText = "All Vendors";
+        document.getElementById('lblDebtVendorName').innerText = "All Vendors & Dealers";
         document.getElementById('lblDebtVendorMobile').innerText = "-";
       }
 
       let totalExp = 0, totalPaid = 0, tableHtml = "";
-      // Filter out only actual expenses and payments
-      let filteredEntries = entries.filter(e => e.productName !== "Payment Deposit");
-      
-      if (filteredEntries.length === 0) {
-        tableHtml = '<tr><td colspan="7" style="text-align: center;">No debt records found.</td></tr>';
+      if (filtered.length === 0) {
+        tableHtml = '<tr><td colspan="6" style="text-align: center;">No debt records found.</td></tr>';
       } else {
-        for (let i = filteredEntries.length - 1; i >= 0; i--) {
-          let e = filteredEntries[i];
-          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-          let amt = parseFloat(e.totalAmount) || 0;
-          totalExp += amt;
+        // Sort by date ascending
+        filtered.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+        for (let i = 0; i < filtered.length; i++) {
+          let r = filtered[i];
+          let formattedDate = r.date ? new Date(r.date).toLocaleDateString('en-GB') : '';
+          
+          if (r.isDeposit || r.note.includes("Paid")) {
+            totalPaid += r.amount;
+          } else {
+            totalExp += r.amount;
+          }
+
+          let badgeClass = r.isDeposit ? 'deposit' : (r.note.includes('Paid') ? 'paid' : 'pending');
+          let statusText = r.isDeposit ? 'Deposit' : (r.note.includes('Paid') ? 'Paid' : 'Pending');
 
           tableHtml += `<tr>
             <td>${formattedDate}</td>
-            <td><b>${e.vendorName}</b></td>
-            <td>${e.productName}</td>
-            <td>${e.quantity} ${e.unit || ''}</td>
-            <td>₹ ${parseFloat(e.ratePerUnit || 0).toFixed(2)}</td>
-            <td style="color: #6366f1; font-weight: 700;">₹ ${amt.toFixed(2)}</td>
-            <td><span class="badge ${e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
+            <td><b>${r.name}</b></td>
+            <td>${r.desc}</td>
+            <td style="color: ${r.isDeposit ? '#047857' : '#1e293b'}; font-weight: 700;">₹ ${r.amount.toFixed(2)}</td>
+            <td><small>${r.note}</small></td>
+            <td><span class="badge ${badgeClass}">${statusText}</span></td>
           </tr>`;
         }
       }
 
-      document.getElementById('lblDebtTotalAmount').innerText = "₹ " + totalExp.toFixed(2);
+      let netRemainingBalance = totalExp - totalPaid;
+      if (netRemainingBalance < 0) netRemainingBalance = 0;
+
+      document.getElementById('lblDebtTotalAmount').innerText = "₹ " + netRemainingBalance.toFixed(2);
       document.getElementById('debtStatementTableBody').innerHTML = tableHtml;
     }
 
@@ -975,7 +1034,7 @@
 
       let totalExpAmt = 0, totalPaidAmt = 0, tableHtml = "";
       if (entries.length === 0) {
-        tableHtml = '<tr><td colspan="6" style="text-align: center;">No expense records found.</td></tr>';
+        tableHtml = '<tr><td colspan="7" style="text-align: center;">No expense records found.</td></tr>';
       } else {
         for (let i = entries.length - 1; i >= 0; i--) {
           let e = entries[i];
@@ -988,13 +1047,16 @@
             totalExpAmt += amt;
           }
 
+          let badgeClass = e.productName === 'Payment Deposit' ? 'deposit' : (e.paymentStatus === 'Paid' ? 'paid' : 'pending');
+
           tableHtml += `<tr>
             <td>${formattedDate}</td>
             <td><b>${e.productName}</b><br><small>${e.vendorName}</small></td>
             <td>${e.quantity} ${e.unit || ''}</td>
             <td>₹ ${parseFloat(e.ratePerUnit || 0).toFixed(2)}</td>
             <td style="color: ${e.productName === 'Payment Deposit' ? '#047857' : '#1e293b'}; font-weight: 700;">₹ ${amt.toFixed(2)}</td>
-            <td><span class="badge ${e.productName === 'Payment Deposit' || e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
+            <td>${e.note || '-'}</td>
+            <td><span class="badge ${badgeClass}">${e.productName === 'Payment Deposit' ? 'Deposit' : (e.paymentStatus || 'Pending')}</span></td>
           </tr>`;
         }
       }
@@ -1009,6 +1071,8 @@
       const vendor = document.getElementById('cattleExpLedgerSelect').value;
       const amt = document.getElementById('expDepositAmount').value;
       const date = document.getElementById('expDepositDate').value;
+      const note = document.getElementById('expDepositNote').value.trim() || "Payment Given";
+      
       if (vendor === "ALL" || !vendor || !amt || parseFloat(amt) <= 0 || !date) { alert("Kripya kisi specific vendor ko select karein aur date/amount sahi bharein!"); return; }
       
       const payload = {
@@ -1016,7 +1080,8 @@
         vendorName: vendor,
         vendorMobile: cattleVendorData[vendor] || "",
         amount: amt,
-        date: date
+        date: date,
+        note: note
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
@@ -1024,6 +1089,7 @@
         if(res.result === "success") {
           alert("Vendor payment successfully save ho gaya!");
           document.getElementById('expDepositAmount').value = "";
+          document.getElementById('expDepositNote').value = "";
           fetchDashboardData();
           setTimeout(() => loadCattleExpLedger(), 1000);
         }
@@ -1063,7 +1129,8 @@
         totalAmount: document.getElementById('expTotalAmount').value,
         vendorName: vendorName,
         vendorMobile: document.getElementById('expVendorMobile').value,
-        paymentStatus: document.getElementById('expPaymentStatus').value
+        paymentStatus: document.getElementById('expPaymentStatus').value,
+        note: document.getElementById('expNote').value.trim()
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })

@@ -6,7 +6,7 @@
   <title>Tiwari & Sons Dairy Farm</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; }
+    body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; width: 100vw; }
     
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9; }
     .overlay.active { display: block; }
@@ -26,59 +26,59 @@
     .dropdown-container.show { display: flex !important; }
     .dropdown-container .menu-btn { padding-left: 38px; font-size: 14px; color: #94a3b8; }
 
-    .main-wrapper { flex: 1; margin-left: 270px; transition: all 0.3s ease; display: flex; flex-direction: column; width: 100%; }
-    .main-wrapper.full-width { margin-left: 0; }
+    .main-wrapper { flex: 1; margin-left: 270px; transition: all 0.3s ease; display: flex; flex-direction: column; width: calc(100% - 270px); }
+    .main-wrapper.full-width { margin-left: 0; width: 100%; }
 
     .top-bar { background: rgba(255, 255, 255, 0.95); padding: 15px 25px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 5; }
     .toggle-btn { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; }
     .page-title { margin-left: 20px; font-size: 20px; font-weight: 800; color: #1e293b; }
 
-    .content { padding: 25px; overflow-y: auto; flex: 1; }
-    .page-section { display: none; }
+    .content { padding: 20px; overflow-y: auto; flex: 1; width: 100%; max-width: 100%; }
+    .page-section { display: none; width: 100%; }
     .page-section.active { display: block; }
 
-    .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 950px; margin: 0 auto; text-align: center; }
+    .card { background: rgba(255, 255, 255, 0.95); border-radius: 14px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); max-width: 900px; margin: 0 auto; text-align: center; width: 100%; }
 
-    .company-banner { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 25px 20px; border-radius: 12px; color: #fff; margin-bottom: 22px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1); }
-    .company-banner h3 { font-size: 24px; font-weight: 900; margin-bottom: 8px; background: linear-gradient(45deg, #38bdf8, #818cf8, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px; text-transform: uppercase; }
-    .dairy-address { font-size: 13px; color: #cbd5e1; line-height: 1.5; font-weight: 500; max-width: 800px; margin: 0 auto; }
+    .company-banner { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 20px 15px; border-radius: 12px; color: #fff; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1); width: 100%; }
+    .company-banner h3 { font-size: 22px; font-weight: 900; margin-bottom: 6px; background: linear-gradient(45deg, #38bdf8, #818cf8, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px; text-transform: uppercase; }
+    .dairy-address { font-size: 12px; color: #cbd5e1; line-height: 1.4; font-weight: 500; max-width: 100%; margin: 0 auto; }
 
-    .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 15px; text-align: left; }
-    .dash-card { padding: 22px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; min-height: 105px; display: flex; flex-direction: column; justify-content: center; }
+    .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; text-align: left; width: 100%; }
+    .dash-card { padding: 20px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); color: #fff; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
     .dash-card.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
     .dash-card.green { background: linear-gradient(135deg, #10b981, #047857); }
     .dash-card.amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
     .dash-card.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
     .dash-card.teal { background: linear-gradient(135deg, #06b6d4, #0e7490); }
-    .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 700; }
-    .dash-card p { font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 700; }
+    .dash-card p { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
     .mini-spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 22px; height: 22px; animation: spin 0.8s linear infinite; display: inline-block; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .party-info-box { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px; text-align: left; }
+    .party-info-box { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 20px; text-align: left; width: 100%; }
     .party-info-item { display: flex; flex-direction: column; gap: 2px; }
     .party-info-item span.title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
-    .party-info-item span.value { font-size: 15px; font-weight: 800; color: #0f172a; }
+    .party-info-item span.value { font-size: 14px; font-weight: 800; color: #0f172a; }
 
-    .table-container { margin-top: 25px; overflow-x: auto; text-align: left; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; }
-    th, td { padding: 12px; text-align: left; font-size: 13px; border-bottom: 1px solid #e2e8f0; }
+    .table-container { margin-top: 20px; overflow-x: auto; text-align: left; width: 100%; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; min-width: 600px; }
+    th, td { padding: 10px 12px; text-align: left; font-size: 12px; border-bottom: 1px solid #e2e8f0; }
     th { background: #1e293b; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 11px; }
     tr:nth-child(even) { background-color: #f8fafc; }
-    .badge { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge { padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
     .badge.paid { background: #d1fae5; color: #065f46; }
     .badge.pending { background: #fef3c7; color: #92400e; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; width: 100%; }
     @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
-    .form-group { display: flex; flex-direction: column; }
-    label { font-size: 13px; font-weight: 700; margin-bottom: 5px; color: #334155; }
-    input, select { padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 14px; background: #fff; }
+    .form-group { display: flex; flex-direction: column; width: 100%; }
+    label { font-size: 12px; font-weight: 700; margin-bottom: 4px; color: #334155; }
+    input, select { padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; background: #fff; width: 100%; }
     input[readonly] { background-color: #f8fafc; cursor: not-allowed; }
 
-    .submit-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
-    .action-btn { padding: 8px 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; margin-top: 10px; }
+    .submit-btn { margin-top: 15px; width: 100%; padding: 12px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .action-btn { padding: 8px 14px; background: #10b981; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px; margin-top: 10px; }
     .action-btn:hover { background: #059669; }
 
     @media print {
@@ -166,7 +166,7 @@
             </div>
             <div class="dash-card teal" style="grid-column: span auto;">
               <h4>Live Cattle Count</h4>
-              <p id="dashCattleCount" style="font-size: 16px; font-weight: 600; line-height: 1.4;"><span class="mini-spinner"></span></p>
+              <p id="dashCattleCount" style="font-size: 15px; font-weight: 600; line-height: 1.4;"><span class="mini-spinner"></span></p>
             </div>
           </div>
         </div>
@@ -279,7 +279,7 @@
               <div class="form-group" id="newCattleTagGroup" style="display:none;"><label>New Tag Number</label><input type="text" id="newCattleTag" placeholder="e.g. TAG-405"></div>
               
               <!-- Purchase Fields Container -->
-              <div id="purchaseFieldsContainer" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div id="purchaseFieldsContainer" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
                 <div class="form-group"><label>Purchase Amount (₹):</label><input type="number" id="cattlePurchaseAmount" placeholder="e.g. 60000"></div>
                 <div class="form-group"><label>Selling Price (₹) [Future Sell]:</label><input type="number" id="cattleSellingPrice" placeholder="e.g. 70000"></div>
               </div>
@@ -488,7 +488,7 @@
       if (pageId === 'dashboard') document.getElementById('pageTitle').innerText = "Dashboard";
       else if (pageId === 'bulkMilk') document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
       else if (pageId === 'retailMilk') document.getElementById('pageTitle').innerText = "Retail Milk Sales";
-      else if (pageId === 'cattleMgmt') document.getElementById('pageTitle').innerText = "Cattle Purchase & Sell Management";
+      else if (pageId === 'cattleMgmt') { document.getElementById('pageTitle').innerText = "Cattle Purchase & Sell Management"; }
       else if (pageId === 'bulkLedger') { document.getElementById('pageTitle').innerText = "Bulk Dairy Ledger Statement"; populateLedgerPartyDropdown(); }
       else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
       else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
@@ -673,6 +673,9 @@
       }
       document.getElementById('cattleTagSelect').value = "";
       document.getElementById('newCattleTagGroup').style.display = "none";
+      document.getElementById('cattleDob').value = "";
+      document.getElementById('cattleAge').value = "";
+      document.getElementById('cattleCalving').value = "0";
     }
 
     function handleCattleTagChange() {
@@ -683,18 +686,23 @@
       if (tag === "ADD_NEW") {
         grp.style.display = "flex";
         document.getElementById('cattleCategory').value = "Milking Cow";
-        if (tx === "Sell") document.getElementById('cattleSellAmount').value = "";
+        if (tx === "Sell") {
+          document.getElementById('cattleSellAmount').value = "";
+          document.getElementById('cattleCalving').value = "0";
+          document.getElementById('cattleDob').value = "";
+          document.getElementById('cattleAge').value = "";
+        }
       } else if (tag !== "") {
         grp.style.display = "none";
         if (cattleMapData[tag]) {
           let info = cattleMapData[tag];
           document.getElementById('cattleCategory').value = info.category;
           if (tx === "Sell") {
-            // Auto fill selling price, calving count, and DOB/Age
             document.getElementById('cattleSellAmount').value = info.sellingPrice || "";
             document.getElementById('cattleCalving').value = info.calvingCount || 0;
             if (info.dob) {
-              document.getElementById('cattleDob').value = info.dob.split('T')[0];
+              let dobStr = info.dob.split('T')[0];
+              document.getElementById('cattleDob').value = dobStr;
               calculateCattleAge();
             }
           }
@@ -730,9 +738,28 @@
         for (let i = entries.length - 1; i >= 0; i--) {
           let c = entries[i];
           let formattedDate = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
-          let formattedDob = c.dob ? new Date(c.dob).toLocaleDateString('en-GB') : 'N/A';
+          
+          // Dynamic live age calculation based on today's date from DOB
+          let liveAgeText = "N/A";
+          let formattedDob = "N/A";
+          if (c.dob) {
+            let dobDate = new Date(c.dob);
+            formattedDob = dobDate.toLocaleDateString('en-GB');
+            let today = new Date();
+            let years = today.getFullYear() - dobDate.getFullYear();
+            let months = today.getMonth() - dobDate.getMonth();
+            let days = today.getDate() - dobDate.getDate();
+            if (days < 0) {
+              months--;
+              let prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+              days += prevMonth.getDate();
+            }
+            if (months < 0) { years--; months += 12; }
+            liveAgeText = `${years} Yrs, ${months} Mos, ${days} Days`;
+          }
+
           let sellingDisplay = c.sellingPrice ? "₹ " + parseFloat(c.sellingPrice).toFixed(2) : (c.transactionType === "Sell" && c.amount ? "₹ " + parseFloat(c.amount).toFixed(2) : "-");
-          let detailsText = `Age: ${c.age || 'N/A'}<br>DOB: ${formattedDob}<br>Calving Count: ${c.calvingCount || 0}`;
+          let detailsText = `Age: ${liveAgeText}<br>DOB: ${formattedDob}<br>Calving Count: ${c.calvingCount || 0}`;
           
           html += `<tr>
             <td>${formattedDate}</td>

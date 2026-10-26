@@ -51,6 +51,7 @@
     .dash-card.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
     .dash-card.teal { background: linear-gradient(135deg, #06b6d4, #0e7490); }
     .dash-card.rose { background: linear-gradient(135deg, #f43f5e, #be123c); }
+    .dash-card.indigo { background: linear-gradient(135deg, #6366f1, #4338ca); }
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 700; }
     .dash-card p { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
@@ -127,6 +128,7 @@
           <button class="menu-btn" onclick="switchPage('retailLedger', this)">📋 Retail Milk Statement</button>
           <button class="menu-btn" onclick="switchPage('cattleLedger', this)">📋 Cattle Ledger</button>
           <button class="menu-btn" onclick="switchPage('cattleExpLedger', this)">📋 Expenses & Vendor Ledger</button>
+          <button class="menu-btn" onclick="switchPage('debtStatement', this)">📋 Debt Statement (Kisko Dena Hai)</button>
         </div>
       </li>
     </ul>
@@ -160,8 +162,12 @@
               <p id="dashTotalQty"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card amber">
-              <h4>Pending Payments</h4>
+              <h4>Pending Payments (Lena Hai)</h4>
               <p id="dashPendingAmount"><span class="mini-spinner"></span></p>
+            </div>
+            <div class="dash-card indigo">
+              <h4>Debt Payment (Dena Hai)</h4>
+              <p id="dashDebtAmount"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card purple">
               <h4>Cattle Investment</h4>
@@ -580,6 +586,53 @@
         </div>
       </section>
 
+      <!-- DEBT STATEMENT PAGE (KISKO DENA HAI) -->
+      <section id="debtStatement" class="page-section">
+        <div class="card printable-card">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Debt Statement (Kisko Dena Hai)</h3>
+            <div class="dairy-address" style="margin: 0;">View outstanding payables to vendors and suppliers.</div>
+          </div>
+          
+          <div class="form-grid no-print" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>Select View / Party</label>
+              <select id="debtStatementSelect" onchange="loadDebtStatement()">
+                <option value="ALL">📊 All Debt Statement (Full Record)</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
+            </div>
+          </div>
+
+          <div id="debtStatementContent" style="display: block;">
+            <div class="party-info-box">
+              <div class="party-info-item"><span class="title">Selected Vendor</span><span class="value" id="lblDebtVendorName">All Vendors</span></div>
+              <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblDebtVendorMobile">-</span></div>
+              <div class="party-info-item"><span class="title">Total Debt (Dena Hai)</span><span class="value" id="lblDebtTotalAmount" style="color: #6366f1;">₹ 0.00</span></div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Vendor Name</th>
+                    <th>Product / Item</th>
+                    <th>Qty / Unit</th>
+                    <th>Rate (₹)</th>
+                    <th>Total Debt Amount (₹)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="debtStatementTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -621,6 +674,7 @@
       else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
       else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
       else if (pageId === 'cattleExpLedger') { document.getElementById('pageTitle').innerText = "Cattle Expenses & Vendor Ledger"; populateCattleExpLedgerDropdown(); loadCattleExpLedger(); }
+      else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Kisko Dena Hai)"; populateDebtStatementDropdown(); loadDebtStatement(); }
 
       document.querySelectorAll('.sidebar-menu .menu-btn').forEach(btn => btn.classList.remove('active'));
       if (element) element.classList.add('active');
@@ -674,6 +728,7 @@
       document.getElementById('dashTotalSales').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashTotalQty').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashPendingAmount').innerHTML = '<span class="mini-spinner"></span>';
+      document.getElementById('dashDebtAmount').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashCattleInvestment').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashCattleExpenses').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashCattleCount').innerHTML = '<span class="mini-spinner"></span>';
@@ -699,6 +754,7 @@
           document.getElementById('dashTotalSales').innerText = "₹ 0.00";
           document.getElementById('dashTotalQty').innerText = "0 Liters";
           document.getElementById('dashPendingAmount').innerText = "₹ 0.00";
+          document.getElementById('dashDebtAmount').innerText = "₹ 0.00";
           document.getElementById('dashCattleInvestment').innerText = "₹ 0.00";
           document.getElementById('dashCattleExpenses').innerText = "₹ 0.00";
           document.getElementById('dashCattleCount').innerText = "No Cattles";
@@ -706,16 +762,20 @@
     }
 
     function updateDashboardUI(bulkEntries, retailEntries, cattleEntries, cattleExpenses) {
-      let totalSales = 0, totalQty = 0, totalPending = 0, totalDeposited = 0;
-      let cattleInvestment = 0, totalExpenses = 0;
+      let totalSales = 0, totalQty = 0, milkPending = 0, milkDeposited = 0;
+      let cattleInvestment = 0, totalExpenses = 0, expenseDeposited = 0;
       let cattleCounts = { "Milking Cow": 0, "Milking Buffalo": 0, "Heifer": 0, "Calf": 0, "Bull": 0 };
+      
+      // Vendor-wise expense and payment tracking for Debt calculation (Kisko Dena Hai)
+      let vendorExpenses = {};
+      let vendorPayments = {};
 
       if (bulkEntries) {
         bulkEntries.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
-          if (!e.shift || e.shift !== "Payment") { totalSales += amt; totalQty += qty; if (e.paymentStatus && e.paymentStatus.includes("Pending")) totalPending += amt; }
-          else totalDeposited += amt;
+          if (!e.shift || e.shift !== "Payment") { totalSales += amt; totalQty += qty; if (e.paymentStatus && e.paymentStatus.includes("Pending")) milkPending += amt; }
+          else milkDeposited += amt;
         });
       }
 
@@ -723,8 +783,8 @@
         retailEntries.forEach(r => {
           let amt = parseFloat(r.totalAmount) || 0;
           let qty = parseFloat(r.quantity) || 0;
-          if (r.amountStatus !== "Deposit") { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus.includes("Pending")) totalPending += amt; }
-          else totalDeposited += amt;
+          if (r.amountStatus !== "Deposit") { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus.includes("Pending")) milkPending += amt; }
+          else milkDeposited += amt;
         });
       }
 
@@ -744,21 +804,33 @@
       if (cattleExpenses) {
         cattleExpenses.forEach(ex => {
           let amt = parseFloat(ex.totalAmount) || 0;
+          let vName = ex.vendorName || "Unknown";
           if (ex.productName !== "Payment Deposit") {
             totalExpenses += amt;
-            if (ex.paymentStatus && ex.paymentStatus.includes("Pending")) totalPending += amt;
+            vendorExpenses[vName] = (vendorExpenses[vName] || 0) + amt;
           } else {
-            totalDeposited += amt;
+            expenseDeposited += amt;
+            vendorPayments[vName] = (vendorPayments[vName] || 0) + amt;
           }
         });
       }
 
-      let netPending = totalPending - totalDeposited;
-      if (netPending < 0) netPending = 0;
+      let netPendingLenaHai = milkPending - milkDeposited;
+      if (netPendingLenaHai < 0) netPendingLenaHai = 0;
+
+      // Calculate total debt (Dena Hai) across all vendors
+      let totalDebtDenaHai = 0;
+      for (let v in vendorExpenses) {
+        let vExp = vendorExpenses[v] || 0;
+        let vPay = vendorPayments[v] || 0;
+        let vDiff = vExp - vPay;
+        if (vDiff > 0) totalDebtDenaHai += vDiff;
+      }
 
       document.getElementById('dashTotalSales').innerText = "₹ " + totalSales.toFixed(2);
       document.getElementById('dashTotalQty').innerText = totalQty.toFixed(2) + " Liters";
-      document.getElementById('dashPendingAmount').innerText = "₹ " + netPending.toFixed(2);
+      document.getElementById('dashPendingAmount').innerText = "₹ " + netPendingLenaHai.toFixed(2);
+      document.getElementById('dashDebtAmount').innerText = "₹ " + totalDebtDenaHai.toFixed(2);
       document.getElementById('dashCattleInvestment').innerText = "₹ " + cattleInvestment.toFixed(2);
       document.getElementById('dashCattleExpenses').innerText = "₹ " + totalExpenses.toFixed(2);
 
@@ -814,6 +886,53 @@
       p.innerHTML = '<option value="ALL">📊 All Vendors Expense Statement (Full Record)</option>';
       for (let k in cattleVendorData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
     }
+    function populateDebtStatementDropdown() {
+      const p = document.getElementById('debtStatementSelect');
+      p.innerHTML = '<option value="ALL">📊 All Debt Statement (Full Record)</option>';
+      for (let k in cattleVendorData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
+    }
+
+    function loadDebtStatement() {
+      const sel = document.getElementById('debtStatementSelect').value;
+      let entries = allCattleExpensesGlobal;
+
+      if (sel !== "ALL") {
+        entries = entries.filter(e => e.vendorName === sel);
+        document.getElementById('lblDebtVendorName').innerText = sel;
+        document.getElementById('lblDebtVendorMobile').innerText = cattleVendorData[sel] || '-';
+      } else {
+        document.getElementById('lblDebtVendorName').innerText = "All Vendors";
+        document.getElementById('lblDebtVendorMobile').innerText = "-";
+      }
+
+      let totalExp = 0, totalPaid = 0, tableHtml = "";
+      // Filter out only actual expenses and payments
+      let filteredEntries = entries.filter(e => e.productName !== "Payment Deposit");
+      
+      if (filteredEntries.length === 0) {
+        tableHtml = '<tr><td colspan="7" style="text-align: center;">No debt records found.</td></tr>';
+      } else {
+        for (let i = filteredEntries.length - 1; i >= 0; i--) {
+          let e = filteredEntries[i];
+          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+          let amt = parseFloat(e.totalAmount) || 0;
+          totalExp += amt;
+
+          tableHtml += `<tr>
+            <td>${formattedDate}</td>
+            <td><b>${e.vendorName}</b></td>
+            <td>${e.productName}</td>
+            <td>${e.quantity} ${e.unit || ''}</td>
+            <td>₹ ${parseFloat(e.ratePerUnit || 0).toFixed(2)}</td>
+            <td style="color: #6366f1; font-weight: 700;">₹ ${amt.toFixed(2)}</td>
+            <td><span class="badge ${e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
+          </tr>`;
+        }
+      }
+
+      document.getElementById('lblDebtTotalAmount').innerText = "₹ " + totalExp.toFixed(2);
+      document.getElementById('debtStatementTableBody').innerHTML = tableHtml;
+    }
 
     function handleExpProductChange() {
       const val = document.getElementById('expProductSelect').value;
@@ -867,9 +986,6 @@
             totalPaidAmt += amt;
           } else {
             totalExpAmt += amt;
-            if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
-              // counted towards pending balance if unpaid
-            }
           }
 
           tableHtml += `<tr>

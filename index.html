@@ -50,6 +50,7 @@
     .dash-card.amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
     .dash-card.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
     .dash-card.teal { background: linear-gradient(135deg, #06b6d4, #0e7490); }
+    .dash-card.rose { background: linear-gradient(135deg, #f43f5e, #be123c); }
     .dash-card h4 { color: rgba(255, 255, 255, 0.9); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 700; }
     .dash-card p { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 
@@ -115,6 +116,7 @@
           <button class="menu-btn" onclick="switchPage('bulkMilk', this)">🥛 Bulk Selling Milk</button>
           <button class="menu-btn" onclick="switchPage('retailMilk', this)">🥛 Retail Milk Sales</button>
           <button class="menu-btn" onclick="switchPage('cattleMgmt', this)">🐂 Cattle Purchase & Sell</button>
+          <button class="menu-btn" onclick="switchPage('cattleExpenses', this)">🌾 Cattle Expenses & Maint.</button>
         </div>
       </li>
 
@@ -124,6 +126,7 @@
           <button class="menu-btn" onclick="switchPage('bulkLedger', this)">📋 Bulk Dairy Ledger</button>
           <button class="menu-btn" onclick="switchPage('retailLedger', this)">📋 Retail Milk Statement</button>
           <button class="menu-btn" onclick="switchPage('cattleLedger', this)">📋 Cattle Ledger</button>
+          <button class="menu-btn" onclick="switchPage('cattleExpLedger', this)">📋 Expenses & Vendor Ledger</button>
         </div>
       </li>
     </ul>
@@ -163,6 +166,10 @@
             <div class="dash-card purple">
               <h4>Cattle Investment</h4>
               <p id="dashCattleInvestment"><span class="mini-spinner"></span></p>
+            </div>
+            <div class="dash-card rose">
+              <h4>Cattle Expenses</h4>
+              <p id="dashCattleExpenses"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card teal" style="grid-column: span auto;">
               <h4>Live Cattle Count</h4>
@@ -278,13 +285,11 @@
               </div>
               <div class="form-group" id="newCattleTagGroup" style="display:none;"><label>New Tag Number</label><input type="text" id="newCattleTag" placeholder="e.g. TAG-405"></div>
               
-              <!-- Purchase Fields Container -->
               <div id="purchaseFieldsContainer" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
                 <div class="form-group"><label>Purchase Amount (₹):</label><input type="number" id="cattlePurchaseAmount" placeholder="e.g. 60000"></div>
                 <div class="form-group"><label>Selling Price (₹) [Future Sell]:</label><input type="number" id="cattleSellingPrice" placeholder="e.g. 70000"></div>
               </div>
 
-              <!-- Sell Amount Field (Shown only on Sell mode) -->
               <div class="form-group" id="sellAmountGroup" style="display:none;"><label>Actual Selling Price (₹):</label><input type="number" id="cattleSellAmount" placeholder="e.g. 70000"></div>
 
               <div class="form-group">
@@ -305,11 +310,74 @@
               </div>
               <div class="form-group"><label>Cattle Date Of Birth (Optional):</label><input type="date" id="cattleDob" onchange="calculateCattleAge()"></div>
               <div class="form-group"><label>Age (Auto calculated):</label><input type="text" id="cattleAge" readonly placeholder="Auto Years, Months & Days"></div>
-              <div class="form-group"><label>Calving Count (Kitni baar jan chuki hai):</label><input type="number" id="cattleCalving" placeholder="e.g. 2" value="0"></div>
-              <div class="form-group"><label>Pregnancy Date (Yadi pregnant hai):</label><input type="date" id="cattlePregDate" onchange="calculatePregnancyDuration()"></div>
-              <div class="form-group"><label>Pregnancy Duration (Auto calculated):</label><input type="text" id="cattlePregDuration" readonly placeholder="Auto Months & Days"></div>
+              <div class="form-group"><label>Calving Count:</label><input type="number" id="cattleCalving" placeholder="e.g. 2" value="0"></div>
+              <div class="form-group"><label>Pregnancy Date:</label><input type="date" id="cattlePregDate" onchange="calculatePregnancyDuration()"></div>
+              <div class="form-group"><label>Pregnancy Duration:</label><input type="text" id="cattlePregDuration" readonly placeholder="Auto Months & Days"></div>
             </div>
             <button type="submit" class="submit-btn" id="cattleSubmitBtn" style="background: linear-gradient(135deg, #ea580c, #c2410c);">💾 Save Cattle Record</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- CATTLE EXPENSES & MAINTENANCE BILLING PAGE -->
+      <section id="cattleExpenses" class="page-section">
+        <div class="card">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Cattle Expenses & Maintenance</h3>
+            <div class="dairy-address" style="margin: 0;">Record expenses like Dana, Pashu Ahar, Bhusa, Medicines etc.</div>
+          </div>
+
+          <form id="cattleExpenseForm">
+            <div class="form-grid">
+              <div class="form-group"><label>Date:</label><input type="date" id="expDate" required></div>
+              <div class="form-group">
+                <label>Product / Item Name:</label>
+                <select id="expProductSelect" onchange="handleExpProductChange()" required>
+                  <option value="">-- Select Product --</option>
+                  <option value="Dana">Dana</option>
+                  <option value="Pashu Ahar">Pashu Ahar</option>
+                  <option value="Bhusa">Bhusa</option>
+                  <option value="Medicine">Medicine</option>
+                  <option value="ADD_NEW">+ Add New Product</option>
+                </select>
+              </div>
+              <div class="form-group" id="newExpProductGroup" style="display:none;"><label>New Product Name</label><input type="text" id="newExpProductName" placeholder="Enter Product Name"></div>
+              
+              <div class="form-group">
+                <label>Unit Option:</label>
+                <select id="expUnitSelect" onchange="handleExpUnitChange()" required>
+                  <option value="">-- Select Unit --</option>
+                  <option value="Bag">Bag</option>
+                  <option value="Kg">Kg</option>
+                  <option value="Packet">Packet</option>
+                  <option value="Liter">Liter</option>
+                  <option value="ADD_NEW">+ Add New Unit</option>
+                </select>
+              </div>
+              <div class="form-group" id="newExpUnitGroup" style="display:none;"><label>New Unit Name</label><input type="text" id="newExpUnitName" placeholder="Enter Unit Name"></div>
+
+              <div class="form-group"><label>Quantity:</label><input type="number" step="0.01" id="expQuantity" oninput="calculateExpTotal()" required></div>
+              <div class="form-group"><label>Rate Per Unit / Ltr (₹):</label><input type="number" step="0.01" id="expRate" oninput="calculateExpTotal()" required></div>
+              <div class="form-group"><label>Total Amount (Auto):</label><input type="number" id="expTotalAmount" readonly required></div>
+
+              <div class="form-group">
+                <label>Vendor Name:</label>
+                <select id="expVendorSelect" onchange="handleExpVendorChange()" required>
+                  <option value="">-- Select Vendor --</option>
+                  <option value="ADD_NEW">+ Add New Vendor</option>
+                </select>
+              </div>
+              <div class="form-group" id="newExpVendorGroup" style="display:none;"><label>New Vendor Name</label><input type="text" id="newExpVendorName" placeholder="Enter Vendor Name"></div>
+              <div class="form-group"><label>Vendor Contact Number:</label><input type="tel" id="expVendorMobile" placeholder="Mobile Number" required></div>
+              <div class="form-group">
+                <label>Payment Status:</label>
+                <select id="expPaymentStatus" required>
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn" id="expSubmitBtn" style="background: linear-gradient(135deg, #059669, #047857);">💾 Save Cattle Expense</button>
           </form>
         </div>
       </section>
@@ -457,6 +525,61 @@
         </div>
       </section>
 
+      <!-- CATTLE EXPENSES & VENDOR LEDGER PAGE -->
+      <section id="cattleExpLedger" class="page-section">
+        <div class="card printable-card">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Cattle Expenses & Vendor Ledger Statement</h3>
+            <div class="dairy-address" style="margin: 0;">Tingajpur-Madana Road 01 Peer Ki Bawdi Vill- Tingajpur, Post- Madana, Tehsil-Gulana, Dist-Shajapur (M.P) 465227</div>
+          </div>
+          
+          <div class="form-grid no-print" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>Select Vendor / Filter</label>
+              <select id="cattleExpLedgerSelect" onchange="loadCattleExpLedger()">
+                <option value="ALL">📊 All Vendors Expense Statement (Full Record)</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
+            </div>
+          </div>
+
+          <div id="cattleExpLedgerContent" style="display: block;">
+            <div class="party-info-box">
+              <div class="party-info-item"><span class="title">Selected Vendor</span><span class="value" id="lblCattleExpVendorName">All Vendors</span></div>
+              <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblCattleExpVendorMobile">-</span></div>
+              <div class="party-info-item"><span class="title">Total Pending Balance</span><span class="value" id="lblCattleExpPending" style="color: #d97706;">₹ 0.00</span></div>
+            </div>
+
+            <div class="no-print" style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;" id="vendorDepositBox">
+              <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Deposit Amount / Pay Vendor</h4>
+              <div class="form-grid" style="align-items: flex-end;">
+                <div class="form-group"><label>Payment Date</label><input type="date" id="expDepositDate"></div>
+                <div class="form-group"><label>Amount (₹)</label><input type="number" id="expDepositAmount" placeholder="Enter Amount"></div>
+              </div>
+              <button type="button" class="action-btn" onclick="submitCattleExpDeposit()" style="margin-top: 12px; width: 100%;">Save Payment to Vendor</button>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Product / Item</th>
+                    <th>Qty / Unit</th>
+                    <th>Rate (₹)</th>
+                    <th>Total Amount (₹)</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="cattleExpLedgerTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -467,15 +590,19 @@
     let retailCustomerData = {};
     let cattlePartyData = {};
     let cattleMapData = {};
+    let cattleVendorData = {};
     let allEntriesGlobal = [];
     let allRetailEntriesGlobal = [];
     let allCattleEntriesGlobal = [];
+    let allCattleExpensesGlobal = [];
 
     document.getElementById('entryDate').valueAsDate = new Date();
     document.getElementById('depositDate').valueAsDate = new Date();
     document.getElementById('retailEntryDate').valueAsDate = new Date();
     document.getElementById('retailDepositDate').valueAsDate = new Date();
     document.getElementById('cattleDate').valueAsDate = new Date();
+    document.getElementById('expDate').valueAsDate = new Date();
+    document.getElementById('expDepositDate').valueAsDate = new Date();
 
     function openSidebar() { document.getElementById('sidebar').classList.remove('hidden'); document.getElementById('overlay').classList.add('active'); }
     function closeSidebar() { document.getElementById('sidebar').classList.add('hidden'); document.getElementById('overlay').classList.remove('active'); }
@@ -489,9 +616,11 @@
       else if (pageId === 'bulkMilk') document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
       else if (pageId === 'retailMilk') document.getElementById('pageTitle').innerText = "Retail Milk Sales";
       else if (pageId === 'cattleMgmt') { document.getElementById('pageTitle').innerText = "Cattle Purchase & Sell Management"; }
+      else if (pageId === 'cattleExpenses') { document.getElementById('pageTitle').innerText = "Cattle Expenses & Maintenance"; }
       else if (pageId === 'bulkLedger') { document.getElementById('pageTitle').innerText = "Bulk Dairy Ledger Statement"; populateLedgerPartyDropdown(); }
       else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
       else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
+      else if (pageId === 'cattleExpLedger') { document.getElementById('pageTitle').innerText = "Cattle Expenses & Vendor Ledger"; populateCattleExpLedgerDropdown(); loadCattleExpLedger(); }
 
       document.querySelectorAll('.sidebar-menu .menu-btn').forEach(btn => btn.classList.remove('active'));
       if (element) element.classList.add('active');
@@ -535,11 +664,18 @@
       document.getElementById('cattlePregDuration').value = `${totalMonths} Months, ${days} Days`;
     }
 
+    function calculateExpTotal() {
+      const qty = parseFloat(document.getElementById('expQuantity').value) || 0;
+      const rate = parseFloat(document.getElementById('expRate').value) || 0;
+      document.getElementById('expTotalAmount').value = (qty * rate).toFixed(2);
+    }
+
     function fetchDashboardData() {
       document.getElementById('dashTotalSales').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashTotalQty').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashPendingAmount').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashCattleInvestment').innerHTML = '<span class="mini-spinner"></span>';
+      document.getElementById('dashCattleExpenses').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashCattleCount').innerHTML = '<span class="mini-spinner"></span>';
 
       fetch(SCRIPT_URL)
@@ -550,11 +686,13 @@
             if (data.retailCustomers) { retailCustomerData = data.retailCustomers; populateRetailCustomerDropdown(); }
             if (data.cattleParties) { cattlePartyData = data.cattleParties; populateCattlePartyDropdown(); }
             if (data.cattleMap) { cattleMapData = data.cattleMap; populateCattleTagDropdown(); }
+            if (data.cattleVendors) { cattleVendorData = data.cattleVendors; populateCattleVendorDropdown(); }
             if (data.entries) allEntriesGlobal = data.entries;
             if (data.retailEntries) allRetailEntriesGlobal = data.retailEntries;
             if (data.cattleEntries) allCattleEntriesGlobal = data.cattleEntries;
+            if (data.cattleExpensesEntries) allCattleExpensesGlobal = data.cattleExpensesEntries;
             
-            updateDashboardUI(allEntriesGlobal, allRetailEntriesGlobal, allCattleEntriesGlobal);
+            updateDashboardUI(allEntriesGlobal, allRetailEntriesGlobal, allCattleEntriesGlobal, allCattleExpensesGlobal);
           }
         })
         .catch(err => {
@@ -562,13 +700,14 @@
           document.getElementById('dashTotalQty').innerText = "0 Liters";
           document.getElementById('dashPendingAmount').innerText = "₹ 0.00";
           document.getElementById('dashCattleInvestment').innerText = "₹ 0.00";
+          document.getElementById('dashCattleExpenses').innerText = "₹ 0.00";
           document.getElementById('dashCattleCount').innerText = "No Cattles";
         });
     }
 
-    function updateDashboardUI(bulkEntries, retailEntries, cattleEntries) {
+    function updateDashboardUI(bulkEntries, retailEntries, cattleEntries, cattleExpenses) {
       let totalSales = 0, totalQty = 0, totalPending = 0, totalDeposited = 0;
-      let cattleInvestment = 0;
+      let cattleInvestment = 0, totalExpenses = 0;
       let cattleCounts = { "Milking Cow": 0, "Milking Buffalo": 0, "Heifer": 0, "Calf": 0, "Bull": 0 };
 
       if (bulkEntries) {
@@ -602,6 +741,18 @@
         });
       }
 
+      if (cattleExpenses) {
+        cattleExpenses.forEach(ex => {
+          let amt = parseFloat(ex.totalAmount) || 0;
+          if (ex.productName !== "Payment Deposit") {
+            totalExpenses += amt;
+            if (ex.paymentStatus && ex.paymentStatus.includes("Pending")) totalPending += amt;
+          } else {
+            totalDeposited += amt;
+          }
+        });
+      }
+
       let netPending = totalPending - totalDeposited;
       if (netPending < 0) netPending = 0;
 
@@ -609,6 +760,7 @@
       document.getElementById('dashTotalQty').innerText = totalQty.toFixed(2) + " Liters";
       document.getElementById('dashPendingAmount').innerText = "₹ " + netPending.toFixed(2);
       document.getElementById('dashCattleInvestment').innerText = "₹ " + cattleInvestment.toFixed(2);
+      document.getElementById('dashCattleExpenses').innerText = "₹ " + totalExpenses.toFixed(2);
 
       let countStr = "";
       for (let cat in cattleCounts) {
@@ -637,6 +789,11 @@
       p.innerHTML = '<option value="">Select Tag Number</option><option value="ADD_NEW">+ Add New Tag</option>';
       for (let tag in cattleMapData) { let opt = document.createElement('option'); opt.value = tag; opt.textContent = tag; p.appendChild(opt); }
     }
+    function populateCattleVendorDropdown() {
+      const p = document.getElementById('expVendorSelect');
+      p.innerHTML = '<option value="">-- Select Vendor --</option><option value="ADD_NEW">+ Add New Vendor</option>';
+      for (let k in cattleVendorData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
+    }
     function populateLedgerPartyDropdown() {
       const p = document.getElementById('ledgerPartySelect');
       p.innerHTML = '<option value="">-- Select Party --</option>';
@@ -652,6 +809,164 @@
       p.innerHTML = '<option value="ALL">📊 All Cattle Statement (Full Record)</option>';
       for (let k in cattlePartyData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
     }
+    function populateCattleExpLedgerDropdown() {
+      const p = document.getElementById('cattleExpLedgerSelect');
+      p.innerHTML = '<option value="ALL">📊 All Vendors Expense Statement (Full Record)</option>';
+      for (let k in cattleVendorData) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
+    }
+
+    function handleExpProductChange() {
+      const val = document.getElementById('expProductSelect').value;
+      const grp = document.getElementById('newExpProductGroup');
+      if (val === "ADD_NEW") grp.style.display = "flex";
+      else grp.style.display = "none";
+    }
+
+    function handleExpUnitChange() {
+      const val = document.getElementById('expUnitSelect').value;
+      const grp = document.getElementById('newExpUnitGroup');
+      if (val === "ADD_NEW") grp.style.display = "flex";
+      else grp.style.display = "none";
+    }
+
+    function handleExpVendorChange() {
+      const sel = document.getElementById('expVendorSelect').value;
+      const grp = document.getElementById('newExpVendorGroup');
+      const mob = document.getElementById('expVendorMobile');
+      if (sel === "ADD_NEW") { grp.style.display = "flex"; mob.value = ""; mob.readOnly = false; }
+      else if (sel !== "") { grp.style.display = "none"; mob.value = cattleVendorData[sel] || ""; mob.readOnly = true; }
+      else { grp.style.display = "none"; mob.value = ""; mob.readOnly = false; }
+    }
+
+    function loadCattleExpLedger() {
+      const sel = document.getElementById('cattleExpLedgerSelect').value;
+      let entries = allCattleExpensesGlobal;
+      const vendorBox = document.getElementById('vendorDepositBox');
+
+      if (sel !== "ALL") {
+        entries = entries.filter(e => e.vendorName === sel);
+        document.getElementById('lblCattleExpVendorName').innerText = sel;
+        document.getElementById('lblCattleExpVendorMobile').innerText = cattleVendorData[sel] || '-';
+        vendorBox.style.display = "block";
+      } else {
+        document.getElementById('lblCattleExpVendorName').innerText = "All Vendors";
+        document.getElementById('lblCattleExpVendorMobile').innerText = "-";
+        vendorBox.style.display = "none";
+      }
+
+      let totalExpAmt = 0, totalPaidAmt = 0, tableHtml = "";
+      if (entries.length === 0) {
+        tableHtml = '<tr><td colspan="6" style="text-align: center;">No expense records found.</td></tr>';
+      } else {
+        for (let i = entries.length - 1; i >= 0; i--) {
+          let e = entries[i];
+          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+          let amt = parseFloat(e.totalAmount) || 0;
+          
+          if (e.productName === "Payment Deposit") {
+            totalPaidAmt += amt;
+          } else {
+            totalExpAmt += amt;
+            if (e.paymentStatus && e.paymentStatus.includes("Pending")) {
+              // counted towards pending balance if unpaid
+            }
+          }
+
+          tableHtml += `<tr>
+            <td>${formattedDate}</td>
+            <td><b>${e.productName}</b><br><small>${e.vendorName}</small></td>
+            <td>${e.quantity} ${e.unit || ''}</td>
+            <td>₹ ${parseFloat(e.ratePerUnit || 0).toFixed(2)}</td>
+            <td style="color: ${e.productName === 'Payment Deposit' ? '#047857' : '#1e293b'}; font-weight: 700;">₹ ${amt.toFixed(2)}</td>
+            <td><span class="badge ${e.productName === 'Payment Deposit' || e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
+          </tr>`;
+        }
+      }
+
+      let netPending = totalExpAmt - totalPaidAmt;
+      if (netPending < 0) netPending = 0;
+      document.getElementById('lblCattleExpPending').innerText = "₹ " + netPending.toFixed(2);
+      document.getElementById('cattleExpLedgerTableBody').innerHTML = tableHtml;
+    }
+
+    function submitCattleExpDeposit() {
+      const vendor = document.getElementById('cattleExpLedgerSelect').value;
+      const amt = document.getElementById('expDepositAmount').value;
+      const date = document.getElementById('expDepositDate').value;
+      if (vendor === "ALL" || !vendor || !amt || parseFloat(amt) <= 0 || !date) { alert("Kripya kisi specific vendor ko select karein aur date/amount sahi bharein!"); return; }
+      
+      const payload = {
+        action: "updateCattleExpensePayment",
+        vendorName: vendor,
+        vendorMobile: cattleVendorData[vendor] || "",
+        amount: amt,
+        date: date
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        if(res.result === "success") {
+          alert("Vendor payment successfully save ho gaya!");
+          document.getElementById('expDepositAmount').value = "";
+          fetchDashboardData();
+          setTimeout(() => loadCattleExpLedger(), 1000);
+        }
+      });
+    }
+
+    document.getElementById('cattleExpenseForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let prodName = document.getElementById('expProductSelect').value;
+      if (prodName === "ADD_NEW") {
+        prodName = document.getElementById('newExpProductName').value.trim();
+        if (!prodName) { alert("Kripya Product Name darj karein"); return; }
+      }
+
+      let unitName = document.getElementById('expUnitSelect').value;
+      if (unitName === "ADD_NEW") {
+        unitName = document.getElementById('newExpUnitName').value.trim();
+        if (!unitName) { alert("Kripya Unit darj karein"); return; }
+      }
+
+      let vendorName = document.getElementById('expVendorSelect').value;
+      if (vendorName === "ADD_NEW") {
+        vendorName = document.getElementById('newExpVendorName').value.trim();
+        if (!vendorName) { alert("Kripya Vendor Name darj karein"); return; }
+      }
+
+      const btn = document.getElementById('expSubmitBtn');
+      btn.innerText = "Saving Expense..."; btn.disabled = true;
+
+      const payload = {
+        action: "addCattleExpense",
+        date: document.getElementById('expDate').value,
+        productName: prodName,
+        unit: unitName,
+        quantity: document.getElementById('expQuantity').value,
+        ratePerUnit: document.getElementById('expRate').value,
+        totalAmount: document.getElementById('expTotalAmount').value,
+        vendorName: vendorName,
+        vendorMobile: document.getElementById('expVendorMobile').value,
+        paymentStatus: document.getElementById('expPaymentStatus').value
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "💾 Save Cattle Expense"; btn.disabled = false;
+        if(res.result === "success") {
+          alert("Cattle Expense successfully save ho gaya!");
+          cattleVendorData[vendorName] = payload.vendorMobile;
+          populateCattleVendorDropdown();
+          document.getElementById('cattleExpenseForm').reset();
+          document.getElementById('expDate').valueAsDate = new Date();
+          document.getElementById('newExpProductGroup').style.display = "none";
+          document.getElementById('newExpUnitGroup').style.display = "none";
+          document.getElementById('newExpVendorGroup').style.display = "none";
+          fetchDashboardData();
+          switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        }
+      });
+    });
 
     function handleCattleTxTypeChange() {
       const tx = document.getElementById('cattleTxType').value;
@@ -757,7 +1072,6 @@
 
           let sellingDisplay = c.sellingPrice ? "₹ " + parseFloat(c.sellingPrice).toFixed(2) : (c.transactionType === "Sell" && c.amount ? "₹ " + parseFloat(c.amount).toFixed(2) : "-");
           
-          // Highlighted Age & Calving Count display
           let detailsText = `<div style="background: #e0f2fe; padding: 6px 10px; border-radius: 6px; border-left: 3px solid #0284c7; display: inline-block;">
             <div><b>Age:</b> <span style="color: #0369a1; font-weight: 700;">${liveAgeText}</span></div>
             <div><b>Calving Count:</b> <span style="background: #fef08a; padding: 1px 6px; border-radius: 4px; color: #854d0e; font-weight: 800;">${c.calvingCount || 0}</span></div>

@@ -446,7 +446,7 @@
                     <th>Tag No.</th>
                     <th>Party</th>
                     <th>Selling Price (₹)</th>
-                    <th>Age / DOB / Calving</th>
+                    <th>Age & Calving Count</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -739,12 +739,9 @@
           let c = entries[i];
           let formattedDate = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
           
-          // Dynamic live age calculation based on today's date from DOB
           let liveAgeText = "N/A";
-          let formattedDob = "N/A";
           if (c.dob) {
             let dobDate = new Date(c.dob);
-            formattedDob = dobDate.toLocaleDateString('en-GB');
             let today = new Date();
             let years = today.getFullYear() - dobDate.getFullYear();
             let months = today.getMonth() - dobDate.getMonth();
@@ -759,7 +756,12 @@
           }
 
           let sellingDisplay = c.sellingPrice ? "₹ " + parseFloat(c.sellingPrice).toFixed(2) : (c.transactionType === "Sell" && c.amount ? "₹ " + parseFloat(c.amount).toFixed(2) : "-");
-          let detailsText = `Age: ${liveAgeText}<br>DOB: ${formattedDob}<br>Calving Count: ${c.calvingCount || 0}`;
+          
+          // Highlighted Age & Calving Count display
+          let detailsText = `<div style="background: #e0f2fe; padding: 6px 10px; border-radius: 6px; border-left: 3px solid #0284c7; display: inline-block;">
+            <div><b>Age:</b> <span style="color: #0369a1; font-weight: 700;">${liveAgeText}</span></div>
+            <div><b>Calving Count:</b> <span style="background: #fef08a; padding: 1px 6px; border-radius: 4px; color: #854d0e; font-weight: 800;">${c.calvingCount || 0}</span></div>
+          </div>`;
           
           html += `<tr>
             <td>${formattedDate}</td>
@@ -768,7 +770,7 @@
             <td>${c.tagNumber}</td>
             <td>${c.partyName}</td>
             <td style="color: #047857; font-weight: 700;">${sellingDisplay}</td>
-            <td><small>${detailsText}</small></td>
+            <td>${detailsText}</td>
             <td><span class="badge ${c.status === 'Paid' ? 'paid' : 'pending'}">${c.status}</span></td>
           </tr>`;
         }

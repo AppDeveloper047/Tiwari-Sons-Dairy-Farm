@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,7 +130,7 @@
           <button class="menu-btn" onclick="switchPage('retailLedger', this)">📋 Retail Milk Statement</button>
           <button class="menu-btn" onclick="switchPage('cattleLedger', this)">📋 Cattle Ledger</button>
           <button class="menu-btn" onclick="switchPage('cattleExpLedger', this)">📋 Expenses & Vendor Ledger</button>
-          <button class="menu-btn" onclick="switchPage('debtStatement', this)">📋 Debt Statement (Kisko Dena Hai)</button>
+          <button class="menu-btn" onclick="switchPage('debtStatement', this)">📋 Debt Statement (Payables)</button>
         </div>
       </li>
 
@@ -175,11 +175,11 @@
               <p id="dashTotalQty"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card amber">
-              <h4>Pending Payments (Lena Hai)</h4>
+              <h4>Pending Payments (Receivable)</h4>
               <p id="dashPendingAmount"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card indigo">
-              <h4>Debt Payment (Dena Hai)</h4>
+              <h4>Debt Payment (Payable)</h4>
               <p id="dashDebtAmount"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card purple">
@@ -581,7 +581,7 @@
               <div class="form-grid" style="align-items: flex-end;">
                 <div class="form-group"><label>Payment Date</label><input type="date" id="expDepositDate"></div>
                 <div class="form-group"><label>Amount (₹)</label><input type="number" id="expDepositAmount" placeholder="Enter Amount"></div>
-                <div class="form-group" style="grid-column: span 2;"><label>Note / Message (Kahan ya kaise diya)</label><input type="text" id="expDepositNote" placeholder="e.g. Cash diya ya Online transfer kiya"></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Note / Message (Payment details)</label><input type="text" id="expDepositNote" placeholder="e.g. Cash given or Online transfer"></div>
               </div>
               <button type="button" class="action-btn" onclick="submitCattleExpDeposit()" style="margin-top: 12px; width: 100%;">Save Payment to Vendor</button>
             </div>
@@ -606,11 +606,11 @@
         </div>
       </section>
 
-      <!-- DEBT STATEMENT PAGE (KISKO DENA HAI) -->
+      <!-- DEBT STATEMENT PAGE (PAYABLES) -->
       <section id="debtStatement" class="page-section">
         <div class="card printable-card">
           <div class="company-banner" style="text-align: left;">
-            <h3>Debt Statement (Kisko Dena Hai)</h3>
+            <h3>Debt Statement (Payables)</h3>
             <div class="dairy-address" style="margin: 0;">View outstanding payables to vendors, suppliers and cattle dealers.</div>
           </div>
           
@@ -630,7 +630,7 @@
             <div class="party-info-box">
               <div class="party-info-item"><span class="title">Selected Vendor / Dealer</span><span class="value" id="lblDebtVendorName">All Vendors</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblDebtVendorMobile">-</span></div>
-              <div class="party-info-item"><span class="title">Total Remaining Balance (Dena Hai)</span><span class="value" id="lblDebtTotalAmount" style="color: #6366f1;">₹ 0.00</span></div>
+              <div class="party-info-item"><span class="title">Total Remaining Balance (Payable)</span><span class="value" id="lblDebtTotalAmount" style="color: #6366f1;">₹ 0.00</span></div>
             </div>
 
             <div class="table-container">
@@ -657,39 +657,41 @@
         <div class="card">
           <div class="company-banner" style="text-align: left;">
             <h3>Employee Joining & Registration Form</h3>
-            <div class="dairy-address" style="margin: 0;">Register new employee with complete KYC and salary terms.</div>
+            <div class="dairy-address" style="margin: 0;">Register new employee with complete KYC, separate Bank details and salary terms.</div>
           </div>
 
           <form id="employeeForm">
             <div class="form-grid">
               <div class="form-group"><label>Joining Date:</label><input type="date" id="empJoiningDate" required></div>
+              <div class="form-group"><label>Employee ID:</label><input type="text" id="empIdInput" readonly style="background: #f1f5f9; font-weight: 700; color: #2563eb;"></div>
               <div class="form-group"><label>Employee Full Name:</label><input type="text" id="empName" placeholder="e.g. Ramesh Kumar" required></div>
               <div class="form-group"><label>Mobile Number:</label><input type="tel" id="empMobile" placeholder="10-digit mobile number" required></div>
               <div class="form-group" style="grid-column: span 2;"><label>Full Address:</label><input type="text" id="empAddress" placeholder="Village, Post, Tehsil, District" required></div>
-              <div class="form-group"><label>Witness Name (गवाह):</label><input type="text" id="empWitness" placeholder="Witness Full Name"></div>
+              <div class="form-group"><label>Witness Name:</label><input type="text" id="empWitness" placeholder="Witness Full Name"></div>
               <div class="form-group"><label>Aadhaar Card Number:</label><input type="text" id="empAadhaar" placeholder="Aadhaar Number"></div>
               <div class="form-group"><label>PAN Card (Optional):</label><input type="text" id="empPan" placeholder="PAN Number"></div>
-              <div class="form-group"><label>Bank Account Details (Optional):</label><input type="text" id="empBank" placeholder="A/C No, IFSC, Bank Name"></div>
               
+              <!-- Separated Bank details -->
+              <div class="form-group"><label>Bank Name:</label><input type="text" id="empBankName" placeholder="e.g. State Bank of India"></div>
+              <div class="form-group"><label>IFSC Code:</label><input type="text" id="empIfsc" placeholder="e.g. SBIN0001234"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>Bank Account Number:</label><input type="text" id="empBankAccount" placeholder="Enter Bank Account Number"></div>
+
               <div class="form-group">
                 <label>Salary Basis Type:</label>
                 <select id="empSalaryType" required>
                   <option value="Monthly">Monthly Salary</option>
-                  <option value="Daily">Daily Wages</option>
-                  <option value="Weekly">Weekly Salary</option>
                   <option value="Yearly">Yearly Contract</option>
                 </select>
               </div>
-              <div class="form-group"><label>Daily Salary (₹):</label><input type="number" step="0.01" id="empDaily" oninput="calculateSalaries('daily')"></div>
-              <div class="form-group"><label>Weekly Salary (₹):</label><input type="number" step="0.01" id="empWeekly" oninput="calculateSalaries('weekly')"></div>
-              <div class="form-group"><label>Monthly Salary (₹):</label><input type="number" step="0.01" id="empMonthly" oninput="calculateSalaries('monthly')"></div>
-              <div class="form-group"><label>Yearly Salary (₹):</label><input type="number" step="0.01" id="empYearly" oninput="calculateSalaries('yearly')"></div>
+              <div class="form-group"><label>Monthly Salary (₹):</label><input type="number" step="0.01" id="empMonthly" oninput="calculateEmpSalaries()" required></div>
+              <div class="form-group"><label>Yearly Salary (₹) [Auto]:</label><input type="number" step="0.01" id="empYearly" readonly></div>
+              <div class="form-group"><label>Petrol / Other Allowance (₹):</label><input type="number" step="0.01" id="empAllowance" placeholder="e.g. 1000" value="0"></div>
 
               <div class="form-group" style="grid-column: span 2;">
-                <label>Terms & Conditions (नियम व शर्ते):</label>
-                <textarea id="empTerms" rows="4" placeholder="Dairy par kary karne ke niyam, samay aur shartein yahan likhein...">1. Kary ka samay subah 5:00 baje se shuru hoga.
-2. Samay par aana aur imandari se pashu ki dekhbhal karna anivarya hai.
-3. Kisi bhi prakar ki chutti ki jankari pehle deni hogi.</textarea>
+                <label>Terms & Conditions:</label>
+                <textarea id="empTerms" rows="4" placeholder="Enter work terms, timings and policies here...">1. Work timing starts from 5:00 AM daily.
+2. Punctuality and careful handling of cattle is mandatory.
+3. Prior notice is required for any leave.</textarea>
               </div>
             </div>
             <button type="submit" class="submit-btn" id="empSubmitBtn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">💾 Save Employee Record</button>
@@ -722,6 +724,7 @@
 
           <div id="agreementContent" style="display: none; text-align: left; padding: 10px;">
             <div class="party-info-box" style="margin-bottom: 15px;">
+              <div class="party-info-item"><span class="title">Employee ID</span><span class="value" id="agEmpId">-</span></div>
               <div class="party-info-item"><span class="title">Employee Name</span><span class="value" id="agName">-</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="agMobile">-</span></div>
               <div class="party-info-item"><span class="title">Joining Date</span><span class="value" id="agDate">-</span></div>
@@ -729,24 +732,27 @@
             </div>
 
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">KYC & Identification Details:</h4>
+              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">KYC & Bank Details:</h4>
               <p style="font-size: 12px; color: #334155; line-height: 1.6;">
-                <strong>Witness (गवाह):</strong> <span id="agWitness">-</span><br>
+                <strong>Witness:</strong> <span id="agWitness">-</span><br>
                 <strong>Aadhaar Card:</strong> <span id="agAadhaar">-</span> | <strong>PAN Card:</strong> <span id="agPan">-</span><br>
-                <strong>Bank Account:</strong> <span id="agBank">-</span>
+                <strong>Bank Name:</strong> <span id="agBankName">-</span> | <strong>IFSC:</strong> <span id="agIfsc">-</span><br>
+                <strong>Account No:</strong> <span id="agAccNo">-</span>
               </p>
             </div>
 
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Salary Structure & Terms:</h4>
+              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Salary Structure (Monthly / Yearly):</h4>
               <p style="font-size: 12px; color: #334155; line-height: 1.6;">
                 <strong>Salary Type:</strong> <span id="agSalaryType">-</span><br>
-                <strong>Monthly:</strong> ₹ <span id="agMonthlySal">0</span> | <strong>Daily:</strong> ₹ <span id="agDailySal">0</span>
+                <strong>Monthly Salary:</strong> ₹ <span id="agMonthlySal">0</span><br>
+                <strong>Yearly Salary:</strong> ₹ <span id="agYearlySal">0</span><br>
+                <strong>Petrol / Other Allowance:</strong> ₹ <span id="agAllowance">0</span>
               </p>
             </div>
 
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
-              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Company Rules & Conditions (नियम व शर्ते):</h4>
+              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Company Rules & Conditions:</h4>
               <p style="font-size: 12px; color: #334155; white-space: pre-wrap; line-height: 1.6;" id="agTerms">-</p>
             </div>
 
@@ -786,12 +792,12 @@
               <div class="form-group">
                 <label>Attendance Status:</label>
                 <select id="attStatus" required>
-                  <option value="Present">Present (उपस्थित)</option>
-                  <option value="Half Day">Half Day (आधा दिन)</option>
-                  <option value="Absent / Leave">Absent / Leave (छुट्टी)</option>
+                  <option value="Present">Present</option>
+                  <option value="Half Day">Half Day</option>
+                  <option value="Absent / Leave">Absent / Leave</option>
                 </select>
               </div>
-              <div class="form-group"><label>Reason / Comment (छुट्टी का कारण):</label><input type="text" id="attReason" placeholder="e.g. Personal work / Fever"></div>
+              <div class="form-group"><label>Reason / Comment:</label><input type="text" id="attReason" placeholder="e.g. Personal work / Fever"></div>
             </div>
             <button type="submit" class="submit-btn" id="attSubmitBtn" style="background: linear-gradient(135deg, #059669, #047857);">💾 Save Attendance Record</button>
           </form>
@@ -834,16 +840,16 @@
               <div class="form-group">
                 <label>Payment Type:</label>
                 <select id="payType" required>
-                  <option value="Advance">Advance (पेटी)</option>
+                  <option value="Advance">Advance</option>
                   <option value="Half Salary">Half Salary</option>
                   <option value="Full Salary">Full Salary</option>
                   <option value="Weekly Payment">Weekly Payment</option>
                   <option value="Bonus">Bonus / Incentive</option>
                 </select>
               </div>
-              <div class="form-group"><label>For Month / Period:</label><input type="text" id="payMonth" placeholder="e.g. October 2026" required></div>
+              <div class="form-group"><label>Select Month / Period:</label><input type="month" id="payMonth" required></div>
               <div class="form-group"><label>Amount (₹):</label><input type="number" step="0.01" id="payAmount" placeholder="e.g. 5000" required></div>
-              <div class="form-group" style="grid-column: span 2;"><label>Note / Comment (कैasे दिया / विवरण):</label><input type="text" id="payNote" placeholder="e.g. Cash diya ya PhonePe transfer kiya"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>Note / Comment:</label><input type="text" id="payNote" placeholder="e.g. Cash given or PhonePe transfer"></div>
             </div>
             <button type="submit" class="submit-btn" id="paySubmitBtn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">💾 Save Employee Payment</button>
           </form>
@@ -870,7 +876,7 @@
             </div>
             <div class="form-group">
               <label>Select Month / Period</label>
-              <input type="text" id="slipMonthInput" placeholder="e.g. October 2026">
+              <input type="month" id="slipMonthInput">
             </div>
             <div class="form-group" style="grid-column: span 2; display: flex; gap: 10px;">
               <button type="button" class="action-btn" onclick="generateSalarySlip()" style="background: #059669; flex: 1;">⚙️ Generate Salary Slip</button>
@@ -880,6 +886,7 @@
 
           <div id="salarySlipContent" style="display: none; text-align: left; padding: 10px;">
             <div class="party-info-box" style="margin-bottom: 15px;">
+              <div class="party-info-item"><span class="title">Employee ID</span><span class="value" id="sEmpId">-</span></div>
               <div class="party-info-item"><span class="title">Employee Name</span><span class="value" id="sEmpName">-</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="sEmpMobile">-</span></div>
               <div class="party-info-item"><span class="title">Salary Month</span><span class="value" id="sMonth">-</span></div>
@@ -899,6 +906,11 @@
                     <td><b>Base Monthly Salary</b></td>
                     <td>Standard agreed monthly salary</td>
                     <td id="sBaseSal">₹ 0.00</td>
+                  </tr>
+                  <tr>
+                    <td><b>Petrol / Other Allowance</b></td>
+                    <td>Monthly allowance amount</td>
+                    <td id="sAllowanceAmt">₹ 0.00</td>
                   </tr>
                   <tr>
                     <td><b>Days Worked</b></td>
@@ -980,8 +992,8 @@
       else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
       else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
       else if (pageId === 'cattleExpLedger') { document.getElementById('pageTitle').innerText = "Cattle Expenses & Vendor Ledger"; populateCattleExpLedgerDropdown(); loadCattleExpLedger(); }
-      else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Kisko Dena Hai)"; populateDebtStatementDropdown(); loadDebtStatement(); }
-      else if (pageId === 'employeeJoining') { document.getElementById('pageTitle').innerText = "Employee Joining Form"; }
+      else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Payables)"; populateDebtStatementDropdown(); loadDebtStatement(); }
+      else if (pageId === 'employeeJoining') { document.getElementById('pageTitle').innerText = "Employee Joining Form"; generateNextEmployeeId(); }
       else if (pageId === 'employeeAgreement') { document.getElementById('pageTitle').innerText = "Joining Agreement & Policy"; populateAgreementDropdown(); }
       else if (pageId === 'employeeAttendance') { document.getElementById('pageTitle').innerText = "Attendance & Leave Tracker"; populateAttendanceDropdown(); renderAttendanceTable(); }
       else if (pageId === 'employeePayment') { document.getElementById('pageTitle').innerText = "Employee Payment Deposit"; populateEmployeePaymentDropdown(); }
@@ -994,29 +1006,15 @@
 
     window.onload = function() { fetchDashboardData(); };
 
-    function calculateSalaries(changed) {
-      let daily = parseFloat(document.getElementById('empDaily').value) || 0;
-      let weekly = parseFloat(document.getElementById('empWeekly').value) || 0;
-      let monthly = parseFloat(document.getElementById('empMonthly').value) || 0;
-      let yearly = parseFloat(document.getElementById('empYearly').value) || 0;
+    function generateNextEmployeeId() {
+      let nextNum = employeesGlobal.length + 1;
+      let formattedId = "EMP-" + String(nextNum).padStart(3, '0');
+      document.getElementById('empIdInput').value = formattedId;
+    }
 
-      if (changed === 'daily' && daily > 0) {
-        document.getElementById('empWeekly').value = (daily * 7).toFixed(2);
-        document.getElementById('empMonthly').value = (daily * 30).toFixed(2);
-        document.getElementById('empYearly').value = (daily * 365).toFixed(2);
-      } else if (changed === 'weekly' && weekly > 0) {
-        document.getElementById('empDaily').value = (weekly / 7).toFixed(2);
-        document.getElementById('empMonthly').value = ((weekly / 7) * 30).toFixed(2);
-        document.getElementById('empYearly').value = (weekly * 52).toFixed(2);
-      } else if (changed === 'monthly' && monthly > 0) {
-        document.getElementById('empDaily').value = (monthly / 30).toFixed(2);
-        document.getElementById('empWeekly').value = ((monthly / 30) * 7).toFixed(2);
-        document.getElementById('empYearly').value = (monthly * 12).toFixed(2);
-      } else if (changed === 'yearly' && yearly > 0) {
-        document.getElementById('empDaily').value = (yearly / 365).toFixed(2);
-        document.getElementById('empMonthly').value = (yearly / 12).toFixed(2);
-        document.getElementById('empWeekly').value = ((yearly / 365) * 7).toFixed(2);
-      }
+    function calculateEmpSalaries() {
+      let monthly = parseFloat(document.getElementById('empMonthly').value) || 0;
+      document.getElementById('empYearly').value = (monthly * 12).toFixed(2);
     }
 
     function fetchDashboardData() {
@@ -1156,18 +1154,20 @@
       const payload = {
         action: "addEmployee",
         joiningDate: document.getElementById('empJoiningDate').value,
+        employeeId: document.getElementById('empIdInput').value,
         employeeName: document.getElementById('empName').value.trim(),
         mobileNumber: document.getElementById('empMobile').value.trim(),
         address: document.getElementById('empAddress').value.trim(),
         witness: document.getElementById('empWitness').value.trim(),
         aadhaar: document.getElementById('empAadhaar').value.trim(),
         pan: document.getElementById('empPan').value.trim(),
-        bankDetails: document.getElementById('empBank').value.trim(),
+        bankName: document.getElementById('empBankName').value.trim(),
+        ifscCode: document.getElementById('empIfsc').value.trim(),
+        bankAccount: document.getElementById('empBankAccount').value.trim(),
         salaryType: document.getElementById('empSalaryType').value,
-        dailySalary: document.getElementById('empDaily').value || 0,
-        weeklySalary: document.getElementById('empWeekly').value || 0,
         monthlySalary: document.getElementById('empMonthly').value || 0,
         yearlySalary: document.getElementById('empYearly').value || 0,
+        allowance: document.getElementById('empAllowance').value || 0,
         terms: document.getElementById('empTerms').value.trim()
       };
 
@@ -1175,7 +1175,7 @@
       .then(res => res.json()).then(res => {
         btn.innerText = "💾 Save Employee Record"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Employee successfully register ho gaya!");
+          alert("Employee successfully registered!");
           document.getElementById('employeeForm').reset();
           document.getElementById('empJoiningDate').valueAsDate = new Date();
           fetchDashboardData();
@@ -1190,7 +1190,7 @@
       employeesGlobal.forEach(em => {
         let opt = document.createElement('option');
         opt.value = em.employeeName;
-        opt.textContent = `${em.employeeName} (${em.mobileNumber})`;
+        opt.textContent = `${em.employeeName} [${em.employeeId || 'EMP'}]`;
         sel.appendChild(opt);
       });
     }
@@ -1203,6 +1203,7 @@
       if (!emp) return;
 
       content.style.display = 'block';
+      document.getElementById('agEmpId').innerText = emp.employeeId || '-';
       document.getElementById('agName').innerText = emp.employeeName;
       document.getElementById('agMobile').innerText = emp.mobileNumber;
       document.getElementById('agDate').innerText = emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString('en-GB') : '-';
@@ -1210,10 +1211,13 @@
       document.getElementById('agWitness').innerText = emp.witness || '-';
       document.getElementById('agAadhaar').innerText = emp.aadhaar || 'N/A';
       document.getElementById('agPan').innerText = emp.pan || 'N/A';
-      document.getElementById('agBank').innerText = emp.bankDetails || 'N/A';
-      document.getElementById('agSalaryType').innerText = emp.salaryType || '-';
+      document.getElementById('agBankName').innerText = emp.bankName || 'N/A';
+      document.getElementById('agIfsc').innerText = emp.ifscCode || 'N/A';
+      document.getElementById('agAccNo').innerText = emp.bankAccount || 'N/A';
+      document.getElementById('agSalaryType').innerText = emp.salaryType || 'Monthly';
       document.getElementById('agMonthlySal').innerText = parseFloat(emp.monthlySalary || 0).toFixed(2);
-      document.getElementById('agDailySal').innerText = parseFloat(emp.dailySalary || 0).toFixed(2);
+      document.getElementById('agYearlySal').innerText = parseFloat(emp.yearlySalary || 0).toFixed(2);
+      document.getElementById('agAllowance').innerText = parseFloat(emp.allowance || 0).toFixed(2);
       document.getElementById('agTerms').innerText = emp.terms || '-';
     }
 
@@ -1245,7 +1249,7 @@
       .then(res => res.json()).then(res => {
         btn.innerText = "💾 Save Attendance Record"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Attendance save ho gayi!");
+          alert("Attendance saved successfully!");
           document.getElementById('attendanceForm').reset();
           document.getElementById('attDate').valueAsDate = new Date();
           fetchDashboardData();
@@ -1305,7 +1309,7 @@
         employeeName: document.getElementById('payEmpSelect').value,
         mobileNumber: document.getElementById('payMobile').value,
         paymentType: document.getElementById('payType').value,
-        month: document.getElementById('payMonth').value.trim(),
+        month: document.getElementById('payMonth').value,
         amount: document.getElementById('payAmount').value,
         note: document.getElementById('payNote').value.trim()
       };
@@ -1314,7 +1318,7 @@
       .then(res => res.json()).then(res => {
         btn.innerText = "💾 Save Employee Payment"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Employee Payment successfully save ho gaya!");
+          alert("Employee payment successfully saved!");
           document.getElementById('empPaymentForm').reset();
           document.getElementById('payDate').valueAsDate = new Date();
           fetchDashboardData();
@@ -1336,38 +1340,39 @@
 
     function generateSalarySlip() {
       const empName = document.getElementById('slipEmpSelect').value;
-      const monthStr = document.getElementById('slipMonthInput').value.trim();
+      const monthStr = document.getElementById('slipMonthInput').value;
       const content = document.getElementById('salarySlipContent');
 
-      if (!empName || !monthStr) { alert("Kripya Employee aur Month sahi select/darj karein!"); return; }
+      if (!empName || !monthStr) { alert("Please select Employee and Month!"); return; }
       const emp = employeesGlobal.find(e => e.employeeName === empName);
       if (!emp) return;
 
       content.style.display = 'block';
+      document.getElementById('sEmpId').innerText = emp.employeeId || '-';
       document.getElementById('sEmpName').innerText = emp.employeeName;
       document.getElementById('sEmpMobile').innerText = emp.mobileNumber;
       document.getElementById('sMonth').innerText = monthStr;
 
       let baseMonthly = parseFloat(emp.monthlySalary) || 0;
+      let allowance = parseFloat(emp.allowance) || 0;
       document.getElementById('sBaseSal').innerText = "₹ " + baseMonthly.toFixed(2);
+      document.getElementById('sAllowanceAmt').innerText = "₹ " + allowance.toFixed(2);
 
-      // Count present days for this employee
-      let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && a.status === 'Present').length;
-      let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && a.status === 'Half Day').length;
+      let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Present').length;
+      let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Half Day').length;
       let totalEffectiveDays = presentDays + (halfDays * 0.5);
       document.getElementById('sDaysWorked').innerText = `${totalEffectiveDays} Days (${presentDays} Full, ${halfDays} Half)`;
 
-      // Calculate total advance/payments given to this employee for this month
       let totalPaidThisMonth = 0;
       employeePaymentsGlobal.forEach(p => {
-        if (p.employeeName === empName && p.month.toLowerCase().includes(monthStr.toLowerCase())) {
+        if (p.employeeName === empName && p.month === monthStr) {
           totalPaidThisMonth += parseFloat(p.amount) || 0;
         }
       });
 
       document.getElementById('sAdvancePaid').innerText = "- ₹ " + totalPaidThisMonth.toFixed(2);
 
-      let netPayable = baseMonthly - totalPaidThisMonth;
+      let netPayable = (baseMonthly + allowance) - totalPaidThisMonth;
       if (netPayable < 0) netPayable = 0;
       document.getElementById('sNetPayable').innerText = "₹ " + netPayable.toFixed(2);
     }
@@ -1430,7 +1435,6 @@
       for (let k in combinedVendors) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
     }
 
-    // Additional supporting functions for milk and cattle
     function handleCattleTxTypeChange() {
       const tx = document.getElementById('cattleTxType').value;
       const purchaseFields = document.getElementById('purchaseFieldsContainer');

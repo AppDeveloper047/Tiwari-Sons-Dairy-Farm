@@ -194,7 +194,7 @@
               <h4>Employment Expenses</h4>
               <p id="dashEmpExpenses"><span class="mini-spinner"></span></p>
             </div>
-            <div class="dash-card teal" style="grid-column: span auto;">
+            <div class="dash-card teal">
               <h4>Live Cattle Count</h4>
               <p id="dashCattleCount" style="font-size: 15px; font-weight: 600; line-height: 1.4;"><span class="mini-spinner"></span></p>
             </div>
@@ -331,11 +331,11 @@
                   <option value="Pending">Pending</option>
                 </select>
               </div>
-              <div class="form-group"><label>Cattle Date Of Birth (Optional):</label><input type="date" id="cattleDob" onchange="calculateCattleAge()"></div>
-              <div class="form-group"><label>Age (Auto calculated):</label><input type="text" id="cattleAge" readonly placeholder="Auto Years, Months & Days"></div>
+              <div class="form-group"><label>Cattle Date Of Birth (Optional):</label><input type="date" id="cattleDob"></div>
+              <div class="form-group"><label>Age (Optional):</label><input type="text" id="cattleAge" placeholder="e.g. 3 Years 2 Months"></div>
               <div class="form-group"><label>Calving Count:</label><input type="number" id="cattleCalving" placeholder="e.g. 2" value="0"></div>
-              <div class="form-group"><label>Pregnancy Date:</label><input type="date" id="cattlePregDate" onchange="calculatePregnancyDuration()"></div>
-              <div class="form-group"><label>Pregnancy Duration:</label><input type="text" id="cattlePregDuration" readonly placeholder="Auto Months & Days"></div>
+              <div class="form-group"><label>Pregnancy Date:</label><input type="date" id="cattlePregDate"></div>
+              <div class="form-group"><label>Pregnancy Duration:</label><input type="text" id="cattlePregDuration" placeholder="e.g. 4 Months"></div>
             </div>
             <button type="submit" class="submit-btn" id="cattleSubmitBtn" style="background: linear-gradient(135deg, #ea580c, #c2410c);">💾 Save Cattle Record</button>
           </form>
@@ -652,7 +652,7 @@
         </div>
       </section>
 
-      <!-- 1. EMPLOYEE JOINING FORM PAGE -->
+      <!-- EMPLOYEE JOINING FORM PAGE -->
       <section id="employeeJoining" class="page-section">
         <div class="card">
           <div class="company-banner" style="text-align: left;">
@@ -671,7 +671,6 @@
               <div class="form-group"><label>Aadhaar Card Number:</label><input type="text" id="empAadhaar" placeholder="Aadhaar Number"></div>
               <div class="form-group"><label>PAN Card (Optional):</label><input type="text" id="empPan" placeholder="PAN Number"></div>
               
-              <!-- Bank details -->
               <div class="form-group"><label>Bank Name:</label><input type="text" id="empBankName" placeholder="e.g. State Bank of India"></div>
               <div class="form-group"><label>IFSC Code:</label><input type="text" id="empIfsc" placeholder="e.g. SBIN0001234"></div>
               <div class="form-group" style="grid-column: span 2;"><label>Bank Account Number:</label><input type="text" id="empBankAccount" placeholder="Enter Bank Account Number"></div>
@@ -701,7 +700,7 @@
         </div>
       </section>
 
-      <!-- 2. JOINING AGREEMENT & POLICY PAGE -->
+      <!-- JOINING AGREEMENT & POLICY PAGE -->
       <section id="employeeAgreement" class="page-section">
         <div class="card printable-card">
           <div class="company-banner">
@@ -773,7 +772,7 @@
         </div>
       </section>
 
-      <!-- 3. ATTENDANCE & LEAVE TRACKER PAGE -->
+      <!-- ATTENDANCE & LEAVE TRACKER PAGE -->
       <section id="employeeAttendance" class="page-section">
         <div class="card">
           <div class="company-banner" style="text-align: left;">
@@ -820,7 +819,7 @@
         </div>
       </section>
 
-      <!-- 4. EMPLOYEE PAYMENT DEPOSIT PAGE -->
+      <!-- EMPLOYEE PAYMENT DEPOSIT PAGE -->
       <section id="employeePayment" class="page-section">
         <div class="card">
           <div class="company-banner" style="text-align: left;">
@@ -857,7 +856,7 @@
         </div>
       </section>
 
-      <!-- 5. SALARY SLIP GENERATOR PAGE -->
+      <!-- SALARY SLIP GENERATOR PAGE -->
       <section id="employeeSalarySlip" class="page-section">
         <div class="card printable-card">
           <div class="company-banner">
@@ -1141,7 +1140,185 @@
       document.getElementById('dashCattleCount').innerText = countStr ? countStr.slice(0, -3) : "No live cattles available";
     }
 
-    // --- BULK DAIRY LEDGER FUNCTIONALITY ---
+    /* --- BILLING FORM SUBMISSIONS (FIXED TO PUSH DATA TO GOOGLE SHEET) --- */
+
+    // 1. Bulk Selling Milk Form Submission
+    document.getElementById('bulkMilkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "Submitting Entry..."; btn.disabled = true;
+
+      let partySelectVal = document.getElementById('partySelect').value;
+      let finalPartyName = (partySelectVal === "ADD_NEW") ? document.getElementById('newPartyName').value.trim() : partySelectVal;
+
+      const payload = {
+        action: "addMilkEntry",
+        date: document.getElementById('entryDate').value,
+        shift: document.getElementById('shift').value,
+        milkType: document.getElementById('milkType').value,
+        quantity: document.getElementById('quantity').value,
+        fat: document.getElementById('fat').value,
+        fatRate: document.getElementById('fatRate').value,
+        snfClr: document.getElementById('snfClr').value,
+        ratePerLiter: document.getElementById('ratePerLiter').value,
+        totalAmount: document.getElementById('totalAmount').value,
+        partyName: finalPartyName,
+        mobileNumber: document.getElementById('mobileNumber').value,
+        paymentStatus: document.getElementById('paymentStatus').value
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "Submit Entry to Google Sheet"; btn.disabled = false;
+        if(res.result === "success") {
+          alert("Bulk Milk entry successfully saved to Google Sheet!");
+          document.getElementById('bulkMilkForm').reset();
+          document.getElementById('entryDate').valueAsDate = new Date();
+          document.getElementById('newPartyGroup').style.display = 'none';
+          fetchDashboardData();
+        }
+      }).catch(err => {
+        btn.innerText = "Submit Entry to Google Sheet"; btn.disabled = false;
+        alert("Error saving data. Please check connection.");
+      });
+    });
+
+    // 2. Retail Milk Sales Form Submission
+    document.getElementById('retailMilkForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('retailSubmitBtn');
+      btn.innerText = "Submitting Retail Entry..."; btn.disabled = true;
+
+      let custSelectVal = document.getElementById('retailCustomerSelect').value;
+      let finalCustName = (custSelectVal === "ADD_NEW") ? document.getElementById('newRetailCustomerName').value.trim() : custSelectVal;
+
+      const payload = {
+        action: "addRetailMilkEntry",
+        date: document.getElementById('retailEntryDate').value,
+        customerName: finalCustName,
+        mobileNumber: document.getElementById('retailMobileNumber').value,
+        address: document.getElementById('retailAddress').value,
+        quantity: document.getElementById('retailQuantity').value,
+        ratePerLiter: document.getElementById('retailRatePerLiter').value,
+        totalAmount: document.getElementById('retailTotalAmount').value,
+        amountStatus: document.getElementById('retailAmountStatus').value
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "Submit Retail Entry"; btn.disabled = false;
+        if(res.result === "success") {
+          alert("Retail Milk entry successfully saved to Google Sheet!");
+          document.getElementById('retailMilkForm').reset();
+          document.getElementById('retailEntryDate').valueAsDate = new Date();
+          document.getElementById('newRetailCustomerGroup').style.display = 'none';
+          fetchDashboardData();
+        }
+      }).catch(err => {
+        btn.innerText = "Submit Retail Entry"; btn.disabled = false;
+        alert("Error saving retail data.");
+      });
+    });
+
+    // 3. Cattle Purchase & Sell Form Submission
+    document.getElementById('cattleForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('cattleSubmitBtn');
+      btn.innerText = "Saving Cattle Record..."; btn.disabled = true;
+
+      let tagVal = document.getElementById('cattleTagSelect').value;
+      let finalTag = (tagVal === "ADD_NEW") ? document.getElementById('newCattleTag').value.trim() : tagVal;
+
+      let partyVal = document.getElementById('cattlePartySelect').value;
+      let finalParty = (partyVal === "ADD_NEW") ? document.getElementById('newCattlePartyName').value.trim() : partyVal;
+
+      let txType = document.getElementById('cattleTxType').value;
+      let amountVal = (txType === "Sell") ? document.getElementById('cattleSellAmount').value : document.getElementById('cattlePurchaseAmount').value;
+
+      const payload = {
+        action: "addCattleRecord",
+        date: document.getElementById('cattleDate').value,
+        transactionType: txType,
+        category: document.getElementById('cattleCategory').value,
+        tagNumber: finalTag,
+        purchaseAmount: document.getElementById('cattlePurchaseAmount').value || 0,
+        sellingPrice: document.getElementById('cattleSellingPrice').value || 0,
+        amount: amountVal || 0,
+        partyName: finalParty,
+        mobile: document.getElementById('cattleMobile').value,
+        status: document.getElementById('cattleStatus').value,
+        dob: document.getElementById('cattleDob').value,
+        age: document.getElementById('cattleAge').value,
+        calvingCount: document.getElementById('cattleCalving').value,
+        pregDate: document.getElementById('cattlePregDate').value,
+        pregDuration: document.getElementById('cattlePregDuration').value
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "💾 Save Cattle Record"; btn.disabled = false;
+        if(res.result === "success") {
+          alert("Cattle record saved successfully!");
+          document.getElementById('cattleForm').reset();
+          document.getElementById('cattleDate').valueAsDate = new Date();
+          document.getElementById('newCattleTagGroup').style.display = 'none';
+          document.getElementById('newCattlePartyGroup').style.display = 'none';
+          fetchDashboardData();
+        }
+      }).catch(err => {
+        btn.innerText = "💾 Save Cattle Record"; btn.disabled = false;
+        alert("Error saving cattle record.");
+      });
+    });
+
+    // 4. Cattle Expenses & Maintenance Form Submission
+    document.getElementById('cattleExpenseForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('expSubmitBtn');
+      btn.innerText = "Saving Expense..."; btn.disabled = true;
+
+      let prodVal = document.getElementById('expProductSelect').value;
+      let finalProd = (prodVal === "ADD_NEW") ? document.getElementById('newExpProductName').value.trim() : prodVal;
+
+      let unitVal = document.getElementById('expUnitSelect').value;
+      let finalUnit = (unitVal === "ADD_NEW") ? document.getElementById('newExpUnitName').value.trim() : unitVal;
+
+      let vendorVal = document.getElementById('expVendorSelect').value;
+      let finalVendor = (vendorVal === "ADD_NEW") ? document.getElementById('newExpVendorName').value.trim() : vendorVal;
+
+      const payload = {
+        action: "addCattleExpense",
+        date: document.getElementById('expDate').value,
+        productName: finalProd,
+        unit: finalUnit,
+        quantity: document.getElementById('expQuantity').value,
+        ratePerUnit: document.getElementById('expRate').value,
+        totalAmount: document.getElementById('expTotalAmount').value,
+        vendorName: finalVendor,
+        vendorMobile: document.getElementById('expVendorMobile').value,
+        note: document.getElementById('expNote').value.trim(),
+        paymentStatus: document.getElementById('expPaymentStatus').value
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        btn.innerText = "💾 Save Cattle Expense"; btn.disabled = false;
+        if(res.result === "success") {
+          alert("Cattle Expense entry saved to Google Sheet!");
+          document.getElementById('cattleExpenseForm').reset();
+          document.getElementById('expDate').valueAsDate = new Date();
+          document.getElementById('newExpProductGroup').style.display = 'none';
+          document.getElementById('newExpUnitGroup').style.display = 'none';
+          document.getElementById('newExpVendorGroup').style.display = 'none';
+          fetchDashboardData();
+        }
+      }).catch(err => {
+        btn.innerText = "💾 Save Cattle Expense"; btn.disabled = false;
+        alert("Error saving expense record.");
+      });
+    });
+
+    // --- LEDGER & STATEMENTS LOGIC ---
     function loadLedgerForParty() {
       const partyName = document.getElementById('ledgerPartySelect').value;
       const content = document.getElementById('ledgerContent');
@@ -1211,7 +1388,6 @@
       });
     }
 
-    // --- RETAIL MILK STATEMENT FUNCTIONALITY ---
     function loadRetailLedgerForCustomer() {
       const customerName = document.getElementById('ledgerRetailCustomerSelect').value;
       const content = document.getElementById('retailLedgerContent');
@@ -1281,7 +1457,6 @@
       });
     }
 
-    // --- CATTLE LEDGER ---
     function loadCattleLedger() {
       const selected = document.getElementById('cattleLedgerSelect').value;
       let tableHtml = "";
@@ -1310,7 +1485,6 @@
       document.getElementById('cattleLedgerTableBody').innerHTML = tableHtml;
     }
 
-    // --- CATTLE EXPENSES LEDGER ---
     function loadCattleExpLedger() {
       const selected = document.getElementById('cattleExpLedgerSelect').value;
       let tableHtml = "";
@@ -1378,7 +1552,6 @@
       });
     }
 
-    // --- DEBT STATEMENT ---
     function loadDebtStatement() {
       const selected = document.getElementById('debtStatementSelect').value;
       let tableHtml = "";
@@ -1442,7 +1615,7 @@
       document.getElementById('debtStatementTableBody').innerHTML = tableHtml;
     }
 
-    // --- EMPLOYEE FORM SUBMIT ---
+    // --- EMPLOYEE MODULE LOGIC ---
     document.getElementById('employeeForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('empSubmitBtn');
@@ -1687,7 +1860,7 @@
       document.getElementById('sNetPayable').innerText = "₹ " + netPayable.toFixed(2);
     }
 
-    // Standard dropdown helpers for milk/cattle
+    // Dropdown helpers
     function populatePartyDropdown() {
       const p = document.getElementById('partySelect');
       p.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';

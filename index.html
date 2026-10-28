@@ -65,7 +65,7 @@
     .party-info-item span.value { font-size: 14px; font-weight: 800; color: #0f172a; }
 
     .table-container { margin-top: 20px; overflow-x: auto; text-align: left; width: 100%; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; min-width: 600px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; border-radius: 8px; overflow: hidden; min-width: 650px; }
     th, td { padding: 10px 12px; text-align: left; font-size: 12px; border-bottom: 1px solid #e2e8f0; }
     th { background: #1e293b; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 11px; }
     tr:nth-child(even) { background-color: #f8fafc; }
@@ -290,6 +290,15 @@
                 </select>
               </div>
               <div class="form-group">
+                <label>Tag Number / Identification:</label>
+                <select id="cattleTagSelect" onchange="handleCattleTagChange()" required>
+                  <option value="">Select Tag Number</option>
+                  <option value="ADD_NEW">+ Add New Tag</option>
+                </select>
+              </div>
+              <div class="form-group" id="newCattleTagGroup" style="display:none;"><label>New Tag Number</label><input type="text" id="newCattleTag" placeholder="e.g. BW02"></div>
+
+              <div class="form-group">
                 <label>Cattle Breed / Category:</label>
                 <select id="cattleCategory" required>
                   <option value="Milking Cow">Milking Cow</option>
@@ -299,15 +308,7 @@
                   <option value="Bull">Bull</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label>Tag Number / Identification:</label>
-                <select id="cattleTagSelect" onchange="handleCattleTagChange()" required>
-                  <option value="">Select Tag Number</option>
-                  <option value="ADD_NEW">+ Add New Tag</option>
-                </select>
-              </div>
-              <div class="form-group" id="newCattleTagGroup" style="display:none;"><label>New Tag Number</label><input type="text" id="newCattleTag" placeholder="e.g. TAG-405"></div>
-              
+
               <div id="purchaseFieldsContainer" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
                 <div class="form-group"><label>Purchase Amount (₹):</label><input type="number" id="cattlePurchaseAmount" placeholder="e.g. 60000"></div>
                 <div class="form-group"><label>Selling Price (₹) [Future Sell]:</label><input type="number" id="cattleSellingPrice" placeholder="e.g. 70000"></div>
@@ -334,7 +335,7 @@
               <div class="form-group"><label>Cattle Date Of Birth (Optional):</label><input type="date" id="cattleDob" onchange="calculateCattleAge()"></div>
               <div class="form-group"><label>Age (Auto calculated):</label><input type="text" id="cattleAge" readonly placeholder="Auto Years, Months & Days"></div>
               <div class="form-group"><label>Calving Count:</label><input type="number" id="cattleCalving" placeholder="e.g. 2" value="0"></div>
-              <div class="form-group"><label>Pregnancy Date:</label><input type="date" id="cattlePregDate" onchange="calculatePregnancyDuration()"></div>
+              <div class="form-group"><label>Pregnancy Date:</label><input type="date" id="cattlePregDate"></div>
             </div>
             <button type="submit" class="submit-btn" id="cattleSubmitBtn" style="background: linear-gradient(135deg, #ea580c, #c2410c);">💾 Save Cattle Record</button>
           </form>
@@ -444,7 +445,7 @@
             <div class="table-container">
               <table>
                 <thead>
-                  <tr><th>Date</th><th>Shift / Type</th><th>Qty (Ltr)</th><th>Amount (₹)</th><th>Status</th></tr>
+                  <tr><th>Date</th><th>Shift / Type</th><th>Qty (Ltr)</th><th>FAT %</th><th>Amount (₹)</th><th>Status</th></tr>
                 </thead>
                 <tbody id="ledgerTableBody"></tbody>
               </table>
@@ -485,6 +486,7 @@
               <div class="form-grid" style="align-items: flex-end;">
                 <div class="form-group"><label>Payment Date</label><input type="date" id="retailDepositDate"></div>
                 <div class="form-group"><label>Amount (₹)</label><input type="number" id="retailDepositAmount" placeholder="Enter Amount"></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Note / Payment Details</label><input type="text" id="retailDepositNote" placeholder="e.g. Cash / PhonePe / Online"></div>
               </div>
               <button type="button" class="action-btn" onclick="submitRetailDeposit()" style="margin-top: 12px; width: 100%;">Save Payment</button>
             </div>
@@ -492,7 +494,7 @@
             <div class="table-container">
               <table>
                 <thead>
-                  <tr><th>Date</th><th>Qty (Ltr)</th><th>Rate/Ltr (₹)</th><th>Total Amount (₹)</th><th>Status</th></tr>
+                  <tr><th>Date</th><th>Qty (Ltr)</th><th>Rate/Ltr (₹)</th><th>Total Amount (₹)</th><th>Note / Details</th><th>Status</th></tr>
                 </thead>
                 <tbody id="retailLedgerTableBody"></tbody>
               </table>
@@ -535,9 +537,9 @@
                     <th>Type</th>
                     <th>Category</th>
                     <th>Tag No.</th>
-                    <th>Party</th>
-                    <th>Amount (₹)</th>
-                    <th>Calving Count</th>
+                    <th>Selling Price (₹)</th>
+                    <th>Age</th>
+                    <th>Pregnancy Duration</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -677,19 +679,21 @@
 
               <div class="form-group">
                 <label>Salary Basis Type:</label>
-                <select id="empSalaryType" required>
+                <select id="empSalaryType" onchange="calculateAutoSalaryStructure()" required>
                   <option value="Monthly">Monthly Salary</option>
                   <option value="Per Day">Per Day Salary</option>
                   <option value="Weekly">Weekly Salary</option>
-                  <option value="Half Yearly">Half Yearly Contract</option>
-                  <option value="Yearly">Yearly Contract</option>
                 </select>
               </div>
-              <div class="form-group"><label>Base Salary Amount (₹):</label><input type="number" step="0.01" id="empBaseSalary" placeholder="e.g. 15000" required></div>
-              <div class="form-group" style="grid-column: span 2;"><label>Petrol / Other Allowance (₹):</label><input type="number" step="0.01" id="empAllowance" placeholder="e.g. 1000" value="0"></div>
+              <div class="form-group"><label>Base Salary Amount (₹):</label><input type="number" step="0.01" id="empBaseSalary" placeholder="Enter rate/salary" oninput="calculateAutoSalaryStructure()" required></div>
+              
+              <div class="form-group"><label>Daily Salary Rate (Auto ₹):</label><input type="number" id="empDailySalary" readonly></div>
+              <div class="form-group"><label>Monthly Salary (Auto ₹):</label><input type="number" id="empMonthlySalary" readonly></div>
+              <div class="form-group"><label>Yearly Salary (Auto ₹):</label><input type="number" id="empYearlySalary" readonly></div>
+              <div class="form-group"><label>Petrol / Other Allowance (Daily ₹):</label><input type="number" step="0.01" id="empAllowance" placeholder="e.g. 50" value="0"></div>
 
               <div class="form-group" style="grid-column: span 2;">
-                <label>Terms & Conditions:</label>
+                <label>Terms & Conditions (Shown in Portal & Agreement Only):</label>
                 <textarea id="empTerms" rows="4" placeholder="Enter work terms, timings and policies here...">1. Work timing starts from 5:00 AM daily.
 2. Punctuality and careful handling of cattle is mandatory.
 3. Prior notice is required for any leave.</textarea>
@@ -743,11 +747,13 @@
             </div>
 
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Salary Structure:</h4>
+              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Complete Salary Structure (Per Day, Monthly & Yearly):</h4>
               <p style="font-size: 12px; color: #334155; line-height: 1.6;">
-                <strong>Salary Basis:</strong> <span id="agSalaryType">-</span><br>
-                <strong>Base Salary:</strong> ₹ <span id="agBaseSal">0</span><br>
-                <strong>Petrol / Other Allowance:</strong> ₹ <span id="agAllowance">0</span>
+                <strong>Salary Basis Type:</strong> <span id="agSalaryType">-</span><br>
+                <strong>Per Day Rate / Calculation:</strong> ₹ <span id="agPerDaySal">0.00</span> / day<br>
+                <strong>Monthly Calculation (30 Days):</strong> ₹ <span id="agMonthlySal">0.00</span> / month<br>
+                <strong>Yearly Calculation (365 Days):</strong> ₹ <span id="agYearlySal">0.00</span> / year<br>
+                <strong>Daily Petrol / Other Allowance:</strong> ₹ <span id="agAllowance">0.00</span> / day
               </p>
             </div>
 
@@ -784,9 +790,15 @@
             <div class="form-grid">
               <div class="form-group"><label>Date:</label><input type="date" id="attDate" required></div>
               <div class="form-group">
-                <label>Select Employee:</label>
-                <select id="attEmpSelect" required>
-                  <option value="">-- Select Employee --</option>
+                <label>Select Employee ID:</label>
+                <select id="attEmpIdSelect" onchange="handleAttIdSelectChange()" required>
+                  <option value="">-- Select Employee ID --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Select Employee Name:</label>
+                <select id="attEmpNameSelect" onchange="handleAttNameSelectChange()" required>
+                  <option value="">-- Select Employee Name --</option>
                 </select>
               </div>
               <div class="form-group">
@@ -797,7 +809,7 @@
                   <option value="Absent / Leave">Absent / Leave</option>
                 </select>
               </div>
-              <div class="form-group"><label>Reason / Comment:</label><input type="text" id="attReason" placeholder="e.g. Personal work / Fever"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>Reason / Comment:</label><input type="text" id="attReason" placeholder="e.g. Personal work / Fever"></div>
             </div>
             <button type="submit" class="submit-btn" id="attSubmitBtn" style="background: linear-gradient(135deg, #059669, #047857);">💾 Save Attendance Record</button>
           </form>
@@ -808,6 +820,7 @@
               <thead>
                 <tr>
                   <th>Date</th>
+                  <th>Emp ID</th>
                   <th>Employee Name</th>
                   <th>Status</th>
                   <th>Reason / Comment</th>
@@ -824,31 +837,34 @@
         <div class="card">
           <div class="company-banner" style="text-align: left;">
             <h3>Employee Payment & Advance Deposit</h3>
-            <div class="dairy-address" style="margin: 0;">Give advance, half salary, full salary or weekly payment to employee.</div>
+            <div class="dairy-address" style="margin: 0;">Give advance, salary payment or record advance deposited by employee.</div>
           </div>
 
           <form id="empPaymentForm">
             <div class="form-grid">
               <div class="form-group"><label>Payment Date:</label><input type="date" id="payDate" required></div>
               <div class="form-group">
-                <label>Select Employee:</label>
-                <select id="payEmpSelect" onchange="handlePayEmpChange()" required>
+                <label>Select Employee (Name [ID]):</label>
+                <select id="payEmpSelect" onchange="calculateAutoEmployeePayment()" required>
                   <option value="">-- Select Employee --</option>
                 </select>
               </div>
-              <div class="form-group"><label>Mobile Number (Auto):</label><input type="tel" id="payMobile" readonly></div>
               <div class="form-group">
-                <label>Payment Type:</label>
-                <select id="payType" required>
-                  <option value="Advance">Advance</option>
-                  <option value="Half Salary">Half Salary</option>
-                  <option value="Full Salary">Full Salary</option>
-                  <option value="Weekly Payment">Weekly Payment</option>
-                  <option value="Bonus">Bonus / Incentive</option>
+                <label>Payment Direction:</label>
+                <select id="payDirection" onchange="calculateAutoEmployeePayment()" required>
+                  <option value="Payment Diya">Payment Diya (To Employee)</option>
+                  <option value="Advance Jama Karwaya">Advance Jama Karwaya (By Employee)</option>
                 </select>
               </div>
-              <div class="form-group"><label>Select Month / Period:</label><input type="month" id="payMonth" required></div>
-              <div class="form-group"><label>Amount (₹):</label><input type="number" step="0.01" id="payAmount" placeholder="e.g. 5000" required></div>
+              <div class="form-group">
+                <label>Payment Type:</label>
+                <select id="payType" onchange="calculateAutoEmployeePayment()" required>
+                  <option value="Earned Salary">Earned Salary (Calculated)</option>
+                  <option value="Advance">Advance Payment</option>
+                  <option value="Bonus / Incentive">Bonus / Incentive</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Amount (Auto / Manual ₹):</label><input type="number" step="0.01" id="payAmount" placeholder="Amount" required></div>
               <div class="form-group" style="grid-column: span 2;"><label>Note / Comment:</label><input type="text" id="payNote" placeholder="e.g. Cash given or PhonePe transfer"></div>
             </div>
             <button type="submit" class="submit-btn" id="paySubmitBtn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">💾 Save Employee Payment</button>
@@ -903,28 +919,33 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><b>Base Salary / Rate</b></td>
-                    <td id="sBaseDesc">Agreed salary amount</td>
+                    <td><b>Full Agreed Base Salary</b></td>
+                    <td id="sBaseDesc">Agreed monthly/daily rate</td>
                     <td id="sBaseSal">₹ 0.00</td>
                   </tr>
                   <tr>
-                    <td><b>Petrol / Other Allowance</b></td>
-                    <td>Monthly fixed allowance</td>
-                    <td id="sAllowanceAmt">₹ 0.00</td>
-                  </tr>
-                  <tr>
-                    <td><b>Working Days / Attendance</b></td>
-                    <td id="sDaysWorkedDesc">Present days count</td>
+                    <td><b>Present Days Worked</b></td>
+                    <td id="sDaysWorkedDesc">0 Days Worked</td>
                     <td id="sEarnedSal">₹ 0.00</td>
                   </tr>
                   <tr>
-                    <td><b>Advance / Payments Already Given</b></td>
-                    <td>Deducted from earned amount</td>
-                    <td id="sAdvancePaid" style="color: #047857;">- ₹ 0.00</td>
+                    <td><b>Fuel / Daily Allowance</b></td>
+                    <td id="sAllowanceDesc">Calculated on working days</td>
+                    <td id="sAllowanceAmt">₹ 0.00</td>
+                  </tr>
+                  <tr>
+                    <td><b>Total Gross Salary Earned</b></td>
+                    <td>Earned Salary + Fuel Allowance</td>
+                    <td id="sGrossEarned" style="font-weight: 700;">₹ 0.00</td>
+                  </tr>
+                  <tr>
+                    <td><b>Payments / Advances Already Given</b></td>
+                    <td>Total paid during this period</td>
+                    <td id="sAdvancePaid" style="color: #d97706;">- ₹ 0.00</td>
                   </tr>
                   <tr style="background: #f1f5f9;">
-                    <td><b>Net Payable Salary</b></td>
-                    <td><b>Final balance amount to be paid</b></td>
+                    <td><b>Net Balance Payable Salary</b></td>
+                    <td><b>Final remaining salary to be paid</b></td>
                     <td><b id="sNetPayable" style="color: #2563eb; font-size: 15px;">₹ 0.00</b></td>
                   </tr>
                 </tbody>
@@ -995,7 +1016,7 @@
       else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Payables)"; populateDebtStatementDropdown(); loadDebtStatement(); }
       else if (pageId === 'employeeJoining') { document.getElementById('pageTitle').innerText = "Employee Joining Form"; generateNextEmployeeId(); }
       else if (pageId === 'employeeAgreement') { document.getElementById('pageTitle').innerText = "Joining Agreement & Policy"; populateAgreementDropdown(); }
-      else if (pageId === 'employeeAttendance') { document.getElementById('pageTitle').innerText = "Attendance & Leave Tracker"; populateAttendanceDropdown(); renderAttendanceTable(); }
+      else if (pageId === 'employeeAttendance') { document.getElementById('pageTitle').innerText = "Attendance & Leave Tracker"; populateAttendanceDropdowns(); renderAttendanceTable(); }
       else if (pageId === 'employeePayment') { document.getElementById('pageTitle').innerText = "Employee Payment Deposit"; populateEmployeePaymentDropdown(); }
       else if (pageId === 'employeeSalarySlip') { document.getElementById('pageTitle').innerText = "Salary Slip Generator"; populateSalarySlipDropdown(); }
 
@@ -1112,7 +1133,7 @@
 
       if (employeePaymentsGlobal) {
         employeePaymentsGlobal.forEach(ep => {
-          totalEmpExpenses += parseFloat(ep.amount) || 0;
+          if (ep.paymentDirection === "Payment Diya") totalEmpExpenses += parseFloat(ep.amount) || 0;
         });
       }
 
@@ -1140,20 +1161,74 @@
       document.getElementById('dashCattleCount').innerText = countStr ? countStr.slice(0, -3) : "No live cattles available";
     }
 
-    // ==========================================
-    // BILLING INVOICE FORM SUBMIT LISTENERS
-    // ==========================================
+    // --- CATTLE MANAGEMENT HELPERS ---
+    function calculateCattleAge() {
+      const dobVal = document.getElementById('cattleDob').value;
+      if (!dobVal) { document.getElementById('cattleAge').value = ""; return; }
+      const dob = new Date(dobVal);
+      const today = new Date();
 
-    // 1. Bulk Milk Form Submit
+      let years = today.getFullYear() - dob.getFullYear();
+      let months = today.getMonth() - dob.getMonth();
+      let days = today.getDate() - dob.getDate();
+
+      if (days < 0) {
+        months--;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+      if (months < 0) { years--; months += 12; }
+
+      document.getElementById('cattleAge').value = `${years} Y, ${months} M, ${days} D`;
+    }
+
+    function calculatePregnancyDurationLive(pregDateVal) {
+      if (!pregDateVal) return "N/A / Not Pregnant";
+      const pregDate = new Date(pregDateVal);
+      const today = new Date();
+      if (pregDate > today) return "Future Date";
+
+      let diffTime = Math.abs(today - pregDate);
+      let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      let months = Math.floor(diffDays / 30);
+      let days = diffDays % 30;
+
+      return `${months} Months, ${days} Days`;
+    }
+
+    function handleCattleTagChange() {
+      const tag = document.getElementById('cattleTagSelect').value;
+      const grp = document.getElementById('newCattleTagGroup');
+      const txType = document.getElementById('cattleTxType').value;
+
+      if (tag === "ADD_NEW") {
+        grp.style.display = "flex";
+        return;
+      }
+      grp.style.display = "none";
+
+      if (txType === "Sell" && tag && cattleMapData[tag]) {
+        const c = cattleMapData[tag];
+        if (c.category) document.getElementById('cattleCategory').value = c.category;
+        if (c.dob) { document.getElementById('cattleDob').value = c.dob.split('T')[0]; calculateCattleAge(); }
+        if (c.calvingCount !== undefined) document.getElementById('cattleCalving').value = c.calvingCount;
+        if (c.pregnancyDate) document.getElementById('cattlePregDate').value = c.pregnancyDate.split('T')[0];
+        if (c.sellingPrice) document.getElementById('cattleSellAmount').value = c.sellingPrice;
+        if (c.partyName) {
+          document.getElementById('cattlePartySelect').value = c.partyName;
+          document.getElementById('cattleMobile').value = c.mobile || cattlePartyData[c.partyName] || "";
+        }
+      }
+    }
+
+    // --- BILLING INVOICE FORM SUBMIT LISTENERS ---
     document.getElementById('bulkMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
       btn.innerText = "Submitting..."; btn.disabled = true;
 
       let partyNameVal = document.getElementById('partySelect').value;
-      if (partyNameVal === "ADD_NEW") {
-        partyNameVal = document.getElementById('newPartyName').value.trim();
-      }
+      if (partyNameVal === "ADD_NEW") partyNameVal = document.getElementById('newPartyName').value.trim();
 
       const payload = {
         action: "addBulkMilk",
@@ -1181,25 +1256,17 @@
           document.getElementById('newPartyGroup').style.display = 'none';
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
-        } else {
-          alert("Error: " + (res.message || "Failed to save"));
         }
-      }).catch(err => {
-        btn.innerText = "Submit Entry to Google Sheet"; btn.disabled = false;
-        alert("Network or Script Error!");
       });
     });
 
-    // 2. Retail Milk Form Submit
     document.getElementById('retailMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('retailSubmitBtn');
       btn.innerText = "Submitting..."; btn.disabled = true;
 
       let custNameVal = document.getElementById('retailCustomerSelect').value;
-      if (custNameVal === "ADD_NEW") {
-        custNameVal = document.getElementById('newRetailCustomerName').value.trim();
-      }
+      if (custNameVal === "ADD_NEW") custNameVal = document.getElementById('newRetailCustomerName').value.trim();
 
       const payload = {
         action: "addRetailMilk",
@@ -1223,16 +1290,10 @@
           document.getElementById('newRetailCustomerGroup').style.display = 'none';
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
-        } else {
-          alert("Error: " + (res.message || "Failed to save"));
         }
-      }).catch(err => {
-        btn.innerText = "Submit Retail Entry"; btn.disabled = false;
-        alert("Network or Script Error!");
       });
     });
 
-    // 3. Cattle Purchase & Sell Form Submit
     document.getElementById('cattleForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('cattleSubmitBtn');
@@ -1261,7 +1322,7 @@
         age: document.getElementById('cattleAge').value,
         calvingCount: document.getElementById('cattleCalving').value || 0,
         pregnancyDate: document.getElementById('cattlePregDate').value || "",
-        sellingPrice: document.getElementById('cattleSellingPrice').value || 0
+        sellingPrice: document.getElementById('cattleSellingPrice').value || amtVal
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
@@ -1273,16 +1334,10 @@
           document.getElementById('cattleDate').valueAsDate = new Date();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
-        } else {
-          alert("Error: " + (res.message || "Failed"));
         }
-      }).catch(err => {
-        btn.innerText = "💾 Save Cattle Record"; btn.disabled = false;
-        alert("Network Error!");
       });
     });
 
-    // 4. Cattle Expenses Form Submit
     document.getElementById('cattleExpenseForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('expSubmitBtn');
@@ -1320,16 +1375,11 @@
           document.getElementById('expDate').valueAsDate = new Date();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
-        } else {
-          alert("Error: " + (res.message || "Failed"));
         }
-      }).catch(err => {
-        btn.innerText = "💾 Save Cattle Expense"; btn.disabled = false;
-        alert("Network Error!");
       });
     });
 
-    // --- BULK DAIRY LEDGER FUNCTIONALITY ---
+    // --- BULK DAIRY LEDGER ---
     function loadLedgerForParty() {
       const partyName = document.getElementById('ledgerPartySelect').value;
       const content = document.getElementById('ledgerContent');
@@ -1345,7 +1395,7 @@
       let filteredEntries = allEntriesGlobal.filter(e => e.partyName === partyName);
 
       if (filteredEntries.length === 0) {
-        tableHtml = '<tr><td colspan="5" style="text-align: center;">No entries found for this party.</td></tr>';
+        tableHtml = '<tr><td colspan="6" style="text-align: center;">No entries found for this party.</td></tr>';
       } else {
         filteredEntries.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
@@ -1358,6 +1408,7 @@
             <td>${formattedDate}</td>
             <td><b>${e.shift || 'Sale'}</b> (${e.milkType || ''})</td>
             <td>${e.quantity ? e.quantity + ' Ltr' : '-'}</td>
+            <td><b>${e.fat ? e.fat + '%' : '-'}</b></td>
             <td>₹ ${amt.toFixed(2)}</td>
             <td><span class="badge ${isDeposit ? 'deposit' : (e.paymentStatus === 'Paid' ? 'paid' : 'pending')}">${isDeposit ? 'Deposit' : (e.paymentStatus || 'Pending')}</span></td>
           </tr>`;
@@ -1375,10 +1426,7 @@
       const date = document.getElementById('depositDate').value;
       const amount = parseFloat(document.getElementById('depositAmount').value) || 0;
 
-      if (!partyName || !date || amount <= 0) {
-        alert("Please select party, date and valid amount!");
-        return;
-      }
+      if (!partyName || !date || amount <= 0) { alert("Please select party, date and valid amount!"); return; }
 
       const payload = {
         action: "updatePayment",
@@ -1399,7 +1447,7 @@
       });
     }
 
-    // --- RETAIL MILK STATEMENT FUNCTIONALITY ---
+    // --- RETAIL MILK STATEMENT ---
     function loadRetailLedgerForCustomer() {
       const customerName = document.getElementById('ledgerRetailCustomerSelect').value;
       const content = document.getElementById('retailLedgerContent');
@@ -1415,7 +1463,7 @@
       let filteredEntries = allRetailEntriesGlobal.filter(r => r.customerName === customerName);
 
       if (filteredEntries.length === 0) {
-        tableHtml = '<tr><td colspan="5" style="text-align: center;">No retail entries found for this customer.</td></tr>';
+        tableHtml = '<tr><td colspan="6" style="text-align: center;">No retail entries found for this customer.</td></tr>';
       } else {
         filteredEntries.forEach(r => {
           let amt = parseFloat(r.totalAmount) || 0;
@@ -1429,6 +1477,7 @@
             <td>${r.quantity ? r.quantity + ' Ltr' : '-'}</td>
             <td>₹ ${parseFloat(r.ratePerLiter || 0).toFixed(2)}</td>
             <td>₹ ${amt.toFixed(2)}</td>
+            <td>${r.note || '-'}</td>
             <td><span class="badge ${isDeposit ? 'deposit' : (r.amountStatus === 'Paid' ? 'paid' : 'pending')}">${r.amountStatus || 'Pending'}</span></td>
           </tr>`;
         });
@@ -1444,18 +1493,17 @@
       const customerName = document.getElementById('ledgerRetailCustomerSelect').value;
       const date = document.getElementById('retailDepositDate').value;
       const amount = parseFloat(document.getElementById('retailDepositAmount').value) || 0;
+      const note = document.getElementById('retailDepositNote').value.trim();
 
-      if (!customerName || !date || amount <= 0) {
-        alert("Please select customer, date and valid amount!");
-        return;
-      }
+      if (!customerName || !date || amount <= 0) { alert("Please select customer, date and valid amount!"); return; }
 
       const payload = {
         action: "updateRetailPayment",
         customerName: customerName,
         mobileNumber: retailCustomerData[customerName]?.mobile || "",
         date: date,
-        amount: amount
+        amount: amount,
+        note: note || "Payment Received"
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
@@ -1463,6 +1511,7 @@
         if(res.result === "success") {
           alert("Retail payment recorded successfully!");
           document.getElementById('retailDepositAmount').value = "";
+          document.getElementById('retailDepositNote').value = "";
           fetchDashboardData();
           setTimeout(() => loadRetailLedgerForCustomer(), 1000);
         }
@@ -1483,14 +1532,17 @@
       } else {
         filtered.forEach(c => {
           let formattedDate = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
+          let sellPriceShow = c.sellingPrice ? parseFloat(c.sellingPrice).toFixed(2) : parseFloat(c.amount || 0).toFixed(2);
+          let pregDuration = calculatePregnancyDurationLive(c.pregnancyDate);
+
           tableHtml += `<tr>
             <td>${formattedDate}</td>
             <td><span class="badge ${c.transactionType === 'Purchase' ? 'pending' : 'paid'}">${c.transactionType}</span></td>
             <td><b>${c.category}</b></td>
             <td>${c.tagNumber || '-'}</td>
-            <td>${c.partyName} (${c.mobile || '-'})</td>
-            <td>₹ ${parseFloat(c.amount || 0).toFixed(2)}</td>
-            <td>${c.calvingCount || 0}</td>
+            <td>₹ ${sellPriceShow}</td>
+            <td>${c.age || '-'}</td>
+            <td>${pregDuration}</td>
             <td><span class="badge ${c.status === 'Paid' ? 'paid' : 'pending'}">${c.status}</span></td>
           </tr>`;
         });
@@ -1631,7 +1683,32 @@
       document.getElementById('debtStatementTableBody').innerHTML = tableHtml;
     }
 
-    // --- EMPLOYEE FORM SUBMIT ---
+    // --- EMPLOYEE JOINING & SALARY STRUCTURE CALCULATOR ---
+    function calculateAutoSalaryStructure() {
+      const type = document.getElementById('empSalaryType').value;
+      const baseAmt = parseFloat(document.getElementById('empBaseSalary').value) || 0;
+
+      let daily = 0, monthly = 0, yearly = 0;
+
+      if (type === "Per Day") {
+        daily = baseAmt;
+        monthly = daily * 30;
+        yearly = daily * 365;
+      } else if (type === "Weekly") {
+        daily = baseAmt / 7;
+        monthly = daily * 30;
+        yearly = daily * 365;
+      } else { // Monthly
+        monthly = baseAmt;
+        daily = monthly / 30;
+        yearly = monthly * 12;
+      }
+
+      document.getElementById('empDailySalary').value = daily.toFixed(2);
+      document.getElementById('empMonthlySalary').value = monthly.toFixed(2);
+      document.getElementById('empYearlySalary').value = yearly.toFixed(2);
+    }
+
     document.getElementById('employeeForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('empSubmitBtn');
@@ -1651,10 +1728,11 @@
         ifscCode: document.getElementById('empIfsc').value.trim(),
         bankAccount: document.getElementById('empBankAccount').value.trim(),
         salaryType: document.getElementById('empSalaryType').value,
-        monthlySalary: document.getElementById('empBaseSalary').value || 0,
-        yearlySalary: 0,
-        allowance: document.getElementById('empAllowance').value || 0,
-        terms: document.getElementById('empTerms').value.trim()
+        baseSalary: document.getElementById('empBaseSalary').value || 0,
+        dailySalary: document.getElementById('empDailySalary').value || 0,
+        monthlySalary: document.getElementById('empMonthlySalary').value || 0,
+        yearlySalary: document.getElementById('empYearlySalary').value || 0,
+        allowance: document.getElementById('empAllowance').value || 0
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
@@ -1701,20 +1779,35 @@
       document.getElementById('agIfsc').innerText = emp.ifscCode || 'N/A';
       document.getElementById('agAccNo').innerText = emp.bankAccount || 'N/A';
       document.getElementById('agSalaryType').innerText = emp.salaryType || 'Monthly';
-      document.getElementById('agBaseSal').innerText = parseFloat(emp.monthlySalary || emp.baseSalary || 0).toFixed(2);
+      document.getElementById('agPerDaySal').innerText = parseFloat(emp.dailySalary || 0).toFixed(2);
+      document.getElementById('agMonthlySal').innerText = parseFloat(emp.monthlySalary || 0).toFixed(2);
+      document.getElementById('agYearlySal').innerText = parseFloat(emp.yearlySalary || 0).toFixed(2);
       document.getElementById('agAllowance').innerText = parseFloat(emp.allowance || 0).toFixed(2);
-      document.getElementById('agTerms').innerText = emp.terms || '-';
+      document.getElementById('agTerms').innerText = `1. Work timing starts from 5:00 AM daily.\n2. Punctuality and careful handling of cattle is mandatory.\n3. Prior notice is required for any leave.`;
     }
 
-    function populateAttendanceDropdown() {
-      const sel = document.getElementById('attEmpSelect');
-      sel.innerHTML = '<option value="">-- Select Employee --</option>';
+    // --- ATTENDANCE MAPPER & HELPERS ---
+    function populateAttendanceDropdowns() {
+      const idSel = document.getElementById('attEmpIdSelect');
+      const nameSel = document.getElementById('attEmpNameSelect');
+      idSel.innerHTML = '<option value="">-- Select Employee ID --</option>';
+      nameSel.innerHTML = '<option value="">-- Select Employee Name --</option>';
+
       employeesGlobal.forEach(em => {
-        let opt = document.createElement('option');
-        opt.value = em.employeeName;
-        opt.textContent = em.employeeName;
-        sel.appendChild(opt);
+        let o1 = document.createElement('option'); o1.value = em.employeeId; o1.textContent = em.employeeId; idSel.appendChild(o1);
+        let o2 = document.createElement('option'); o2.value = em.employeeName; o2.textContent = em.employeeName; nameSel.appendChild(o2);
       });
+    }
+
+    function handleAttIdSelectChange() {
+      const idVal = document.getElementById('attEmpIdSelect').value;
+      const emp = employeesGlobal.find(e => e.employeeId === idVal);
+      if (emp) document.getElementById('attEmpNameSelect').value = emp.employeeName;
+    }
+    function handleAttNameSelectChange() {
+      const nameVal = document.getElementById('attEmpNameSelect').value;
+      const emp = employeesGlobal.find(e => e.employeeName === nameVal);
+      if (emp) document.getElementById('attEmpIdSelect').value = emp.employeeId;
     }
 
     document.getElementById('attendanceForm').addEventListener('submit', function(e) {
@@ -1725,7 +1818,8 @@
       const payload = {
         action: "saveAttendance",
         date: document.getElementById('attDate').value,
-        employeeName: document.getElementById('attEmpSelect').value,
+        employeeId: document.getElementById('attEmpIdSelect').value,
+        employeeName: document.getElementById('attEmpNameSelect').value,
         status: document.getElementById('attStatus').value,
         reason: document.getElementById('attReason').value.trim()
       };
@@ -1746,14 +1840,15 @@
     function renderAttendanceTable() {
       let html = "";
       if (attendanceGlobal.length === 0) {
-        html = '<tr><td colspan="4" style="text-align: center;">No attendance records found.</td></tr>';
+        html = '<tr><td colspan="5" style="text-align: center;">No attendance records found.</td></tr>';
       } else {
         for (let i = attendanceGlobal.length - 1; i >= 0; i--) {
           let a = attendanceGlobal[i];
           let formattedDate = a.date ? new Date(a.date).toLocaleDateString('en-GB') : '';
           html += `<tr>
             <td>${formattedDate}</td>
-            <td><b>${a.employeeName}</b></td>
+            <td><b>${a.employeeId || '-'}</b></td>
+            <td>${a.employeeName}</td>
             <td><span class="badge ${a.status === 'Present' ? 'paid' : 'pending'}">${a.status}</span></td>
             <td>${a.reason || '-'}</td>
           </tr>`;
@@ -1762,25 +1857,43 @@
       document.getElementById('attendanceTableBody').innerHTML = html;
     }
 
+    // --- EMPLOYEE PAYMENT & ADVANCE DEPOSIT ---
     function populateEmployeePaymentDropdown() {
       const sel = document.getElementById('payEmpSelect');
       sel.innerHTML = '<option value="">-- Select Employee --</option>';
       employeesGlobal.forEach(em => {
         let opt = document.createElement('option');
         opt.value = em.employeeName;
-        opt.textContent = `${em.employeeName} (${em.mobileNumber})`;
+        opt.textContent = `${em.employeeName} [${em.employeeId || 'EMP'}]`;
         sel.appendChild(opt);
       });
     }
 
-    function handlePayEmpChange() {
-      const name = document.getElementById('payEmpSelect').value;
-      const emp = employeesGlobal.find(e => e.employeeName === name);
-      if (emp) {
-        document.getElementById('payMobile').value = emp.mobileNumber || '';
-      } else {
-        document.getElementById('payMobile').value = '';
+    function calculateAutoEmployeePayment() {
+      const empName = document.getElementById('payEmpSelect').value;
+      const pType = document.getElementById('payType').value;
+      const amtInput = document.getElementById('payAmount');
+
+      if (!empName) { amtInput.value = ""; return; }
+      const emp = employeesGlobal.find(e => e.employeeName === empName);
+      if (!emp) return;
+
+      if (pType === "Advance" || pType === "Bonus / Incentive") {
+        amtInput.value = "";
+        amtInput.readOnly = false;
+        return;
       }
+
+      amtInput.readOnly = true;
+      let dailySal = parseFloat(emp.dailySalary) || ((parseFloat(emp.monthlySalary) || 0) / 30);
+      let dailyAllow = parseFloat(emp.allowance) || 0;
+
+      let presentCount = attendanceGlobal.filter(a => a.employeeName === empName && a.status === 'Present').length;
+      let halfCount = attendanceGlobal.filter(a => a.employeeName === empName && a.status === 'Half Day').length;
+      let totalEffectiveDays = presentCount + (halfCount * 0.5);
+
+      let totalCalculated = (totalEffectiveDays * dailySal) + (totalEffectiveDays * dailyAllow);
+      amtInput.value = totalCalculated.toFixed(2);
     }
 
     document.getElementById('empPaymentForm').addEventListener('submit', function(e) {
@@ -1788,13 +1901,17 @@
       const btn = document.getElementById('paySubmitBtn');
       btn.innerText = "Saving Payment..."; btn.disabled = true;
 
+      const empName = document.getElementById('payEmpSelect').value;
+      const emp = employeesGlobal.find(e => e.employeeName === empName);
+
       const payload = {
         action: "addEmployeePayment",
         date: document.getElementById('payDate').value,
-        employeeName: document.getElementById('payEmpSelect').value,
-        mobileNumber: document.getElementById('payMobile').value,
+        employeeId: emp ? emp.employeeId : "",
+        employeeName: empName,
+        mobileNumber: emp ? emp.mobileNumber : "",
+        paymentDirection: document.getElementById('payDirection').value,
         paymentType: document.getElementById('payType').value,
-        month: document.getElementById('payMonth').value,
         amount: document.getElementById('payAmount').value,
         note: document.getElementById('payNote').value.trim()
       };
@@ -1812,13 +1929,14 @@
       });
     });
 
+    // --- SALARY SLIP GENERATOR ---
     function populateSalarySlipDropdown() {
       const sel = document.getElementById('slipEmpSelect');
       sel.innerHTML = '<option value="">-- Select Employee --</option>';
       employeesGlobal.forEach(em => {
         let opt = document.createElement('option');
         opt.value = em.employeeName;
-        opt.textContent = em.employeeName;
+        opt.textContent = `${em.employeeName} [${em.employeeId || 'EMP'}]`;
         sel.appendChild(opt);
       });
     }
@@ -1839,45 +1957,39 @@
       document.getElementById('sMonth').innerText = monthStr;
 
       let baseSalary = parseFloat(emp.monthlySalary || emp.baseSalary) || 0;
-      let allowance = parseFloat(emp.allowance) || 0;
-      let salaryType = emp.salaryType || "Monthly";
+      let dailySalary = parseFloat(emp.dailySalary) || (baseSalary / 30);
+      let dailyAllowance = parseFloat(emp.allowance) || 0;
 
       let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Present').length;
       let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Half Day').length;
       let totalEffectiveDays = presentDays + (halfDays * 0.5);
 
-      let earnedBaseSalary = 0;
-      if (salaryType === "Per Day") {
-        earnedBaseSalary = baseSalary * totalEffectiveDays;
-        document.getElementById('sBaseDesc').innerText = `Per Day Rate: ₹${baseSalary} × ${totalEffectiveDays} Days Worked`;
-      } else if (salaryType === "Weekly") {
-        earnedBaseSalary = baseSalary * (totalEffectiveDays / 7);
-        document.getElementById('sBaseDesc').innerText = `Weekly Rate: ₹${baseSalary} (Pro-rated for ${totalEffectiveDays} days)`;
-      } else {
-        earnedBaseSalary = baseSalary;
-        document.getElementById('sBaseDesc').innerText = `Agreed ${salaryType} Base Salary`;
-      }
+      let earnedBaseSalary = dailySalary * totalEffectiveDays;
+      let earnedAllowance = dailyAllowance * totalEffectiveDays;
+      let totalGrossEarned = earnedBaseSalary + earnedAllowance;
 
       document.getElementById('sBaseSal').innerText = "₹ " + baseSalary.toFixed(2);
-      document.getElementById('sAllowanceAmt').innerText = "₹ " + allowance.toFixed(2);
       document.getElementById('sDaysWorkedDesc').innerText = `${totalEffectiveDays} Days (${presentDays} Full, ${halfDays} Half)`;
       document.getElementById('sEarnedSal').innerText = "₹ " + earnedBaseSalary.toFixed(2);
+      document.getElementById('sAllowanceDesc').innerText = `₹${dailyAllowance}/day × ${totalEffectiveDays} days`;
+      document.getElementById('sAllowanceAmt').innerText = "₹ " + earnedAllowance.toFixed(2);
+      document.getElementById('sGrossEarned').innerText = "₹ " + totalGrossEarned.toFixed(2);
 
       let totalPaidThisMonth = 0;
       employeePaymentsGlobal.forEach(p => {
-        if (p.employeeName === empName && p.month === monthStr) {
+        if (p.employeeName === empName && p.date && p.date.startsWith(monthStr) && p.paymentDirection === "Payment Diya") {
           totalPaidThisMonth += parseFloat(p.amount) || 0;
         }
       });
 
       document.getElementById('sAdvancePaid').innerText = "- ₹ " + totalPaidThisMonth.toFixed(2);
 
-      let netPayable = (earnedBaseSalary + allowance) - totalPaidThisMonth;
+      let netPayable = totalGrossEarned - totalPaidThisMonth;
       if (netPayable < 0) netPayable = 0;
       document.getElementById('sNetPayable').innerText = "₹ " + netPayable.toFixed(2);
     }
 
-    // Standard dropdown helpers for milk/cattle
+    // Standard dropdown helpers
     function populatePartyDropdown() {
       const p = document.getElementById('partySelect');
       p.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';
@@ -1927,9 +2039,7 @@
       const p = document.getElementById('debtStatementSelect');
       let combinedVendors = {...cattleVendorData};
       allCattleEntriesGlobal.forEach(c => {
-        if (c.transactionType === "Purchase" && c.partyName) {
-          combinedVendors[c.partyName] = c.mobile || "";
-        }
+        if (c.transactionType === "Purchase" && c.partyName) combinedVendors[c.partyName] = c.mobile || "";
       });
       p.innerHTML = '<option value="ALL">📊 All Debt Statement (Full Record)</option>';
       for (let k in combinedVendors) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }
@@ -1952,12 +2062,6 @@
         document.getElementById('cattleSellingPrice').required = true;
         document.getElementById('cattleSellAmount').required = false;
       }
-    }
-    function handleCattleTagChange() {
-      const tag = document.getElementById('cattleTagSelect').value;
-      const grp = document.getElementById('newCattleTagGroup');
-      if (tag === "ADD_NEW") grp.style.display = "flex";
-      else grp.style.display = "none";
     }
     function handleCattlePartyChange() {
       const sel = document.getElementById('cattlePartySelect').value;

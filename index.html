@@ -11,18 +11,24 @@
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9; }
     .overlay.active { display: block; }
 
-    .sidebar { width: 270px; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: #fff; height: 100vh; position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .sidebar { width: 270px; background: linear-gradient(270deg, #0f172a, #1e293b, #2563eb, #4f46e5, #7c3aed); background-size: 400% 400%; animation: gradientAnimation 12s ease infinite; color: #fff; height: 100vh; position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
     .sidebar.hidden { left: -270px; }
-    .sidebar-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255,255,255,0.1); }
     .sidebar-header h2 { font-size: 17px; background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
     .close-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
 
     .sidebar-menu { list-style: none; padding-top: 15px; }
     .menu-item { width: 100%; }
     .menu-btn { background: transparent; border: none; color: #cbd5e1; padding: 14px 22px; text-align: left; font-size: 14px; cursor: pointer; width: 100%; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-    .menu-btn:hover, .menu-btn.active { background: linear-gradient(90deg, rgba(56, 189, 248, 0.2), transparent); color: #38bdf8; border-left: 4px solid #38bdf8; }
+    .menu-btn:hover, .menu-btn.active { background: rgba(255, 255, 255, 0.15); color: #38bdf8; border-left: 4px solid #38bdf8; }
 
-    .dropdown-container { display: none; background: rgba(15, 23, 42, 0.8); flex-direction: column; }
+    .dropdown-container { display: none; background: rgba(15, 23, 42, 0.75); flex-direction: column; }
     .dropdown-container.show { display: flex !important; }
     .dropdown-container .menu-btn { padding-left: 38px; font-size: 13px; color: #94a3b8; }
 
@@ -128,7 +134,7 @@
         <div class="dropdown-container" id="ledgerDropdown">
           <button class="menu-btn" onclick="switchPage('bulkLedger', this)">📋 Bulk Dairy Ledger</button>
           <button class="menu-btn" onclick="switchPage('retailLedger', this)">📋 Retail Milk Statement</button>
-          <button class="menu-btn" onclick="switchPage('cattleLedger', this)">📋 Cattle Ledger</button>
+          <button class="menu-btn" onclick="switchPage('cattleLedger', this)">📋 Cattle Ledger & Statement</button>
           <button class="menu-btn" onclick="switchPage('cattleExpLedger', this)">📋 Expenses & Vendor Ledger</button>
           <button class="menu-btn" onclick="switchPage('debtStatement', this)">📋 Debt Statement (Payables)</button>
         </div>
@@ -193,6 +199,10 @@
             <div class="dash-card cyan">
               <h4>Employment Expenses</h4>
               <p id="dashEmpExpenses"><span class="mini-spinner"></span></p>
+            </div>
+            <div class="dash-card amber" style="background: linear-gradient(135deg, #d97706, #b45309);">
+              <h4>Total Employee Advance Balance</h4>
+              <p id="dashEmpAdvanceBalance"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card teal" style="grid-column: span auto;">
               <h4>Live Cattle Count</h4>
@@ -527,6 +537,24 @@
             <div class="party-info-box">
               <div class="party-info-item"><span class="title">Selected View</span><span class="value" id="lblCattlePartyName">All Cattle Records</span></div>
               <div class="party-info-item"><span class="title">Total Records</span><span class="value" id="lblCattleTotalRecords">0</span></div>
+              <div class="party-info-item"><span class="title">Pending Net Balance</span><span class="value" id="lblCattlePendingNet" style="color: #d97706;">₹ 0.00</span></div>
+            </div>
+
+            <div class="no-print" style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;" id="cattlePaymentBox">
+              <h4 style="font-size: 14px; margin-bottom: 10px; color: #1e293b;">Record Cattle Payment (Give / Receive)</h4>
+              <div class="form-grid" style="align-items: flex-end;">
+                <div class="form-group"><label>Payment Date</label><input type="date" id="cattlePayDate"></div>
+                <div class="form-group">
+                  <label>Payment Direction</label>
+                  <select id="cattlePayDirection">
+                    <option value="Payment Given">Payment Given (Payable Settlement)</option>
+                    <option value="Payment Received">Payment Received (Receivable Settlement)</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Amount (₹)</label><input type="number" id="cattlePayAmount" placeholder="Enter Amount"></div>
+                <div class="form-group"><label>Note / Details</label><input type="text" id="cattlePayNote" placeholder="e.g. Cash / Online settlement"></div>
+              </div>
+              <button type="button" class="action-btn" onclick="submitCattlePayment()" style="margin-top: 12px; width: 100%;">Save Cattle Payment</button>
             </div>
 
             <div class="table-container">
@@ -537,7 +565,7 @@
                     <th>Type</th>
                     <th>Category</th>
                     <th>Tag No.</th>
-                    <th>Selling Price (₹)</th>
+                    <th>Amount (₹)</th>
                     <th>Age</th>
                     <th>Pregnancy Duration</th>
                     <th>Status</th>
@@ -611,7 +639,7 @@
       <section id="debtStatement" class="page-section">
         <div class="card printable-card">
           <div class="company-banner" style="text-align: left;">
-            <h3>Debt Statement (Payables)</h3>
+            <h3>Debt Statement (Payables & Receivables)</h3>
             <div class="dairy-address" style="margin: 0;">View outstanding payables to vendors, suppliers and cattle dealers.</div>
           </div>
           
@@ -852,8 +880,8 @@
               <div class="form-group">
                 <label>Payment Direction:</label>
                 <select id="payDirection" onchange="calculateAutoEmployeePayment()" required>
-                  <option value="Payment Diya">Payment Diya (To Employee)</option>
-                  <option value="Advance Jama Karwaya">Advance Jama Karwaya (By Employee)</option>
+                  <option value="Payment Diya">Payment Given (To Employee)</option>
+                  <option value="Advance Jama Karwaya">Advance Deposited / Received (By Employee)</option>
                 </select>
               </div>
               <div class="form-group">
@@ -862,6 +890,7 @@
                   <option value="Earned Salary">Earned Salary (Calculated)</option>
                   <option value="Advance">Advance Payment</option>
                   <option value="Bonus / Incentive">Bonus / Incentive</option>
+                  <option value="Advance Deduction">Advance Deduction Adjustment</option>
                 </select>
               </div>
               <div class="form-group"><label>Amount (Auto / Manual ₹):</label><input type="number" step="0.01" id="payAmount" placeholder="Amount" required></div>
@@ -892,7 +921,7 @@
             </div>
             <div class="form-group">
               <label>Select Month / Period</label>
-              <input type="month" id="slipMonthInput">
+              <input type="month" id="slipMonthInput" required>
             </div>
             <div class="form-group" style="grid-column: span 2; display: flex; gap: 10px;">
               <button type="button" class="action-btn" onclick="generateSalarySlip()" style="background: #059669; flex: 1;">⚙️ Generate Salary Slip</button>
@@ -939,14 +968,24 @@
                     <td id="sGrossEarned" style="font-weight: 700;">₹ 0.00</td>
                   </tr>
                   <tr>
-                    <td><b>Payments / Advances Already Given</b></td>
-                    <td>Total paid during this period</td>
+                    <td><b>Advance Deducted This Month</b></td>
+                    <td>Adjusted from previous advance balance</td>
+                    <td id="sAdvanceDeducted" style="color: #d97706;">- ₹ 0.00</td>
+                  </tr>
+                  <tr>
+                    <td><b>Other Payments / Advances Given</b></td>
+                    <td>Paid during this period</td>
                     <td id="sAdvancePaid" style="color: #d97706;">- ₹ 0.00</td>
                   </tr>
                   <tr style="background: #f1f5f9;">
                     <td><b>Net Balance Payable Salary</b></td>
                     <td><b>Final remaining salary to be paid</b></td>
                     <td><b id="sNetPayable" style="color: #2563eb; font-size: 15px;">₹ 0.00</b></td>
+                  </tr>
+                  <tr>
+                    <td><b>Remaining Advance Balance</b></td>
+                    <td>Total advance balance left</td>
+                    <td id="sRemainingAdvance" style="color: #8b5cf6; font-weight: 700;">₹ 0.00</td>
                   </tr>
                 </tbody>
               </table>
@@ -990,6 +1029,7 @@
     document.getElementById('retailEntryDate').valueAsDate = new Date();
     document.getElementById('retailDepositDate').valueAsDate = new Date();
     document.getElementById('cattleDate').valueAsDate = new Date();
+    document.getElementById('cattlePayDate').valueAsDate = new Date();
     document.getElementById('expDate').valueAsDate = new Date();
     document.getElementById('expDepositDate').valueAsDate = new Date();
     document.getElementById('empJoiningDate').valueAsDate = new Date();
@@ -1010,10 +1050,10 @@
       else if (pageId === 'cattleMgmt') document.getElementById('pageTitle').innerText = "Cattle Purchase & Sell Management";
       else if (pageId === 'cattleExpenses') document.getElementById('pageTitle').innerText = "Cattle Expenses & Maintenance";
       else if (pageId === 'bulkLedger') { document.getElementById('pageTitle').innerText = "Bulk Dairy Ledger Statement"; populateLedgerPartyDropdown(); }
-      else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
-      else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
+      else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Customer Statement"; populateRetailLedgerCustomerDropdown(); }
+      else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger & Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
       else if (pageId === 'cattleExpLedger') { document.getElementById('pageTitle').innerText = "Cattle Expenses & Vendor Ledger"; populateCattleExpLedgerDropdown(); loadCattleExpLedger(); }
-      else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Payables)"; populateDebtStatementDropdown(); loadDebtStatement(); }
+      else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Payables & Receivables)"; populateDebtStatementDropdown(); loadDebtStatement(); }
       else if (pageId === 'employeeJoining') { document.getElementById('pageTitle').innerText = "Employee Joining Form"; generateNextEmployeeId(); }
       else if (pageId === 'employeeAgreement') { document.getElementById('pageTitle').innerText = "Joining Agreement & Policy"; populateAgreementDropdown(); }
       else if (pageId === 'employeeAttendance') { document.getElementById('pageTitle').innerText = "Attendance & Leave Tracker"; populateAttendanceDropdowns(); renderAttendanceTable(); }
@@ -1041,6 +1081,7 @@
       document.getElementById('dashCattleInvestment').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashCattleExpenses').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashEmpExpenses').innerHTML = '<span class="mini-spinner"></span>';
+      document.getElementById('dashEmpAdvanceBalance').innerHTML = '<span class="mini-spinner"></span>';
       document.getElementById('dashCattleCount').innerHTML = '<span class="mini-spinner"></span>';
 
       fetch(SCRIPT_URL)
@@ -1071,6 +1112,7 @@
           document.getElementById('dashCattleInvestment').innerText = "₹ 0.00";
           document.getElementById('dashCattleExpenses').innerText = "₹ 0.00";
           document.getElementById('dashEmpExpenses').innerText = "₹ 0.00";
+          document.getElementById('dashEmpAdvanceBalance').innerText = "₹ 0.00";
           document.getElementById('dashCattleCount').innerText = "No Cattles";
         });
     }
@@ -1078,8 +1120,10 @@
     function updateDashboardUI() {
       let totalSales = 0, totalQty = 0, milkPending = 0, milkDeposited = 0;
       let cattleInvestment = 0, totalExpenses = 0, totalEmpExpenses = 0;
+      let totalEmpAdvance = 0;
       let cattleCounts = { "Milking Cow": 0, "Milking Buffalo": 0, "Heifer": 0, "Calf": 0, "Bull": 0 };
       let allPayables = {};
+      let cattlePartyBalances = {};
 
       if (allEntriesGlobal) {
         allEntriesGlobal.forEach(e => {
@@ -1094,7 +1138,7 @@
         allRetailEntriesGlobal.forEach(r => {
           let amt = parseFloat(r.totalAmount) || 0;
           let qty = parseFloat(r.quantity) || 0;
-          if (r.amountStatus !== "Deposit") { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus.includes("Pending")) milkPending += amt; }
+          if (r.amountStatus !== "Deposit") { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus === "Pending") milkPending += amt; }
           else milkDeposited += amt;
         });
       }
@@ -1103,17 +1147,36 @@
         allCattleEntriesGlobal.forEach(c => {
           let amt = parseFloat(c.amount) || 0;
           let pName = c.partyName || "Unknown";
+          if (!cattlePartyBalances[pName]) cattlePartyBalances[pName] = { total: 0, paid: 0 };
+
           if (c.transactionType === "Purchase") {
             cattleInvestment += amt;
-            if (cattleCounts[c.category] !== undefined) cattleCounts[c.category]++;
-            if (!allPayables[pName]) allPayables[pName] = { total: 0, paid: 0 };
-            allPayables[pName].total += amt;
-            if (c.status === "Paid") allPayables[pName].paid += amt;
+            if (c.tagNumber && c.tagNumber !== "PAYMENT") {
+              if (cattleCounts[c.category] !== undefined) cattleCounts[c.category]++;
+            }
+            if (c.tagNumber !== "PAYMENT") {
+              cattlePartyBalances[pName].total += amt;
+              if (c.status === "Paid") cattlePartyBalances[pName].paid += amt;
+            } else {
+              if (c.category === "Payment Given") cattlePartyBalances[pName].paid += amt;
+              else if (c.category === "Payment Received") cattlePartyBalances[pName].total += amt;
+            }
           } else if (c.transactionType === "Sell") {
             cattleInvestment -= amt;
-            if (cattleCounts[c.category] !== undefined && cattleCounts[c.category] > 0) cattleCounts[c.category]--;
+            if (c.tagNumber && cattleCounts[c.category] !== undefined && cattleCounts[c.category] > 0) cattleCounts[c.category]--;
+            cattlePartyBalances[pName].total += amt;
+            if (c.status === "Paid") cattlePartyBalances[pName].paid += amt;
           }
         });
+      }
+
+      for (let p in cattlePartyBalances) {
+        let diff = cattlePartyBalances[p].total - cattlePartyBalances[p].paid;
+        if (diff !== 0) {
+          if (!allPayables[p]) allPayables[p] = { total: 0, paid: 0 };
+          if (diff > 0) allPayables[p].total += diff;
+          else allPayables[p].paid += Math.abs(diff);
+        }
       }
 
       if (allCattleExpensesGlobal) {
@@ -1133,9 +1196,19 @@
 
       if (employeePaymentsGlobal) {
         employeePaymentsGlobal.forEach(ep => {
-          if (ep.paymentDirection === "Payment Diya") totalEmpExpenses += parseFloat(ep.amount) || 0;
+          let amt = parseFloat(ep.amount) || 0;
+          if (ep.paymentDirection === "Payment Diya") {
+            totalEmpExpenses += amt;
+            if (ep.paymentType === "Advance") totalEmpAdvance += amt;
+          } else if (ep.paymentDirection === "Advance Jama Karwaya") {
+            totalEmpAdvance += amt;
+          }
+          if (ep.paymentType === "Advance Deduction") {
+            totalEmpAdvance -= amt;
+          }
         });
       }
+      if (totalEmpAdvance < 0) totalEmpAdvance = 0;
 
       let netPendingLenaHai = milkPending - milkDeposited;
       if (netPendingLenaHai < 0) netPendingLenaHai = 0;
@@ -1153,6 +1226,7 @@
       document.getElementById('dashCattleInvestment').innerText = "₹ " + cattleInvestment.toFixed(2);
       document.getElementById('dashCattleExpenses').innerText = "₹ " + totalExpenses.toFixed(2);
       document.getElementById('dashEmpExpenses').innerText = "₹ " + totalEmpExpenses.toFixed(2);
+      document.getElementById('dashEmpAdvanceBalance').innerText = "₹ " + totalEmpAdvance.toFixed(2);
 
       let countStr = "";
       for (let cat in cattleCounts) {
@@ -1447,7 +1521,7 @@
       });
     }
 
-    // --- RETAIL MILK STATEMENT ---
+    // --- RETAIL MILK STATEMENT (FIXED PENDING LOGIC) ---
     function loadRetailLedgerForCustomer() {
       const customerName = document.getElementById('ledgerRetailCustomerSelect').value;
       const content = document.getElementById('retailLedgerContent');
@@ -1458,8 +1532,8 @@
       document.getElementById('lblRetailCustomerMobile').innerText = retailCustomerData[customerName]?.mobile || '-';
 
       let tableHtml = "";
-      let totalAmountAll = 0;
-      let totalPaidAll = 0;
+      let totalPendingBills = 0;
+      let totalPaidDeposits = 0;
       let filteredEntries = allRetailEntriesGlobal.filter(r => r.customerName === customerName);
 
       if (filteredEntries.length === 0) {
@@ -1468,8 +1542,10 @@
         filteredEntries.forEach(r => {
           let amt = parseFloat(r.totalAmount) || 0;
           let isDeposit = (r.amountStatus === "Deposit");
-          if (!isDeposit) totalAmountAll += amt;
-          else totalPaidAll += amt;
+          let isPending = (r.amountStatus === "Pending");
+
+          if (isPending) totalPendingBills += amt;
+          if (isDeposit) totalPaidDeposits += amt;
 
           let formattedDate = r.date ? new Date(r.date).toLocaleDateString('en-GB') : '';
           tableHtml += `<tr>
@@ -1483,9 +1559,9 @@
         });
       }
 
-      let pendingAmt = totalAmountAll - totalPaidAll;
-      if (pendingAmt < 0) pendingAmt = 0;
-      document.getElementById('lblRetailPendingAmount').innerText = "₹ " + pendingAmt.toFixed(2);
+      let netPendingAmt = totalPendingBills - totalPaidDeposits;
+      if (netPendingAmt < 0) netPendingAmt = 0;
+      document.getElementById('lblRetailPendingAmount').innerText = "₹ " + netPendingAmt.toFixed(2);
       document.getElementById('retailLedgerTableBody').innerHTML = tableHtml;
     }
 
@@ -1518,7 +1594,7 @@
       });
     }
 
-    // --- CATTLE LEDGER ---
+    // --- CATTLE LEDGER & PAYMENT DEPOSIT ---
     function loadCattleLedger() {
       const selected = document.getElementById('cattleLedgerSelect').value;
       let tableHtml = "";
@@ -1527,17 +1603,32 @@
       document.getElementById('lblCattlePartyName').innerText = selected === "ALL" ? "All Cattle Records" : selected;
       document.getElementById('lblCattleTotalRecords').innerText = filtered.length;
 
+      let totalAmount = 0, totalPaid = 0;
+      filtered.forEach(c => {
+        let amt = parseFloat(c.amount) || 0;
+        if (c.tagNumber !== "PAYMENT") {
+          totalAmount += amt;
+          if (c.status === "Paid") totalPaid += amt;
+        } else {
+          if (c.category === "Payment Received") totalAmount += amt;
+          else totalPaid += amt;
+        }
+      });
+      let netPending = totalAmount - totalPaid;
+      document.getElementById('lblCattlePendingNet').innerText = "₹ " + netPending.toFixed(2);
+
       if (filtered.length === 0) {
         tableHtml = '<tr><td colspan="8" style="text-align: center;">No cattle records found.</td></tr>';
       } else {
         filtered.forEach(c => {
           let formattedDate = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
-          let sellPriceShow = c.sellingPrice ? parseFloat(c.sellingPrice).toFixed(2) : parseFloat(c.amount || 0).toFixed(2);
+          let sellPriceShow = parseFloat(c.amount || 0).toFixed(2);
           let pregDuration = calculatePregnancyDurationLive(c.pregnancyDate);
+          let isPaymentRow = (c.tagNumber === "PAYMENT");
 
           tableHtml += `<tr>
             <td>${formattedDate}</td>
-            <td><span class="badge ${c.transactionType === 'Purchase' ? 'pending' : 'paid'}">${c.transactionType}</span></td>
+            <td><span class="badge ${isPaymentRow ? 'deposit' : (c.transactionType === 'Purchase' ? 'pending' : 'paid')}">${isPaymentRow ? c.category : c.transactionType}</span></td>
             <td><b>${c.category}</b></td>
             <td>${c.tagNumber || '-'}</td>
             <td>₹ ${sellPriceShow}</td>
@@ -1548,6 +1639,40 @@
         });
       }
       document.getElementById('cattleLedgerTableBody').innerHTML = tableHtml;
+    }
+
+    function submitCattlePayment() {
+      const selectedParty = document.getElementById('cattleLedgerSelect').value;
+      if (selectedParty === "ALL") { alert("Please select a specific party/dealer to settle payment!"); return; }
+      
+      const date = document.getElementById('cattlePayDate').value;
+      const direction = document.getElementById('cattlePayDirection').value;
+      const amount = parseFloat(document.getElementById('cattlePayAmount').value) || 0;
+      const note = document.getElementById('cattlePayNote').value.trim();
+
+      if (!date || amount <= 0) { alert("Please enter valid date and amount!"); return; }
+
+      const payload = {
+        action: "updateCattlePayment",
+        partyName: selectedParty,
+        mobile: cattlePartyData[selectedParty] || "",
+        date: date,
+        paymentDirection: direction,
+        amount: amount,
+        status: "Paid",
+        tagNumber: "PAYMENT"
+      };
+
+      fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+      .then(res => res.json()).then(res => {
+        if(res.result === "success") {
+          alert("Cattle payment settlement recorded successfully!");
+          document.getElementById('cattlePayAmount').value = "";
+          document.getElementById('cattlePayNote').value = "";
+          fetchDashboardData();
+          setTimeout(() => loadCattleLedger(), 1000);
+        }
+      });
     }
 
     // --- CATTLE EXPENSES LEDGER ---
@@ -1626,13 +1751,20 @@
       let payablesMap = {};
 
       allCattleEntriesGlobal.forEach(c => {
-        if (c.transactionType === "Purchase") {
-          let v = c.partyName || "Unknown";
-          if (!payablesMap[v]) payablesMap[v] = { mobile: c.mobile || "", total: 0, paid: 0, items: [] };
-          let amt = parseFloat(c.amount) || 0;
+        let v = c.partyName || "Unknown";
+        if (!payablesMap[v]) payablesMap[v] = { mobile: c.mobile || "", total: 0, paid: 0, items: [] };
+        let amt = parseFloat(c.amount) || 0;
+        if (c.transactionType === "Purchase" && c.tagNumber !== "PAYMENT") {
           payablesMap[v].total += amt;
           if (c.status === "Paid") payablesMap[v].paid += amt;
           payablesMap[v].items.push({ date: c.date, desc: `Cattle Purchase (${c.category})`, amount: amt, status: c.status, note: 'Tag: ' + (c.tagNumber || '-') });
+        } else if (c.transactionType === "Sell" && c.tagNumber !== "PAYMENT") {
+          payablesMap[v].paid += amt;
+          payablesMap[v].items.push({ date: c.date, desc: `Cattle Sell (${c.category})`, amount: amt, status: c.status, note: 'Tag: ' + (c.tagNumber || '-') });
+        } else if (c.tagNumber === "PAYMENT") {
+          if (c.category === "Payment Received") payablesMap[v].total += amt;
+          else payablesMap[v].paid += amt;
+          payablesMap[v].items.push({ date: c.date, desc: `Cattle Payment Settlement (${c.category})`, amount: amt, status: c.status, note: '-' });
         }
       });
 
@@ -1878,7 +2010,7 @@
       const emp = employeesGlobal.find(e => e.employeeName === empName);
       if (!emp) return;
 
-      if (pType === "Advance" || pType === "Bonus / Incentive") {
+      if (pType === "Advance" || pType === "Bonus / Incentive" || pType === "Advance Deduction") {
         amtInput.value = "";
         amtInput.readOnly = false;
         return;
@@ -1976,17 +2108,39 @@
       document.getElementById('sGrossEarned').innerText = "₹ " + totalGrossEarned.toFixed(2);
 
       let totalPaidThisMonth = 0;
+      let advanceDeductedThisMonth = 0;
+      let totalAdvanceGivenOverall = 0;
+      let totalAdvanceDeductedOverall = 0;
+
       employeePaymentsGlobal.forEach(p => {
-        if (p.employeeName === empName && p.date && p.date.startsWith(monthStr) && p.paymentDirection === "Payment Diya") {
-          totalPaidThisMonth += parseFloat(p.amount) || 0;
+        let pAmt = parseFloat(p.amount) || 0;
+        if (p.employeeName === empName) {
+          if (p.paymentDirection === "Payment Diya" && p.paymentType === "Advance") totalAdvanceGivenOverall += pAmt;
+          if (p.paymentDirection === "Advance Jama Karwaya") totalAdvanceGivenOverall += pAmt;
+          if (p.paymentType === "Advance Deduction") totalAdvanceDeductedOverall += pAmt;
+
+          if (p.date && p.date.startsWith(monthStr)) {
+            if (p.paymentDirection === "Payment Diya" && p.paymentType !== "Advance Deduction") {
+              totalPaidThisMonth += pAmt;
+            }
+            if (p.paymentType === "Advance Deduction") {
+              advanceDeductedThisMonth += pAmt;
+            }
+          }
         }
       });
 
+      let remainingAdvanceBalance = totalAdvanceGivenOverall - totalAdvanceDeductedOverall;
+      if (remainingAdvanceBalance < 0) remainingAdvanceBalance = 0;
+
+      document.getElementById('sAdvanceDeducted').innerText = "- ₹ " + advanceDeductedThisMonth.toFixed(2);
       document.getElementById('sAdvancePaid').innerText = "- ₹ " + totalPaidThisMonth.toFixed(2);
 
-      let netPayable = totalGrossEarned - totalPaidThisMonth;
+      let netPayable = totalGrossEarned - advanceDeductedThisMonth - totalPaidThisMonth;
       if (netPayable < 0) netPayable = 0;
+
       document.getElementById('sNetPayable').innerText = "₹ " + netPayable.toFixed(2);
+      document.getElementById('sRemainingAdvance').innerText = "₹ " + remainingAdvanceBalance.toFixed(2);
     }
 
     // Standard dropdown helpers
@@ -2039,7 +2193,7 @@
       const p = document.getElementById('debtStatementSelect');
       let combinedVendors = {...cattleVendorData};
       allCattleEntriesGlobal.forEach(c => {
-        if (c.transactionType === "Purchase" && c.partyName) combinedVendors[c.partyName] = c.mobile || "";
+        if (c.partyName) combinedVendors[c.partyName] = c.mobile || "";
       });
       p.innerHTML = '<option value="ALL">📊 All Debt Statement (Full Record)</option>';
       for (let k in combinedVendors) { let opt = document.createElement('option'); opt.value = k; opt.textContent = k; p.appendChild(opt); }

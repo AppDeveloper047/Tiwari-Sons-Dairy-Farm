@@ -671,7 +671,7 @@
               <div class="form-group"><label>Aadhaar Card Number:</label><input type="text" id="empAadhaar" placeholder="Aadhaar Number"></div>
               <div class="form-group"><label>PAN Card (Optional):</label><input type="text" id="empPan" placeholder="PAN Number"></div>
               
-              <!-- Bank details -->
+              <!-- Separated Bank details -->
               <div class="form-group"><label>Bank Name:</label><input type="text" id="empBankName" placeholder="e.g. State Bank of India"></div>
               <div class="form-group"><label>IFSC Code:</label><input type="text" id="empIfsc" placeholder="e.g. SBIN0001234"></div>
               <div class="form-group" style="grid-column: span 2;"><label>Bank Account Number:</label><input type="text" id="empBankAccount" placeholder="Enter Bank Account Number"></div>
@@ -680,14 +680,12 @@
                 <label>Salary Basis Type:</label>
                 <select id="empSalaryType" required>
                   <option value="Monthly">Monthly Salary</option>
-                  <option value="Per Day">Per Day Salary</option>
-                  <option value="Weekly">Weekly Salary</option>
-                  <option value="Half Yearly">Half Yearly Contract</option>
                   <option value="Yearly">Yearly Contract</option>
                 </select>
               </div>
-              <div class="form-group"><label>Base Salary Amount (₹):</label><input type="number" step="0.01" id="empBaseSalary" placeholder="e.g. 15000" required></div>
-              <div class="form-group" style="grid-column: span 2;"><label>Petrol / Other Allowance (₹):</label><input type="number" step="0.01" id="empAllowance" placeholder="e.g. 1000" value="0"></div>
+              <div class="form-group"><label>Monthly Salary (₹):</label><input type="number" step="0.01" id="empMonthly" oninput="calculateEmpSalaries()" required></div>
+              <div class="form-group"><label>Yearly Salary (₹) [Auto]:</label><input type="number" step="0.01" id="empYearly" readonly></div>
+              <div class="form-group"><label>Petrol / Other Allowance (₹):</label><input type="number" step="0.01" id="empAllowance" placeholder="e.g. 1000" value="0"></div>
 
               <div class="form-group" style="grid-column: span 2;">
                 <label>Terms & Conditions:</label>
@@ -744,10 +742,11 @@
             </div>
 
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Salary Structure:</h4>
+              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Salary Structure (Monthly / Yearly):</h4>
               <p style="font-size: 12px; color: #334155; line-height: 1.6;">
-                <strong>Salary Basis:</strong> <span id="agSalaryType">-</span><br>
-                <strong>Base Salary:</strong> ₹ <span id="agBaseSal">0</span><br>
+                <strong>Salary Type:</strong> <span id="agSalaryType">-</span><br>
+                <strong>Monthly Salary:</strong> ₹ <span id="agMonthlySal">0</span><br>
+                <strong>Yearly Salary:</strong> ₹ <span id="agYearlySal">0</span><br>
                 <strong>Petrol / Other Allowance:</strong> ₹ <span id="agAllowance">0</span>
               </p>
             </div>
@@ -898,34 +897,34 @@
                 <thead>
                   <tr>
                     <th>Salary Particulars</th>
-                    <th>Details / Calculation Breakdown</th>
+                    <th>Details / Calculation</th>
                     <th>Amount (₹)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td><b>Base Salary / Rate</b></td>
-                    <td id="sBaseDesc">Agreed salary amount</td>
+                    <td><b>Base Monthly Salary</b></td>
+                    <td>Standard agreed monthly salary</td>
                     <td id="sBaseSal">₹ 0.00</td>
                   </tr>
                   <tr>
                     <td><b>Petrol / Other Allowance</b></td>
-                    <td>Monthly fixed allowance</td>
+                    <td>Monthly allowance amount</td>
                     <td id="sAllowanceAmt">₹ 0.00</td>
                   </tr>
                   <tr>
-                    <td><b>Working Days / Attendance</b></td>
-                    <td id="sDaysWorkedDesc">Present days count</td>
-                    <td id="sEarnedSal">₹ 0.00</td>
+                    <td><b>Days Worked</b></td>
+                    <td>Present days in month</td>
+                    <td id="sDaysWorked">0 Days</td>
                   </tr>
                   <tr>
-                    <td><b>Advance / Payments Already Given</b></td>
-                    <td>Deducted from earned amount</td>
+                    <td><b>Advance / Payments Given</b></td>
+                    <td>Already paid during the month</td>
                     <td id="sAdvancePaid" style="color: #047857;">- ₹ 0.00</td>
                   </tr>
                   <tr style="background: #f1f5f9;">
                     <td><b>Net Payable Salary</b></td>
-                    <td><b>Final balance amount to be paid</b></td>
+                    <td><b>Final balance amount to pay</b></td>
                     <td><b id="sNetPayable" style="color: #2563eb; font-size: 15px;">₹ 0.00</b></td>
                   </tr>
                 </tbody>
@@ -1011,6 +1010,11 @@
       let nextNum = employeesGlobal.length + 1;
       let formattedId = "EMP-" + String(nextNum).padStart(3, '0');
       document.getElementById('empIdInput').value = formattedId;
+    }
+
+    function calculateEmpSalaries() {
+      let monthly = parseFloat(document.getElementById('empMonthly').value) || 0;
+      document.getElementById('empYearly').value = (monthly * 12).toFixed(2);
     }
 
     function fetchDashboardData() {
@@ -1161,7 +1165,8 @@
         ifscCode: document.getElementById('empIfsc').value.trim(),
         bankAccount: document.getElementById('empBankAccount').value.trim(),
         salaryType: document.getElementById('empSalaryType').value,
-        baseSalary: document.getElementById('empBaseSalary').value || 0,
+        monthlySalary: document.getElementById('empMonthly').value || 0,
+        yearlySalary: document.getElementById('empYearly').value || 0,
         allowance: document.getElementById('empAllowance').value || 0,
         terms: document.getElementById('empTerms').value.trim()
       };
@@ -1210,7 +1215,8 @@
       document.getElementById('agIfsc').innerText = emp.ifscCode || 'N/A';
       document.getElementById('agAccNo').innerText = emp.bankAccount || 'N/A';
       document.getElementById('agSalaryType').innerText = emp.salaryType || 'Monthly';
-      document.getElementById('agBaseSal').innerText = parseFloat(emp.baseSalary || 0).toFixed(2);
+      document.getElementById('agMonthlySal').innerText = parseFloat(emp.monthlySalary || 0).toFixed(2);
+      document.getElementById('agYearlySal').innerText = parseFloat(emp.yearlySalary || 0).toFixed(2);
       document.getElementById('agAllowance').innerText = parseFloat(emp.allowance || 0).toFixed(2);
       document.getElementById('agTerms').innerText = emp.terms || '-';
     }
@@ -1347,34 +1353,16 @@
       document.getElementById('sEmpMobile').innerText = emp.mobileNumber;
       document.getElementById('sMonth').innerText = monthStr;
 
-      let baseSalary = parseFloat(emp.baseSalary) || 0;
+      let baseMonthly = parseFloat(emp.monthlySalary) || 0;
       let allowance = parseFloat(emp.allowance) || 0;
-      let salaryType = emp.salaryType || "Monthly";
+      document.getElementById('sBaseSal').innerText = "₹ " + baseMonthly.toFixed(2);
+      document.getElementById('sAllowanceAmt').innerText = "₹ " + allowance.toFixed(2);
 
-      // Count present days for this employee in selected month
       let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Present').length;
       let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Half Day').length;
       let totalEffectiveDays = presentDays + (halfDays * 0.5);
+      document.getElementById('sDaysWorked').innerText = `${totalEffectiveDays} Days (${presentDays} Full, ${halfDays} Half)`;
 
-      let earnedBaseSalary = 0;
-      if (salaryType === "Per Day") {
-        earnedBaseSalary = baseSalary * totalEffectiveDays;
-        document.getElementById('sBaseDesc').innerText = `Per Day Rate: ₹${baseSalary} × ${totalEffectiveDays} Days Worked`;
-      } else if (salaryType === "Weekly") {
-        earnedBaseSalary = baseSalary * (totalEffectiveDays / 7);
-        document.getElementById('sBaseDesc').innerText = `Weekly Rate: ₹${baseSalary} (Pro-rated for ${totalEffectiveDays} days)`;
-      } else {
-        // Monthly, Half Yearly, Yearly
-        earnedBaseSalary = baseSalary;
-        document.getElementById('sBaseDesc').innerText = `Agreed ${salaryType} Base Salary`;
-      }
-
-      document.getElementById('sBaseSal').innerText = "₹ " + baseSalary.toFixed(2);
-      document.getElementById('sAllowanceAmt').innerText = "₹ " + allowance.toFixed(2);
-      document.getElementById('sDaysWorkedDesc').innerText = `${totalEffectiveDays} Days (${presentDays} Full, ${halfDays} Half)`;
-      document.getElementById('sEarnedSal').innerText = "₹ " + earnedBaseSalary.toFixed(2);
-
-      // Calculate total advance/payments already given during this month
       let totalPaidThisMonth = 0;
       employeePaymentsGlobal.forEach(p => {
         if (p.employeeName === empName && p.month === monthStr) {
@@ -1384,7 +1372,7 @@
 
       document.getElementById('sAdvancePaid').innerText = "- ₹ " + totalPaidThisMonth.toFixed(2);
 
-      let netPayable = (earnedBaseSalary + allowance) - totalPaidThisMonth;
+      let netPayable = (baseMonthly + allowance) - totalPaidThisMonth;
       if (netPayable < 0) netPayable = 0;
       document.getElementById('sNetPayable').innerText = "₹ " + netPayable.toFixed(2);
     }

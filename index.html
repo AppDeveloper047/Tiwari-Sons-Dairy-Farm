@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -130,7 +130,7 @@
           <button class="menu-btn" onclick="switchPage('retailLedger', this)">📋 Retail Milk Statement</button>
           <button class="menu-btn" onclick="switchPage('cattleLedger', this)">📋 Cattle Ledger</button>
           <button class="menu-btn" onclick="switchPage('cattleExpLedger', this)">📋 Expenses & Vendor Ledger</button>
-          <button class="menu-btn" onclick="switchPage('debtStatement', this)">📋 Debt Statement (Payables)</button>
+          <button class="menu-btn" onclick="switchPage('debtStatement', this)">📋 Debt Statement (Kisko Dena Hai)</button>
         </div>
       </li>
 
@@ -175,11 +175,11 @@
               <p id="dashTotalQty"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card amber">
-              <h4>Pending Payments (Receivable)</h4>
+              <h4>Pending Payments (Lena Hai)</h4>
               <p id="dashPendingAmount"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card indigo">
-              <h4>Debt Payment (Payable)</h4>
+              <h4>Debt Payment (Dena Hai)</h4>
               <p id="dashDebtAmount"><span class="mini-spinner"></span></p>
             </div>
             <div class="dash-card purple">
@@ -581,7 +581,7 @@
               <div class="form-grid" style="align-items: flex-end;">
                 <div class="form-group"><label>Payment Date</label><input type="date" id="expDepositDate"></div>
                 <div class="form-group"><label>Amount (₹)</label><input type="number" id="expDepositAmount" placeholder="Enter Amount"></div>
-                <div class="form-group" style="grid-column: span 2;"><label>Note / Message (Payment details)</label><input type="text" id="expDepositNote" placeholder="e.g. Cash given or Online transfer"></div>
+                <div class="form-group" style="grid-column: span 2;"><label>Note / Message (Kahan ya kaise diya)</label><input type="text" id="expDepositNote" placeholder="e.g. Cash diya ya Online transfer kiya"></div>
               </div>
               <button type="button" class="action-btn" onclick="submitCattleExpDeposit()" style="margin-top: 12px; width: 100%;">Save Payment to Vendor</button>
             </div>
@@ -606,11 +606,11 @@
         </div>
       </section>
 
-      <!-- DEBT STATEMENT PAGE (PAYABLES) -->
+      <!-- DEBT STATEMENT PAGE (KISKO DENA HAI) -->
       <section id="debtStatement" class="page-section">
         <div class="card printable-card">
           <div class="company-banner" style="text-align: left;">
-            <h3>Debt Statement (Payables)</h3>
+            <h3>Debt Statement (Kisko Dena Hai)</h3>
             <div class="dairy-address" style="margin: 0;">View outstanding payables to vendors, suppliers and cattle dealers.</div>
           </div>
           
@@ -630,7 +630,7 @@
             <div class="party-info-box">
               <div class="party-info-item"><span class="title">Selected Vendor / Dealer</span><span class="value" id="lblDebtVendorName">All Vendors</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblDebtVendorMobile">-</span></div>
-              <div class="party-info-item"><span class="title">Total Remaining Balance (Payable)</span><span class="value" id="lblDebtTotalAmount" style="color: #6366f1;">₹ 0.00</span></div>
+              <div class="party-info-item"><span class="title">Total Remaining Balance (Dena Hai)</span><span class="value" id="lblDebtTotalAmount" style="color: #6366f1;">₹ 0.00</span></div>
             </div>
 
             <div class="table-container">
@@ -657,7 +657,7 @@
         <div class="card">
           <div class="company-banner" style="text-align: left;">
             <h3>Employee Joining & Registration Form</h3>
-            <div class="dairy-address" style="margin: 0;">Register new employee with complete KYC, separate Bank details and salary terms.</div>
+            <div class="dairy-address" style="margin: 0;">Register new employee with complete KYC, Bank details and salary terms.</div>
           </div>
 
           <form id="employeeForm">
@@ -667,11 +667,11 @@
               <div class="form-group"><label>Employee Full Name:</label><input type="text" id="empName" placeholder="e.g. Ramesh Kumar" required></div>
               <div class="form-group"><label>Mobile Number:</label><input type="tel" id="empMobile" placeholder="10-digit mobile number" required></div>
               <div class="form-group" style="grid-column: span 2;"><label>Full Address:</label><input type="text" id="empAddress" placeholder="Village, Post, Tehsil, District" required></div>
-              <div class="form-group"><label>Witness Name:</label><input type="text" id="empWitness" placeholder="Witness Full Name"></div>
+              <div class="form-group"><label>Witness Name (गवाह):</label><input type="text" id="empWitness" placeholder="Witness Full Name"></div>
               <div class="form-group"><label>Aadhaar Card Number:</label><input type="text" id="empAadhaar" placeholder="Aadhaar Number"></div>
               <div class="form-group"><label>PAN Card (Optional):</label><input type="text" id="empPan" placeholder="PAN Number"></div>
               
-              <!-- Separated Bank details -->
+              <!-- Bank details split -->
               <div class="form-group"><label>Bank Name:</label><input type="text" id="empBankName" placeholder="e.g. State Bank of India"></div>
               <div class="form-group"><label>IFSC Code:</label><input type="text" id="empIfsc" placeholder="e.g. SBIN0001234"></div>
               <div class="form-group" style="grid-column: span 2;"><label>Bank Account Number:</label><input type="text" id="empBankAccount" placeholder="Enter Bank Account Number"></div>
@@ -688,10 +688,10 @@
               <div class="form-group"><label>Petrol / Other Allowance (₹):</label><input type="number" step="0.01" id="empAllowance" placeholder="e.g. 1000" value="0"></div>
 
               <div class="form-group" style="grid-column: span 2;">
-                <label>Terms & Conditions:</label>
-                <textarea id="empTerms" rows="4" placeholder="Enter work terms, timings and policies here...">1. Work timing starts from 5:00 AM daily.
-2. Punctuality and careful handling of cattle is mandatory.
-3. Prior notice is required for any leave.</textarea>
+                <label>Terms & Conditions (नियम व शर्ते):</label>
+                <textarea id="empTerms" rows="4" placeholder="Dairy par kary karne ke niyam, samay aur shartein yahan likhein...">1. Kary ka samay subah 5:00 baje se shuru hoga.
+2. Samay par aana aur imandari se pashu ki dekhbhal karna anivarya hai.
+3. Kisi bhi prakar ki chutti ki jankari pehle deni hogi.</textarea>
               </div>
             </div>
             <button type="submit" class="submit-btn" id="empSubmitBtn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">💾 Save Employee Record</button>
@@ -734,7 +734,7 @@
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
               <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">KYC & Bank Details:</h4>
               <p style="font-size: 12px; color: #334155; line-height: 1.6;">
-                <strong>Witness:</strong> <span id="agWitness">-</span><br>
+                <strong>Witness (गवाह):</strong> <span id="agWitness">-</span><br>
                 <strong>Aadhaar Card:</strong> <span id="agAadhaar">-</span> | <strong>PAN Card:</strong> <span id="agPan">-</span><br>
                 <strong>Bank Name:</strong> <span id="agBankName">-</span> | <strong>IFSC:</strong> <span id="agIfsc">-</span><br>
                 <strong>Account No:</strong> <span id="agAccNo">-</span>
@@ -752,7 +752,7 @@
             </div>
 
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
-              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Company Rules & Conditions:</h4>
+              <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">Company Rules & Conditions (नियम व शर्ते):</h4>
               <p style="font-size: 12px; color: #334155; white-space: pre-wrap; line-height: 1.6;" id="agTerms">-</p>
             </div>
 
@@ -792,12 +792,12 @@
               <div class="form-group">
                 <label>Attendance Status:</label>
                 <select id="attStatus" required>
-                  <option value="Present">Present</option>
-                  <option value="Half Day">Half Day</option>
-                  <option value="Absent / Leave">Absent / Leave</option>
+                  <option value="Present">Present (उपस्थित)</option>
+                  <option value="Half Day">Half Day (आधा दिन)</option>
+                  <option value="Absent / Leave">Absent / Leave (छुट्टी)</option>
                 </select>
               </div>
-              <div class="form-group"><label>Reason / Comment:</label><input type="text" id="attReason" placeholder="e.g. Personal work / Fever"></div>
+              <div class="form-group"><label>Reason / Comment (छुट्टी का कारण):</label><input type="text" id="attReason" placeholder="e.g. Personal work / Fever"></div>
             </div>
             <button type="submit" class="submit-btn" id="attSubmitBtn" style="background: linear-gradient(135deg, #059669, #047857);">💾 Save Attendance Record</button>
           </form>
@@ -840,16 +840,16 @@
               <div class="form-group">
                 <label>Payment Type:</label>
                 <select id="payType" required>
-                  <option value="Advance">Advance</option>
+                  <option value="Advance">Advance (पेटी)</option>
                   <option value="Half Salary">Half Salary</option>
                   <option value="Full Salary">Full Salary</option>
                   <option value="Weekly Payment">Weekly Payment</option>
                   <option value="Bonus">Bonus / Incentive</option>
                 </select>
               </div>
-              <div class="form-group"><label>Select Month / Period:</label><input type="month" id="payMonth" required></div>
+              <div class="form-group"><label>For Month / Period (Select Month):</label><input type="month" id="payMonth" required></div>
               <div class="form-group"><label>Amount (₹):</label><input type="number" step="0.01" id="payAmount" placeholder="e.g. 5000" required></div>
-              <div class="form-group" style="grid-column: span 2;"><label>Note / Comment:</label><input type="text" id="payNote" placeholder="e.g. Cash given or PhonePe transfer"></div>
+              <div class="form-group" style="grid-column: span 2;"><label>Note / Comment (कैasे दिया / विवरण):</label><input type="text" id="payNote" placeholder="e.g. Cash diya ya PhonePe transfer kiya"></div>
             </div>
             <button type="submit" class="submit-btn" id="paySubmitBtn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">💾 Save Employee Payment</button>
           </form>
@@ -992,7 +992,7 @@
       else if (pageId === 'retailLedger') { document.getElementById('pageTitle').innerText = "Retail Milk Statement"; populateRetailLedgerCustomerDropdown(); }
       else if (pageId === 'cattleLedger') { document.getElementById('pageTitle').innerText = "Cattle Ledger Statement"; populateCattleLedgerDropdown(); loadCattleLedger(); }
       else if (pageId === 'cattleExpLedger') { document.getElementById('pageTitle').innerText = "Cattle Expenses & Vendor Ledger"; populateCattleExpLedgerDropdown(); loadCattleExpLedger(); }
-      else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Payables)"; populateDebtStatementDropdown(); loadDebtStatement(); }
+      else if (pageId === 'debtStatement') { document.getElementById('pageTitle').innerText = "Debt Statement (Kisko Dena Hai)"; populateDebtStatementDropdown(); loadDebtStatement(); }
       else if (pageId === 'employeeJoining') { document.getElementById('pageTitle').innerText = "Employee Joining Form"; generateNextEmployeeId(); }
       else if (pageId === 'employeeAgreement') { document.getElementById('pageTitle').innerText = "Joining Agreement & Policy"; populateAgreementDropdown(); }
       else if (pageId === 'employeeAttendance') { document.getElementById('pageTitle').innerText = "Attendance & Leave Tracker"; populateAttendanceDropdown(); renderAttendanceTable(); }
@@ -1175,7 +1175,7 @@
       .then(res => res.json()).then(res => {
         btn.innerText = "💾 Save Employee Record"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Employee successfully registered!");
+          alert("Employee successfully register ho gaya!");
           document.getElementById('employeeForm').reset();
           document.getElementById('empJoiningDate').valueAsDate = new Date();
           fetchDashboardData();
@@ -1249,7 +1249,7 @@
       .then(res => res.json()).then(res => {
         btn.innerText = "💾 Save Attendance Record"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Attendance saved successfully!");
+          alert("Attendance save ho gayi!");
           document.getElementById('attendanceForm').reset();
           document.getElementById('attDate').valueAsDate = new Date();
           fetchDashboardData();
@@ -1309,7 +1309,7 @@
         employeeName: document.getElementById('payEmpSelect').value,
         mobileNumber: document.getElementById('payMobile').value,
         paymentType: document.getElementById('payType').value,
-        month: document.getElementById('payMonth').value,
+        month: document.getElementById('payMonth').value, // yyyy-mm format
         amount: document.getElementById('payAmount').value,
         note: document.getElementById('payNote').value.trim()
       };
@@ -1318,7 +1318,7 @@
       .then(res => res.json()).then(res => {
         btn.innerText = "💾 Save Employee Payment"; btn.disabled = false;
         if(res.result === "success") {
-          alert("Employee payment successfully saved!");
+          alert("Employee Payment successfully save ho gaya!");
           document.getElementById('empPaymentForm').reset();
           document.getElementById('payDate').valueAsDate = new Date();
           fetchDashboardData();
@@ -1340,10 +1340,10 @@
 
     function generateSalarySlip() {
       const empName = document.getElementById('slipEmpSelect').value;
-      const monthStr = document.getElementById('slipMonthInput').value;
+      const monthStr = document.getElementById('slipMonthInput').value; // yyyy-mm
       const content = document.getElementById('salarySlipContent');
 
-      if (!empName || !monthStr) { alert("Please select Employee and Month!"); return; }
+      if (!empName || !monthStr) { alert("Kripya Employee aur Month sahi select karein!"); return; }
       const emp = employeesGlobal.find(e => e.employeeName === empName);
       if (!emp) return;
 
@@ -1358,11 +1358,13 @@
       document.getElementById('sBaseSal').innerText = "₹ " + baseMonthly.toFixed(2);
       document.getElementById('sAllowanceAmt').innerText = "₹ " + allowance.toFixed(2);
 
+      // Count present days for this employee in selected month
       let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Present').length;
       let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Half Day').length;
       let totalEffectiveDays = presentDays + (halfDays * 0.5);
       document.getElementById('sDaysWorked').innerText = `${totalEffectiveDays} Days (${presentDays} Full, ${halfDays} Half)`;
 
+      // Calculate total advance/payments given to this employee for this month
       let totalPaidThisMonth = 0;
       employeePaymentsGlobal.forEach(p => {
         if (p.employeeName === empName && p.month === monthStr) {

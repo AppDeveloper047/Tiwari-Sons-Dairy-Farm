@@ -1198,13 +1198,18 @@
         employeePaymentsGlobal.forEach(ep => {
           let amt = parseFloat(ep.amount) || 0;
           if (ep.paymentDirection === "Payment Diya") {
-            totalEmpExpenses += amt;
+            // EXCLUDE Advance payment from Employment Expenses as requested
+            if (ep.paymentType !== "Advance") {
+              totalEmpExpenses += amt;
+            }
             if (ep.paymentType === "Advance") totalEmpAdvance += amt;
           } else if (ep.paymentDirection === "Advance Jama Karwaya") {
             totalEmpAdvance += amt;
           }
           if (ep.paymentType === "Advance Deduction") {
             totalEmpAdvance -= amt;
+            // Add adjusted advance deduction into actual employee expense
+            totalEmpExpenses += amt;
           }
         });
       }
@@ -2120,7 +2125,7 @@
           if (p.paymentType === "Advance Deduction") totalAdvanceDeductedOverall += pAmt;
 
           if (p.date && p.date.startsWith(monthStr)) {
-            if (p.paymentDirection === "Payment Diya" && p.paymentType !== "Advance Deduction") {
+            if (p.paymentDirection === "Payment Diya" && p.paymentType !== "Advance Deduction" && p.paymentType !== "Advance") {
               totalPaidThisMonth += pAmt;
             }
             if (p.paymentType === "Advance Deduction") {

@@ -142,6 +142,7 @@
           <button class="menu-btn" onclick="switchPage('employeeAgreement', this)">📜 Joining Agreement & Policy</button>
           <button class="menu-btn" onclick="switchPage('employeeAttendance', this)">⏱️ Attendance & Leave Tracker</button>
           <button class="menu-btn" onclick="switchPage('employeePayment', this)">💵 Employee Payment Deposit</button>
+          <button class="menu-btn" onclick="switchPage('employeeStatement', this)">📋 Employee Ledger & Statement</button>
           <button class="menu-btn" onclick="switchPage('employeeSalarySlip', this)">📄 Salary Slip Generator</button>
         </div>
       </li>
@@ -876,21 +877,26 @@
               </div>
               <div class="form-group">
                 <label>Payment Direction:</label>
-                <select id="payDirection" onchange="calculateAutoEmployeePayment()" required>
-                  <option value="Payment Diya">Payment Given (To Employee)</option>
-                  <option value="Advance Jama Karwaya">Advance Deposited / Received (By Employee)</option>
+                <select id="payDirection" onchange="handlePaymentDirectionChange()" required>
+                  <option value="Payment Given">Payment Given (Jo payment mene kisi ko diya)</option>
+                  <option value="Payment Received">Payment Received (Jo payment kisi ne jama kiya)</option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Payment Type:</label>
-                <select id="payType" onchange="calculateAutoEmployeePayment()" required>
+                <select id="payType" onchange="handlePaymentTypeChange()" required>
                   <option value="Earned Salary">Earned Salary (Calculated)</option>
-                  <option value="Advance">Advance Payment</option>
+                  <option value="Advance Payment">Advance Payment</option>
                   <option value="Bonus / Incentive">Bonus / Incentive</option>
-                  <option value="Advance Deduction">Advance Deduction Adjustment</option>
+                  <option value="Advance Adjustment With Salary">Advance Adjustment With Salary</option>
                 </select>
               </div>
               <div class="form-group"><label>Amount (Auto / Manual ₹):</label><input type="number" step="0.01" id="payAmount" placeholder="Amount" required></div>
+              
+              <!-- Extra 2 columns for Advance Adjustment with Salary -->
+              <div class="form-group" id="advanceDepositGroup" style="display:none;"><label>Deposit In Advance Payment (₹):</label><input type="number" step="0.01" id="payAdvanceDeposit" placeholder="Enter advance amount to adjust" oninput="calculateNetPayableSalary()"></div>
+              <div class="form-group" id="netPayableGroup" style="display:none;"><label>Net Payable Salary (₹) [Auto]:</label><input type="number" step="0.01" id="payNetPayable" readonly style="background: #f1f5f9; font-weight: 700; color: #2563eb;"></div>
+
               <div class="form-group" style="grid-column: span 2;"><label>Note / Comment:</label><input type="text" id="payNote" placeholder="e.g. Cash given or PhonePe transfer"></div>
             </div>
             <button type="submit" class="submit-btn" id="paySubmitBtn" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">💾 Save Employee Payment</button>
@@ -898,7 +904,55 @@
         </div>
       </section>
 
-      <!-- 5. SALARY SLIP GENERATOR PAGE -->
+      <!-- 5. EMPLOYEE LEDGER & STATEMENT PAGE -->
+      <section id="employeeStatement" class="page-section">
+        <div class="card printable-card">
+          <div class="company-banner" style="text-align: left;">
+            <h3>Employee Ledger & Statement</h3>
+            <div class="dairy-address" style="margin: 0;">View complete payment and advance history for all or individual employee.</div>
+          </div>
+          
+          <div class="form-grid no-print" style="margin-bottom: 20px;">
+            <div class="form-group">
+              <label>Select Employee Name / ID</label>
+              <select id="statementEmpSelect" onchange="loadEmployeeStatement()">
+                <option value="ALL">📊 All Employees Statement (Full Record)</option>
+              </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: flex-end;">
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb;">📥 Download Statement PDF</button>
+            </div>
+          </div>
+
+          <div id="employeeStatementContent" style="display: block;">
+            <div class="party-info-box">
+              <div class="party-info-item"><span class="title">Selected Employee</span><span class="value" id="lblStmtEmpName">All Employees</span></div>
+              <div class="party-info-item"><span class="title">Total Records</span><span class="value" id="lblStmtTotalRecords">0</span></div>
+              <div class="party-info-item"><span class="title">Total Amount Paid / Handled</span><span class="value" id="lblStmtTotalAmount" style="color: #2563eb;">₹ 0.00</span></div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Emp Name</th>
+                    <th>Emp ID</th>
+                    <th>Mobile Number</th>
+                    <th>Payment Direction</th>
+                    <th>Payment Type & Details</th>
+                    <th>Amount (₹)</th>
+                    <th>Comments / Note</th>
+                  </tr>
+                </thead>
+                <tbody id="employeeStatementTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. SALARY SLIP GENERATOR PAGE -->
       <section id="employeeSalarySlip" class="page-section">
         <div class="card printable-card">
           <div class="company-banner">
@@ -1078,6 +1132,7 @@
       else if (pageId === 'employeeAgreement') { document.getElementById('pageTitle').innerText = "Joining Agreement & Policy"; populateAgreementDropdown(); }
       else if (pageId === 'employeeAttendance') { document.getElementById('pageTitle').innerText = "Attendance & Leave Tracker"; populateAttendanceDropdowns(); renderAttendanceTable(); }
       else if (pageId === 'employeePayment') { document.getElementById('pageTitle').innerText = "Employee Payment Deposit"; populateEmployeePaymentDropdown(); }
+      else if (pageId === 'employeeStatement') { document.getElementById('pageTitle').innerText = "Employee Ledger & Statement"; populateEmployeeStatementDropdown(); loadEmployeeStatement(); }
       else if (pageId === 'employeeSalarySlip') { document.getElementById('pageTitle').innerText = "Salary Slip Generator"; populateSalarySlipDropdown(); }
 
       document.querySelectorAll('.sidebar-menu .menu-btn').forEach(btn => btn.classList.remove('active'));
@@ -1217,17 +1272,21 @@
       if (employeePaymentsGlobal) {
         employeePaymentsGlobal.forEach(ep => {
           let amt = parseFloat(ep.amount) || 0;
-          if (ep.paymentDirection === "Payment Diya") {
-            if (ep.paymentType !== "Advance") {
+          let pType = ep.paymentType;
+          let pDir = ep.paymentDirection;
+
+          if (pDir === "Payment Given") {
+            if (pType !== "Advance Payment") {
               totalEmpExpenses += amt;
             }
-            if (ep.paymentType === "Advance") totalEmpAdvance += amt;
-          } else if (ep.paymentDirection === "Advance Jama Karwaya") {
+            if (pType === "Advance Payment") totalEmpAdvance += amt;
+          } else if (pDir === "Payment Received") {
             totalEmpAdvance += amt;
           }
-          if (ep.paymentType === "Advance Deduction") {
-            totalEmpAdvance -= amt;
-            totalEmpExpenses += amt;
+          if (pType === "Advance Adjustment With Salary") {
+            let advDep = parseFloat(ep.advanceDeposit || 0);
+            totalEmpAdvance -= advDep;
+            totalEmpExpenses += advDep;
           }
         });
       }
@@ -2020,6 +2079,44 @@
         opt.textContent = `${em.employeeName} [${em.employeeId || 'EMP'}]`;
         sel.appendChild(opt);
       });
+      handlePaymentDirectionChange();
+    }
+
+    function handlePaymentDirectionChange() {
+      const dir = document.getElementById('payDirection').value;
+      const typeSel = document.getElementById('payType');
+      typeSel.innerHTML = "";
+
+      if (dir === "Payment Given") {
+        typeSel.innerHTML = `
+          <option value="Earned Salary">Earned Salary (Calculated)</option>
+          <option value="Advance Payment">Advance Payment</option>
+          <option value="Bonus / Incentive">Bonus / Incentive</option>
+          <option value="Advance Adjustment With Salary">Advance Adjustment With Salary</option>
+        `;
+      } else {
+        typeSel.innerHTML = `
+          <option value="Advance Payment">Advance Payment (Jama / Received)</option>
+        `;
+      }
+      handlePaymentTypeChange();
+    }
+
+    function handlePaymentTypeChange() {
+      const pType = document.getElementById('payType').value;
+      const advGroup = document.getElementById('advanceDepositGroup');
+      const netGroup = document.getElementById('netPayableGroup');
+
+      if (pType === "Advance Adjustment With Salary") {
+        advGroup.style.display = "flex";
+        netGroup.style.display = "flex";
+        document.getElementById('payAdvanceDeposit').required = true;
+      } else {
+        advGroup.style.display = "none";
+        netGroup.style.display = "none";
+        document.getElementById('payAdvanceDeposit').required = false;
+      }
+      calculateAutoEmployeePayment();
     }
 
     function calculateAutoEmployeePayment() {
@@ -2031,7 +2128,7 @@
       const emp = employeesGlobal.find(e => e.employeeName === empName);
       if (!emp) return;
 
-      if (pType === "Advance" || pType === "Bonus / Incentive" || pType === "Advance Deduction") {
+      if (pType === "Advance Payment" || pType === "Bonus / Incentive") {
         amtInput.value = "";
         amtInput.readOnly = false;
         return;
@@ -2047,6 +2144,18 @@
 
       let totalCalculated = (totalEffectiveDays * dailySal) + (totalEffectiveDays * dailyAllow);
       amtInput.value = totalCalculated.toFixed(2);
+
+      if (pType === "Advance Adjustment With Salary") {
+        calculateNetPayableSalary();
+      }
+    }
+
+    function calculateNetPayableSalary() {
+      const grossAmt = parseFloat(document.getElementById('payAmount').value) || 0;
+      const advDep = parseFloat(document.getElementById('payAdvanceDeposit').value) || 0;
+      let netPay = grossAmt - advDep;
+      if (netPay < 0) netPay = 0;
+      document.getElementById('payNetPayable').value = netPay.toFixed(2);
     }
 
     document.getElementById('empPaymentForm').addEventListener('submit', function(e) {
@@ -2056,6 +2165,13 @@
 
       const empName = document.getElementById('payEmpSelect').value;
       const emp = employeesGlobal.find(e => e.employeeName === empName);
+      const pType = document.getElementById('payType').value;
+      let finalAmt = document.getElementById('payAmount').value;
+
+      if (pType === "Advance Adjustment With Salary") {
+        let netPay = document.getElementById('payNetPayable').value;
+        finalAmt = netPay; // net payable amount stored as main transaction amount
+      }
 
       const payload = {
         action: "addEmployeePayment",
@@ -2064,8 +2180,9 @@
         employeeName: empName,
         mobileNumber: emp ? emp.mobileNumber : "",
         paymentDirection: document.getElementById('payDirection').value,
-        paymentType: document.getElementById('payType').value,
-        amount: document.getElementById('payAmount').value,
+        paymentType: pType,
+        amount: finalAmt,
+        advanceDeposit: document.getElementById('payAdvanceDeposit').value || 0,
         note: document.getElementById('payNote').value.trim()
       };
 
@@ -2081,6 +2198,59 @@
         }
       });
     });
+
+    function populateEmployeeStatementDropdown() {
+      const sel = document.getElementById('statementEmpSelect');
+      sel.innerHTML = '<option value="ALL">📊 All Employees Statement (Full Record)</option>';
+      employeesGlobal.forEach(em => {
+        let opt = document.createElement('option');
+        opt.value = em.employeeName;
+        opt.textContent = `${em.employeeName} [${em.employeeId || 'EMP'}]`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function loadEmployeeStatement() {
+      const selected = document.getElementById('statementEmpSelect').value;
+      let tableHtml = "";
+      let filtered = selected === "ALL" ? employeePaymentsGlobal : employeePaymentsGlobal.filter(p => p.employeeName === selected);
+
+      document.getElementById('lblStmtEmpName').innerText = selected === "ALL" ? "All Employees" : selected;
+      document.getElementById('lblStmtTotalRecords').innerText = filtered.length;
+
+      let totalAmt = 0;
+      filtered.forEach(p => { totalAmt += parseFloat(p.amount) || 0; });
+      document.getElementById('lblStmtTotalAmount').innerText = "₹ " + totalAmt.toFixed(2);
+
+      if (filtered.length === 0) {
+        tableHtml = '<tr><td colspan="8" style="text-align: center;">No payment records found.</td></tr>';
+      } else {
+        for (let i = filtered.length - 1; i >= 0; i--) {
+          let p = filtered.log || filtered[i];
+          let formattedDate = p.date ? new Date(p.date).toLocaleDateString('en-GB') : '';
+          let empObj = employeesGlobal.find(e => e.employeeName === p.employeeName);
+          let empId = p.employeeId || (empObj ? empObj.employeeId : '-');
+          let mob = p.mobileNumber || (empObj ? empObj.mobileNumber : '-');
+
+          let detailsText = p.paymentType;
+          if (p.paymentType === "Advance Adjustment With Salary" && p.advanceDeposit) {
+            detailsText += ` (Advance Adjusted: ₹${p.advanceDeposit})`;
+          }
+
+          tableHtml += `<tr>
+            <td>${formattedDate}</td>
+            <td><b>${p.employeeName}</b></td>
+            <td>${empId}</td>
+            <td>${mob}</td>
+            <td><span class="badge ${p.paymentDirection === 'Payment Given' ? 'pending' : 'paid'}">${p.paymentDirection}</span></td>
+            <td>${detailsText}</td>
+            <td>₹ ${parseFloat(p.amount || 0).toFixed(2)}</td>
+            <td>${p.note || '-'}</td>
+          </tr>`;
+        }
+      }
+      document.getElementById('employeeStatementTableBody').innerHTML = tableHtml;
+    }
 
     function populateSalarySlipDropdown() {
       const sel = document.getElementById('slipEmpSelect');
@@ -2137,17 +2307,21 @@
 
       employeePaymentsGlobal.forEach(p => {
         let pAmt = parseFloat(p.amount) || 0;
+        let advDep = parseFloat(p.advanceDeposit || 0);
         if (p.employeeName === empName) {
-          if (p.paymentDirection === "Payment Diya" && p.paymentType === "Advance") totalAdvanceGivenOverall += pAmt;
-          if (p.paymentDirection === "Advance Jama Karwaya") totalAdvanceGivenOverall += pAmt;
-          if (p.paymentType === "Advance Deduction") totalAdvanceDeductedOverall += pAmt;
+          if (p.paymentDirection === "Payment Given" && p.paymentType === "Advance Payment") totalAdvanceGivenOverall += pAmt;
+          if (p.paymentDirection === "Payment Received") totalAdvanceGivenOverall += pAmt;
+          if (p.paymentType === "Advance Adjustment With Salary") {
+            totalAdvanceDeductedOverall += advDep;
+          }
 
           if (p.date && p.date.startsWith(monthStr)) {
-            if (p.paymentDirection === "Payment Diya" && p.paymentType !== "Advance Deduction" && p.paymentType !== "Advance") {
+            if (p.paymentDirection === "Payment Given" && p.paymentType !== "Advance Adjustment With Salary" && p.paymentType !== "Advance Payment") {
               totalPaidThisMonth += pAmt;
             }
-            if (p.paymentType === "Advance Deduction") {
-              advanceDeductedThisMonth += pAmt;
+            if (p.paymentType === "Advance Adjustment With Salary") {
+              advanceDeductedThisMonth += advDep;
+              totalPaidThisMonth += pAmt; // Net payable salary given
             }
           }
         }

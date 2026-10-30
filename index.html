@@ -11,7 +11,7 @@
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9; }
     .overlay.active { display: block; }
 
-    /* Updated Light & Clean Modern Gradient for Sidebar */
+    /* Light & Clean Modern Gradient for Sidebar */
     .sidebar { width: 270px; background: linear-gradient(180deg, #1e293b 0%, #334155 50%, #1d4ed8 100%); color: #fff; height: 100vh; position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.15); overflow-y: auto; }
     .sidebar.hidden { left: -270px; }
     .sidebar-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -706,6 +706,8 @@
                   <option value="Monthly">Monthly Salary</option>
                   <option value="Per Day">Per Day Salary</option>
                   <option value="Weekly">Weekly Salary</option>
+                  <option value="Half Yearly">Half Yearly Salary</option>
+                  <option value="Yearly">Yearly Salary</option>
                 </select>
               </div>
               <div class="form-group"><label>Base Salary Amount (₹):</label><input type="number" step="0.01" id="empBaseSalary" placeholder="Enter rate/salary" oninput="calculateAutoSalaryStructure()" required></div>
@@ -1843,6 +1845,14 @@
         daily = baseAmt / 7;
         monthly = daily * 30;
         yearly = daily * 365;
+      } else if (type === "Half Yearly") {
+        monthly = baseAmt / 6;
+        daily = monthly / 30;
+        yearly = baseAmt * 2;
+      } else if (type === "Yearly") {
+        yearly = baseAmt;
+        monthly = yearly / 12;
+        daily = monthly / 30;
       } else {
         monthly = baseAmt;
         daily = monthly / 30;

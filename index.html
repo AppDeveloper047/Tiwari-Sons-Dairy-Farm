@@ -11,15 +11,10 @@
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9; }
     .overlay.active { display: block; }
 
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .sidebar { width: 270px; background: linear-gradient(270deg, #0f172a, #1e293b, #2563eb, #4f46e5, #7c3aed); background-size: 400% 400%; animation: gradientAnimation 12s ease infinite; color: #fff; height: 100vh; position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
+    /* Updated Light & Clean Modern Gradient for Sidebar */
+    .sidebar { width: 270px; background: linear-gradient(180deg, #1e293b 0%, #334155 50%, #1d4ed8 100%); color: #fff; height: 100vh; position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.15); overflow-y: auto; }
     .sidebar.hidden { left: -270px; }
-    .sidebar-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
     .sidebar-header h2 { font-size: 17px; background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
     .close-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
 
@@ -28,7 +23,7 @@
     .menu-btn { background: transparent; border: none; color: #cbd5e1; padding: 14px 22px; text-align: left; font-size: 14px; cursor: pointer; width: 100%; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
     .menu-btn:hover, .menu-btn.active { background: rgba(255, 255, 255, 0.15); color: #38bdf8; border-left: 4px solid #38bdf8; }
 
-    .dropdown-container { display: none; background: rgba(15, 23, 42, 0.75); flex-direction: column; }
+    .dropdown-container { display: none; background: rgba(15, 23, 42, 0.65); flex-direction: column; }
     .dropdown-container.show { display: flex !important; }
     .dropdown-container .menu-btn { padding-left: 38px; font-size: 13px; color: #94a3b8; }
 
@@ -920,36 +915,35 @@
               </select>
             </div>
             <div class="form-group">
-  <label>Select Month / Period</label>
-  <div style="display: flex; gap: 8px;">
-    <select id="slipMonth" style="flex: 1;" required>
-      <option value="">-- Select Month --</option>
-      <option value="01">January</option>
-      <option value="02">February</option>
-      <option value="03">March</option>
-      <option value="04">April</option>
-      <option value="05">May</option>
-      <option value="06">June</option>
-      <option value="07">July</option>
-      <option value="08">August</option>
-      <option value="09">September</option>
-      <option value="10">October</option>
-      <option value="11">November</option>
-      <option value="12">December</option>
-    </select>
-    <select id="slipYear" style="flex: 1;" required>
-      <option value="">-- Select Year --</option>
-      <option value="2025">2025</option>
-      <option value="2026" selected>2026</option>
-      <option value="2027">2027</option>
-      <option value="2028">2028</option>
-    </select>
-  </div>
-</div>
-            
+              <label>Select Month / Period</label>
+              <div style="display: flex; gap: 8px;">
+                <select id="slipMonth" style="flex: 1;" required>
+                  <option value="">-- Month --</option>
+                  <option value="01">January</option>
+                  <option value="02">February</option>
+                  <option value="03">March</option>
+                  <option value="04">April</option>
+                  <option value="05">May</option>
+                  <option value="06">June</option>
+                  <option value="07">July</option>
+                  <option value="08">August</option>
+                  <option value="09">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+                <select id="slipYear" style="flex: 1;" required>
+                  <option value="">-- Year --</option>
+                  <option value="2025">2025</option>
+                  <option value="2026" selected>2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                </select>
+              </div>
+            </div>
             <div class="form-group" style="grid-column: span 2; display: flex; gap: 10px;">
-              <button type="button" class="action-btn" onclick="generateSalarySlip()" style="background: #059669; flex: 1;">⚙️ Generate Salary Slip</button>
-              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb; flex: 1;">📥 Print / Download Slip PDF</button>
+              <button type="button" class="action-btn" onclick="generateSalarySlip()" style="background: #059669; flex: 1; margin-top: 0;">⚙️ Generate Salary Slip</button>
+              <button type="button" class="action-btn" onclick="window.print()" style="background: #2563eb; flex: 1; margin-top: 0;">📥 Print / Download Slip PDF</button>
             </div>
           </div>
 
@@ -1222,7 +1216,6 @@
         employeePaymentsGlobal.forEach(ep => {
           let amt = parseFloat(ep.amount) || 0;
           if (ep.paymentDirection === "Payment Diya") {
-            // EXCLUDE Advance payment from Employment Expenses as requested
             if (ep.paymentType !== "Advance") {
               totalEmpExpenses += amt;
             }
@@ -1232,7 +1225,6 @@
           }
           if (ep.paymentType === "Advance Deduction") {
             totalEmpAdvance -= amt;
-            // Add adjusted advance deduction into actual employee expense
             totalEmpExpenses += amt;
           }
         });
@@ -1264,7 +1256,6 @@
       document.getElementById('dashCattleCount').innerText = countStr ? countStr.slice(0, -3) : "No live cattles available";
     }
 
-    // --- CATTLE MANAGEMENT HELPERS ---
     function calculateCattleAge() {
       const dobVal = document.getElementById('cattleDob').value;
       if (!dobVal) { document.getElementById('cattleAge').value = ""; return; }
@@ -1324,7 +1315,6 @@
       }
     }
 
-    // --- BILLING INVOICE FORM SUBMIT LISTENERS ---
     document.getElementById('bulkMilkForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('submitBtn');
@@ -1482,7 +1472,6 @@
       });
     });
 
-    // --- BULK DAIRY LEDGER ---
     function loadLedgerForParty() {
       const partyName = document.getElementById('ledgerPartySelect').value;
       const content = document.getElementById('ledgerContent');
@@ -1550,7 +1539,6 @@
       });
     }
 
-    // --- RETAIL MILK STATEMENT (FIXED PENDING LOGIC) ---
     function loadRetailLedgerForCustomer() {
       const customerName = document.getElementById('ledgerRetailCustomerSelect').value;
       const content = document.getElementById('retailLedgerContent');
@@ -1623,7 +1611,6 @@
       });
     }
 
-    // --- CATTLE LEDGER & PAYMENT DEPOSIT ---
     function loadCattleLedger() {
       const selected = document.getElementById('cattleLedgerSelect').value;
       let tableHtml = "";
@@ -1704,7 +1691,6 @@
       });
     }
 
-    // --- CATTLE EXPENSES LEDGER ---
     function loadCattleExpLedger() {
       const selected = document.getElementById('cattleExpLedgerSelect').value;
       let tableHtml = "";
@@ -1773,7 +1759,6 @@
       });
     }
 
-    // --- DEBT STATEMENT ---
     function loadDebtStatement() {
       const selected = document.getElementById('debtStatementSelect').value;
       let tableHtml = "";
@@ -1844,7 +1829,6 @@
       document.getElementById('debtStatementTableBody').innerHTML = tableHtml;
     }
 
-    // --- EMPLOYEE JOINING & SALARY STRUCTURE CALCULATOR ---
     function calculateAutoSalaryStructure() {
       const type = document.getElementById('empSalaryType').value;
       const baseAmt = parseFloat(document.getElementById('empBaseSalary').value) || 0;
@@ -1859,7 +1843,7 @@
         daily = baseAmt / 7;
         monthly = daily * 30;
         yearly = daily * 365;
-      } else { // Monthly
+      } else {
         monthly = baseAmt;
         daily = monthly / 30;
         yearly = monthly * 12;
@@ -1947,7 +1931,6 @@
       document.getElementById('agTerms').innerText = `1. Work timing starts from 5:00 AM daily.\n2. Punctuality and careful handling of cattle is mandatory.\n3. Prior notice is required for any leave.`;
     }
 
-    // --- ATTENDANCE MAPPER & HELPERS ---
     function populateAttendanceDropdowns() {
       const idSel = document.getElementById('attEmpIdSelect');
       const nameSel = document.getElementById('attEmpNameSelect');
@@ -2018,7 +2001,6 @@
       document.getElementById('attendanceTableBody').innerHTML = html;
     }
 
-    // --- EMPLOYEE PAYMENT & ADVANCE DEPOSIT ---
     function populateEmployeePaymentDropdown() {
       const sel = document.getElementById('payEmpSelect');
       sel.innerHTML = '<option value="">-- Select Employee --</option>';
@@ -2090,7 +2072,6 @@
       });
     });
 
-    // --- SALARY SLIP GENERATOR ---
     function populateSalarySlipDropdown() {
       const sel = document.getElementById('slipEmpSelect');
       sel.innerHTML = '<option value="">-- Select Employee --</option>';
@@ -2104,10 +2085,13 @@
 
     function generateSalarySlip() {
       const empName = document.getElementById('slipEmpSelect').value;
-      const monthStr = document.getElementById('slipMonthInput').value;
+      const selectedMonth = document.getElementById('slipMonth').value;
+      const selectedYear = document.getElementById('slipYear').value;
       const content = document.getElementById('salarySlipContent');
 
-      if (!empName || !monthStr) { alert("Please select Employee and Month!"); return; }
+      if (!empName || !selectedMonth || !selectedYear) { alert("Please select Employee, Month and Year!"); return; }
+      
+      const monthStr = `${selectedYear}-${selectedMonth}`;
       const emp = employeesGlobal.find(e => e.employeeName === empName);
       if (!emp) return;
 
@@ -2115,7 +2099,7 @@
       document.getElementById('sEmpId').innerText = emp.employeeId || '-';
       document.getElementById('sEmpName').innerText = emp.employeeName;
       document.getElementById('sEmpMobile').innerText = emp.mobileNumber;
-      document.getElementById('sMonth').innerText = monthStr;
+      document.getElementById('sMonth').innerText = `${selectedMonth}/${selectedYear}`;
 
       let baseSalary = parseFloat(emp.monthlySalary || emp.baseSalary) || 0;
       let dailySalary = parseFloat(emp.dailySalary) || (baseSalary / 30);
@@ -2172,7 +2156,6 @@
       document.getElementById('sRemainingAdvance').innerText = "₹ " + remainingAdvanceBalance.toFixed(2);
     }
 
-    // Standard dropdown helpers
     function populatePartyDropdown() {
       const p = document.getElementById('partySelect');
       p.innerHTML = '<option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option>';

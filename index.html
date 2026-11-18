@@ -444,7 +444,8 @@
             <div class="party-info-box">
               <div class="party-info-item"><span class="title">Party Name</span><span class="value" id="lblPartyName">-</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblPartyMobile">-</span></div>
-              <div class="party-info-item"><span class="title">Total Pending Amount (Selected Range)</span><span class="value" id="lblPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
+              <div class="party-info-item"><span class="title">Range Pending (Milk Sales)</span><span class="value" id="lblRangePending" style="color: #2563eb;">₹ 0.00</span></div>
+              <div class="party-info-item"><span class="title">Total Actual Pending (Overall)</span><span class="value" id="lblPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
             </div>
 
             <div class="no-print" style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
@@ -1106,17 +1107,26 @@
     let allCattleEntriesGlobal = [];
     let allCattleExpensesGlobal = [];
 
-    document.getElementById('entryDate').valueAsDate = new Date();
-    document.getElementById('depositDate').valueAsDate = new Date();
-    document.getElementById('retailEntryDate').valueAsDate = new Date();
-    document.getElementById('retailDepositDate').valueAsDate = new Date();
-    document.getElementById('cattleDate').valueAsDate = new Date();
-    document.getElementById('cattlePayDate').valueAsDate = new Date();
-    document.getElementById('expDate').valueAsDate = new Date();
-    document.getElementById('expDepositDate').valueAsDate = new Date();
-    document.getElementById('empJoiningDate').valueAsDate = new Date();
-    document.getElementById('attDate').valueAsDate = new Date();
-    document.getElementById('payDate').valueAsDate = new Date();
+    // Correct local date string formatting without timezone shift
+    function getLocalDateString(d = new Date()) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    const todayStr = getLocalDateString();
+    document.getElementById('entryDate').value = todayStr;
+    document.getElementById('depositDate').value = todayStr;
+    document.getElementById('retailEntryDate').value = todayStr;
+    document.getElementById('retailDepositDate').value = todayStr;
+    document.getElementById('cattleDate').value = todayStr;
+    document.getElementById('cattlePayDate').value = todayStr;
+    document.getElementById('expDate').value = todayStr;
+    document.getElementById('expDepositDate').value = todayStr;
+    document.getElementById('empJoiningDate').value = todayStr;
+    document.getElementById('attDate').value = todayStr;
+    document.getElementById('payDate').value = todayStr;
 
     function openSidebar() { document.getElementById('sidebar').classList.remove('hidden'); document.getElementById('overlay').classList.add('active'); }
     function closeSidebar() { document.getElementById('sidebar').classList.add('hidden'); document.getElementById('overlay').classList.remove('active'); }
@@ -1414,7 +1424,7 @@
         if(res.result === "success") {
           alert("Bulk Milk entry successfully saved to Sheet!");
           document.getElementById('bulkMilkForm').reset();
-          document.getElementById('entryDate').valueAsDate = new Date();
+          document.getElementById('entryDate').value = getLocalDateString();
           document.getElementById('newPartyGroup').style.display = 'none';
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
@@ -1448,7 +1458,7 @@
         if(res.result === "success") {
           alert("Retail Milk entry successfully saved!");
           document.getElementById('retailMilkForm').reset();
-          document.getElementById('retailEntryDate').valueAsDate = new Date();
+          document.getElementById('retailEntryDate').value = getLocalDateString();
           document.getElementById('newRetailCustomerGroup').style.display = 'none';
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
@@ -1493,7 +1503,7 @@
         if(res.result === "success") {
           alert("Cattle record successfully saved!");
           document.getElementById('cattleForm').reset();
-          document.getElementById('cattleDate').valueAsDate = new Date();
+          document.getElementById('cattleDate').value = getLocalDateString();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }
@@ -1534,7 +1544,7 @@
         if(res.result === "success") {
           alert("Cattle expense successfully saved!");
           document.getElementById('cattleExpenseForm').reset();
-          document.getElementById('expDate').valueAsDate = new Date();
+          document.getElementById('expDate').value = getLocalDateString();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }
@@ -1556,11 +1566,26 @@
       let tableHtml = "";
       let totalAmountFiltered = 0;
       let totalPaidFiltered = 0;
+      let totalOverallPending = 0;
+      let totalOverallSales = 0;
+      let totalOverallDeposits = 0;
+
+      // Calculate overall actual pending
+      allEntriesGlobal.forEach(e => {
+        if (e.partyName === partyName) {
+          let amt = parseFloat(e.totalAmount) || 0;
+          let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
+          if (!isDeposit) totalOverallSales += amt;
+          else totalOverallDeposits += amt;
+        }
+      });
+      totalOverallPending = totalOverallSales - totalOverallDeposits;
+      if (totalOverallPending < 0) totalOverallPending = 0;
+      document.getElementById('lblPendingAmount').innerText = "₹ " + totalOverallPending.toFixed(2);
       
       let filteredEntries = allEntriesGlobal.filter(e => {
         if (e.partyName !== partyName) return false;
         if (!e.date) return true;
-        // Extract exact YYYY-MM-DD from entry date string or object
         let entryDateStr = typeof e.date === 'string' ? e.date.split('T')[0] : new Date(e.date).toISOString().split('T')[0];
         if (fromDateVal && entryDateStr < fromDateVal) return false;
         if (toDateVal && entryDateStr > toDateVal) return false;
@@ -1588,9 +1613,9 @@
         });
       }
 
-      let pendingAmt = totalAmountFiltered - totalPaidFiltered;
-      if (pendingAmt < 0) pendingAmt = 0;
-      document.getElementById('lblPendingAmount').innerText = "₹ " + pendingAmt.toFixed(2);
+      let rangePending = totalAmountFiltered - totalPaidFiltered;
+      if (rangePending < 0) rangePending = 0;
+      document.getElementById('lblRangePending').innerText = "₹ " + rangePending.toFixed(2);
       document.getElementById('ledgerTableBody').innerHTML = tableHtml;
     }
 
@@ -1975,7 +2000,7 @@
         if(res.result === "success") {
           alert("Employee successfully registered!");
           document.getElementById('employeeForm').reset();
-          document.getElementById('empJoiningDate').valueAsDate = new Date();
+          document.getElementById('empJoiningDate').value = getLocalDateString();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }
@@ -2063,7 +2088,7 @@
         if(res.result === "success") {
           alert("Attendance saved successfully!");
           document.getElementById('attendanceForm').reset();
-          document.getElementById('attDate').valueAsDate = new Date();
+          document.getElementById('attDate').value = getLocalDateString();
           fetchDashboardData();
           setTimeout(() => renderAttendanceTable(), 1000);
         }
@@ -2212,7 +2237,7 @@
         if(res.result === "success") {
           alert("Employee payment successfully saved!");
           document.getElementById('empPaymentForm').reset();
-          document.getElementById('payDate').valueAsDate = new Date();
+          document.getElementById('payDate').value = getLocalDateString();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
         }

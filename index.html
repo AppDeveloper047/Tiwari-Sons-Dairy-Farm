@@ -427,11 +427,11 @@
               </select>
             </div>
             <div class="form-group">
-              <label>From Date</label>
+              <label>From Date (Optional)</label>
               <input type="date" id="ledgerFromDate" onchange="loadLedgerForParty()">
             </div>
             <div class="form-group">
-              <label>To Date</label>
+              <label>To Date (Optional)</label>
               <input type="date" id="ledgerToDate" onchange="loadLedgerForParty()">
             </div>
             <div class="form-group" style="display: flex; align-items: flex-end;">
@@ -443,7 +443,7 @@
             <div class="party-info-box">
               <div class="party-info-item"><span class="title">Party Name</span><span class="value" id="lblPartyName">-</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblPartyMobile">-</span></div>
-              <div class="party-info-item"><span class="title">Date Range Sales Total</span><span class="value" id="lblRangeSalesTotal" style="color: #2563eb;">₹ 0.00</span></div>
+              <div class="party-info-item"><span class="title" id="lblRangeTitle">Statement Total (Milk Sales)</span><span class="value" id="lblRangeSalesTotal" style="color: #2563eb;">₹ 0.00</span></div>
               <div class="party-info-item"><span class="title">Total Actual Pending (Overall)</span><span class="value" id="lblPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
             </div>
 
@@ -1576,7 +1576,7 @@
       const toDateVal = document.getElementById('ledgerToDate').value;
 
       let tableHtml = "";
-      let rangeSalesTotal = 0;
+      let statementTotal = 0;
       let totalOverallPending = 0;
       let totalOverallSales = 0;
       let totalOverallDeposits = 0;
@@ -1594,25 +1594,40 @@
       if (totalOverallPending < 0) totalOverallPending = 0;
       document.getElementById('lblPendingAmount').innerText = "₹ " + totalOverallPending.toFixed(2);
       
-      // Filter entries for date range (EXCLUDING deposits from the table/range calculation as requested)
+      // Check if Date Range is selected
+      const isDateRangeActive = (fromDateVal !== "" || toDateVal !== "");
+
       let filteredEntries = allEntriesGlobal.filter(e => {
         if (e.partyName !== partyName) return false;
         let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
-        if (isDeposit) return false; // Do not show or count deposits in date range statement table
-        
-        if (!e.date) return true;
-        let entryDateStr = String(e.date).split('T')[0];
-        if (fromDateVal && entryDateStr < fromDateVal) return false;
-        if (toDateVal && entryDateStr > toDateVal) return false;
+
+        // Yadi date range active hai, tabhi deposit entries ko table se hatao
+        if (isDateRangeActive && isDeposit) return false;
+
+        // Date range filter apply karo agar selected hain
+        if (e.date) {
+          let entryDateStr = String(e.date).split('T')[0];
+          if (fromDateVal && entryDateStr < fromDateVal) return false;
+          if (toDateVal && entryDateStr > toDateVal) return false;
+        }
         return true;
       });
 
       if (filteredEntries.length === 0) {
-        tableHtml = '<tr><td colspan="6" style="text-align: center;">No milk sales entries found for this date range.</td></tr>';
+        tableHtml = '<tr><td colspan="6" style="text-align: center;">No entries found for this selection.</td></tr>';
       } else {
         filteredEntries.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
-          rangeSalesTotal += amt;
+          let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
+          
+          if (isDateRangeActive) {
+            // Agar date range active hai toh sirf sales/milk amount jodo
+            if (!isDeposit) statementTotal += amt;
+          } else {
+            // Agar date range unselected (All Statement) hai, toh net calculation ya total dikhao
+            if (!isDeposit) statementTotal += amt;
+            else statementTotal -= amt;
+          }
 
           let formattedDate = formatDisplayDate(e.date);
           tableHtml += `<tr>
@@ -1621,12 +1636,19 @@
             <td>${e.quantity ? e.quantity + ' Ltr' : '-'}</td>
             <td><b>${e.fat ? e.fat + '%' : '-'}</b></td>
             <td>₹ ${amt.toFixed(2)}</td>
-            <td><span class="badge ${e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
+            <td><span class="badge ${isDeposit ? 'deposit' : (e.paymentStatus === 'Paid' ? 'paid' : 'pending')}">${isDeposit ? 'Deposit' : (e.paymentStatus || 'Pending')}</span></td>
           </tr>`;
         });
       }
 
-      document.getElementById('lblRangeSalesTotal').innerText = "₹ " + rangeSalesTotal.toFixed(2);
+      // Title change dynamically for clarity
+      if (isDateRangeActive) {
+        document.getElementById('lblRangeTitle').innerText = "Date Range Sales Total";
+      } else {
+        document.getElementById('lblRangeTitle').innerText = "All Statement Net Total";
+      }
+
+      document.getElementById('lblRangeSalesTotal').innerText = "₹ " + statementTotal.toFixed(2);
       document.getElementById('ledgerTableBody').innerHTML = tableHtml;
     }
 

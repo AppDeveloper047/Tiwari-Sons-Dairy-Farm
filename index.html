@@ -1560,7 +1560,8 @@
       let filteredEntries = allEntriesGlobal.filter(e => {
         if (e.partyName !== partyName) return false;
         if (!e.date) return true;
-        let entryDateStr = e.date.split('T')[0];
+        // Extract exact YYYY-MM-DD from entry date string or object
+        let entryDateStr = typeof e.date === 'string' ? e.date.split('T')[0] : new Date(e.date).toISOString().split('T')[0];
         if (fromDateVal && entryDateStr < fromDateVal) return false;
         if (toDateVal && entryDateStr > toDateVal) return false;
         return true;
@@ -2471,7 +2472,7 @@
       const rate = parseFloat(document.getElementById('expRate').value) || 0;
       document.getElementById('expTotalAmount').value = (qty * rate).toFixed(2);
     }
-    function handleExpProductCommand() {
+    function handleExpProductChange() {
       const val = document.getElementById('expProductSelect').value;
       const grp = document.getElementById('newExpProductGroup');
       if (val === "ADD_NEW") grp.style.display = "flex"; else grp.style.display = "none";

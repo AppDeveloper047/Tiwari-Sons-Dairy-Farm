@@ -11,7 +11,6 @@
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9; }
     .overlay.active { display: block; }
 
-    /* Light & Clean Modern Gradient for Sidebar */
     .sidebar { width: 270px; background: linear-gradient(180deg, #1e293b 0%, #334155 50%, #1d4ed8 100%); color: #fff; height: 100vh; position: fixed; left: 0; top: 0; transition: all 0.3s ease; z-index: 10; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.15); overflow-y: auto; }
     .sidebar.hidden { left: -270px; }
     .sidebar-header { padding: 22px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -444,7 +443,7 @@
             <div class="party-info-box">
               <div class="party-info-item"><span class="title">Party Name</span><span class="value" id="lblPartyName">-</span></div>
               <div class="party-info-item"><span class="title">Mobile Number</span><span class="value" id="lblPartyMobile">-</span></div>
-              <div class="party-info-item"><span class="title">Range Pending (Milk Sales)</span><span class="value" id="lblRangePending" style="color: #2563eb;">₹ 0.00</span></div>
+              <div class="party-info-item"><span class="title">Date Range Sales Total</span><span class="value" id="lblRangeSalesTotal" style="color: #2563eb;">₹ 0.00</span></div>
               <div class="party-info-item"><span class="title">Total Actual Pending (Overall)</span><span class="value" id="lblPendingAmount" style="color: #d97706;">₹ 0.00</span></div>
             </div>
 
@@ -1107,12 +1106,23 @@
     let allCattleEntriesGlobal = [];
     let allCattleExpensesGlobal = [];
 
-    // Correct local date string formatting without timezone shift
+    // Robust local date formatting without timezone offsets
     function getLocalDateString(d = new Date()) {
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
+    }
+
+    // Direct display formatter without timezone shifting
+    function formatDisplayDate(dateInput) {
+      if (!dateInput) return '-';
+      let cleanStr = String(dateInput).split('T')[0];
+      let parts = cleanStr.split('-');
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return cleanStr;
     }
 
     const todayStr = getLocalDateString();
@@ -1222,7 +1232,8 @@
         allEntriesGlobal.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
           let qty = parseFloat(e.quantity) || 0;
-          if (!e.shift || e.shift !== "Payment") { totalSales += amt; totalQty += qty; if (e.paymentStatus && e.paymentStatus.includes("Pending")) milkPending += amt; }
+          let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
+          if (!isDeposit) { totalSales += amt; totalQty += qty; if (e.paymentStatus && e.paymentStatus.includes("Pending")) milkPending += amt; }
           else milkDeposited += amt;
         });
       }
@@ -1231,7 +1242,8 @@
         allRetailEntriesGlobal.forEach(r => {
           let amt = parseFloat(r.totalAmount) || 0;
           let qty = parseFloat(r.quantity) || 0;
-          if (r.amountStatus !== "Deposit") { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus === "Pending") milkPending += amt; }
+          let isDeposit = (r.amountStatus === "Deposit");
+          if (!isDeposit) { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus === "Pending") milkPending += amt; }
           else milkDeposited += amt;
         });
       }
@@ -1383,9 +1395,9 @@
       if (txType === "Sell" && tag && cattleMapData[tag]) {
         const c = cattleMapData[tag];
         if (c.category) document.getElementById('cattleCategory').value = c.category;
-        if (c.dob) { document.getElementById('cattleDob').value = c.dob.split('T')[0]; calculateCattleAge(); }
+        if (c.dob) { document.getElementById('cattleDob').value = String(c.dob).split('T')[0]; calculateCattleAge(); }
         if (c.calvingCount !== undefined) document.getElementById('cattleCalving').value = c.calvingCount;
-        if (c.pregnancyDate) document.getElementById('cattlePregDate').value = c.pregnancyDate.split('T')[0];
+        if (c.pregnancyDate) document.getElementById('cattlePregDate').value = String(c.pregnancyDate).split('T')[0];
         if (c.sellingPrice) document.getElementById('cattleSellAmount').value = c.sellingPrice;
         if (c.partyName) {
           document.getElementById('cattlePartySelect').value = c.partyName;
@@ -1564,8 +1576,7 @@
       const toDateVal = document.getElementById('ledgerToDate').value;
 
       let tableHtml = "";
-      let totalAmountFiltered = 0;
-      let totalPaidFiltered = 0;
+      let rangeSalesTotal = 0;
       let totalOverallPending = 0;
       let totalOverallSales = 0;
       let totalOverallDeposits = 0;
@@ -1583,39 +1594,39 @@
       if (totalOverallPending < 0) totalOverallPending = 0;
       document.getElementById('lblPendingAmount').innerText = "₹ " + totalOverallPending.toFixed(2);
       
+      // Filter entries for date range (EXCLUDING deposits from the table/range calculation as requested)
       let filteredEntries = allEntriesGlobal.filter(e => {
         if (e.partyName !== partyName) return false;
+        let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
+        if (isDeposit) return false; // Do not show or count deposits in date range statement table
+        
         if (!e.date) return true;
-        let entryDateStr = typeof e.date === 'string' ? e.date.split('T')[0] : new Date(e.date).toISOString().split('T')[0];
+        let entryDateStr = String(e.date).split('T')[0];
         if (fromDateVal && entryDateStr < fromDateVal) return false;
         if (toDateVal && entryDateStr > toDateVal) return false;
         return true;
       });
 
       if (filteredEntries.length === 0) {
-        tableHtml = '<tr><td colspan="6" style="text-align: center;">No entries found for this date range.</td></tr>';
+        tableHtml = '<tr><td colspan="6" style="text-align: center;">No milk sales entries found for this date range.</td></tr>';
       } else {
         filteredEntries.forEach(e => {
           let amt = parseFloat(e.totalAmount) || 0;
-          let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
-          if (!isDeposit) totalAmountFiltered += amt;
-          else totalPaidFiltered += amt;
+          rangeSalesTotal += amt;
 
-          let formattedDate = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+          let formattedDate = formatDisplayDate(e.date);
           tableHtml += `<tr>
             <td>${formattedDate}</td>
             <td><b>${e.shift || 'Sale'}</b> (${e.milkType || ''})</td>
             <td>${e.quantity ? e.quantity + ' Ltr' : '-'}</td>
             <td><b>${e.fat ? e.fat + '%' : '-'}</b></td>
             <td>₹ ${amt.toFixed(2)}</td>
-            <td><span class="badge ${isDeposit ? 'deposit' : (e.paymentStatus === 'Paid' ? 'paid' : 'pending')}">${isDeposit ? 'Deposit' : (e.paymentStatus || 'Pending')}</span></td>
+            <td><span class="badge ${e.paymentStatus === 'Paid' ? 'paid' : 'pending'}">${e.paymentStatus || 'Pending'}</span></td>
           </tr>`;
         });
       }
 
-      let rangePending = totalAmountFiltered - totalPaidFiltered;
-      if (rangePending < 0) rangePending = 0;
-      document.getElementById('lblRangePending').innerText = "₹ " + rangePending.toFixed(2);
+      document.getElementById('lblRangeSalesTotal').innerText = "₹ " + rangeSalesTotal.toFixed(2);
       document.getElementById('ledgerTableBody').innerHTML = tableHtml;
     }
 
@@ -1670,7 +1681,7 @@
           if (isPending) totalPendingBills += amt;
           if (isDeposit) totalPaidDeposits += amt;
 
-          let formattedDate = r.date ? new Date(r.date).toLocaleDateString('en-GB') : '';
+          let formattedDate = formatDisplayDate(r.date);
           tableHtml += `<tr>
             <td>${formattedDate}</td>
             <td>${r.quantity ? r.quantity + ' Ltr' : '-'}</td>
@@ -1743,7 +1754,7 @@
         tableHtml = '<tr><td colspan="8" style="text-align: center;">No cattle records found.</td></tr>';
       } else {
         filtered.forEach(c => {
-          let formattedDate = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
+          let formattedDate = formatDisplayDate(c.date);
           let sellPriceShow = parseFloat(c.amount || 0).toFixed(2);
           let pregDuration = calculatePregnancyDurationLive(c.pregnancyDate);
           let isPaymentRow = (c.tagNumber === "PAYMENT");
@@ -1819,7 +1830,7 @@
         tableHtml = '<tr><td colspan="7" style="text-align: center;">No expense records found.</td></tr>';
       } else {
         filtered.forEach(ex => {
-          let formattedDate = ex.date ? new Date(ex.date).toLocaleDateString('en-GB') : '';
+          let formattedDate = formatDisplayDate(ex.date);
           let isDep = (ex.productName === "Payment Deposit");
           tableHtml += `<tr>
             <td>${formattedDate}</td>
@@ -1921,7 +1932,7 @@
         tableHtml = '<tr><td colspan="6" style="text-align: center;">No debt or payable records found.</td></tr>';
       } else {
         filtered.forEach(r => {
-          let formattedDate = r.date ? new Date(r.date).toLocaleDateString('en-GB') : '';
+          let formattedDate = formatDisplayDate(r.date);
           tableHtml += `<tr>
             <td>${formattedDate}</td>
             <td><b>${r.vendor}</b></td>
@@ -2029,7 +2040,7 @@
       document.getElementById('agEmpId').innerText = emp.employeeId || '-';
       document.getElementById('agName').innerText = emp.employeeName;
       document.getElementById('agMobile').innerText = emp.mobileNumber;
-      document.getElementById('agDate').innerText = emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString('en-GB') : '-';
+      document.getElementById('agDate').innerText = formatDisplayDate(emp.joiningDate);
       document.getElementById('agAddress').innerText = emp.address || '-';
       document.getElementById('agWitness').innerText = emp.witness || '-';
       document.getElementById('agAadhaar').innerText = emp.aadhaar || 'N/A';
@@ -2102,7 +2113,7 @@
       } else {
         for (let i = attendanceGlobal.length - 1; i >= 0; i--) {
           let a = attendanceGlobal[i];
-          let formattedDate = a.date ? new Date(a.date).toLocaleDateString('en-GB') : '';
+          let formattedDate = formatDisplayDate(a.date);
           html += `<tr>
             <td>${formattedDate}</td>
             <td><b>${a.employeeId || '-'}</b></td>
@@ -2272,7 +2283,7 @@
       } else {
         for (let i = filtered.length - 1; i >= 0; i--) {
           let p = filtered[i];
-          let formattedDate = p.date ? new Date(p.date).toLocaleDateString('en-GB') : '';
+          let formattedDate = formatDisplayDate(p.date);
           let empObj = employeesGlobal.find(e => e.employeeName === p.employeeName);
           let empId = p.employeeId || (empObj ? empObj.employeeId : '-');
           let mob = p.mobileNumber || (empObj ? empObj.mobileNumber : '-');
@@ -2330,8 +2341,8 @@
       let dailySalary = parseFloat(emp.dailySalary) || (baseSalary / 30);
       let dailyAllowance = parseFloat(emp.allowance) || 0;
 
-      let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Present').length;
-      let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && a.date.startsWith(monthStr) && a.status === 'Half Day').length;
+      let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && String(a.date).startsWith(monthStr) && a.status === 'Present').length;
+      let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && String(a.date).startsWith(monthStr) && a.status === 'Half Day').length;
       let totalEffectiveDays = presentDays + (halfDays * 0.5);
 
       let earnedBaseSalary = dailySalary * totalEffectiveDays;
@@ -2360,7 +2371,7 @@
             totalAdvanceDeductedOverall += advDep;
           }
 
-          if (p.date && p.date.startsWith(monthStr)) {
+          if (p.date && String(p.date).startsWith(monthStr)) {
             if (p.paymentDirection === "Payment Given" && p.paymentType !== "Advance Adjustment With Salary" && p.paymentType !== "Advance Payment") {
               totalPaidThisMonth += pAmt;
             }

@@ -1106,23 +1106,54 @@
     let allCattleEntriesGlobal = [];
     let allCattleExpensesGlobal = [];
 
-    // Robust local date formatting without timezone offsets
+    // Local IST date string without UTC shift
     function getLocalDateString(d = new Date()) {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(d);
+      const y = parts.find(p => p.type === 'year').value;
+      const m = parts.find(p => p.type === 'month').value;
+      const day = parts.find(p => p.type === 'day').value;
+      return `${y}-${m}-${day}`;
     }
 
-    // Direct display formatter without timezone shifting
+    // Converts any date / ISO string safely to IST YYYY-MM-DD so UTC shift never subtracts 1 day
+    function normalizeEntryDate(dateInput) {
+      if (!dateInput) return '';
+      const str = String(dateInput).trim();
+
+      // Already YYYY-MM-DD (no time component)
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        return str;
+      }
+
+      // DD-MM-YYYY or DD/MM/YYYY
+      const dmyMatch = str.match(/^(\d{2})[\/\-](\d{2})[\/\-](\d{4})$/);
+      if (dmyMatch) {
+        return `${dmyMatch[3]}-${dmyMatch[2]}-${dmyMatch[1]}`;
+      }
+
+      // ISO / timestamp string: convert using Asia/Kolkata timezone
+      const parsed = new Date(str);
+      if (!isNaN(parsed.getTime())) {
+        return getLocalDateString(parsed);
+      }
+
+      return str.split('T')[0];
+    }
+
+    // Displays DD-MM-YYYY cleanly
     function formatDisplayDate(dateInput) {
-      if (!dateInput) return '-';
-      let cleanStr = String(dateInput).split('T')[0];
-      let parts = cleanStr.split('-');
+      const norm = normalizeEntryDate(dateInput);
+      if (!norm) return '-';
+      const parts = norm.split('-');
       if (parts.length === 3) {
         return `${parts[2]}-${parts[1]}-${parts[0]}`;
       }
-      return cleanStr;
+      return norm;
     }
 
     const todayStr = getLocalDateString();
@@ -1395,9 +1426,9 @@
       if (txType === "Sell" && tag && cattleMapData[tag]) {
         const c = cattleMapData[tag];
         if (c.category) document.getElementById('cattleCategory').value = c.category;
-        if (c.dob) { document.getElementById('cattleDob').value = String(c.dob).split('T')[0]; calculateCattleAge(); }
+        if (c.dob) { document.getElementById('cattleDob').value = normalizeEntryDate(c.dob); calculateCattleAge(); }
         if (c.calvingCount !== undefined) document.getElementById('cattleCalving').value = c.calvingCount;
-        if (c.pregnancyDate) document.getElementById('cattlePregDate').value = String(c.pregnancyDate).split('T')[0];
+        if (c.pregnancyDate) document.getElementById('cattlePregDate').value = normalizeEntryDate(c.pregnancyDate);
         if (c.sellingPrice) document.getElementById('cattleSellAmount').value = c.sellingPrice;
         if (c.partyName) {
           document.getElementById('cattlePartySelect').value = c.partyName;
@@ -1581,7 +1612,6 @@
       let totalOverallSales = 0;
       let totalOverallDeposits = 0;
 
-      // Calculate overall actual pending
       allEntriesGlobal.forEach(e => {
         if (e.partyName === partyName) {
           let amt = parseFloat(e.totalAmount) || 0;
@@ -1594,19 +1624,16 @@
       if (totalOverallPending < 0) totalOverallPending = 0;
       document.getElementById('lblPendingAmount').innerText = "₹ " + totalOverallPending.toFixed(2);
       
-      // Check if Date Range is selected
       const isDateRangeActive = (fromDateVal !== "" || toDateVal !== "");
 
       let filteredEntries = allEntriesGlobal.filter(e => {
         if (e.partyName !== partyName) return false;
         let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
 
-        // Yadi date range active hai, tabhi deposit entries ko table se hatao
         if (isDateRangeActive && isDeposit) return false;
 
-        // Date range filter apply karo agar selected hain
         if (e.date) {
-          let entryDateStr = String(e.date).split('T')[0];
+          let entryDateStr = normalizeEntryDate(e.date);
           if (fromDateVal && entryDateStr < fromDateVal) return false;
           if (toDateVal && entryDateStr > toDateVal) return false;
         }
@@ -1621,10 +1648,8 @@
           let isDeposit = (e.shift === "Payment" || e.paymentStatus === "Deposit");
           
           if (isDateRangeActive) {
-            // Agar date range active hai toh sirf sales/milk amount jodo
             if (!isDeposit) statementTotal += amt;
           } else {
-            // Agar date range unselected (All Statement) hai, toh net calculation ya total dikhao
             if (!isDeposit) statementTotal += amt;
             else statementTotal -= amt;
           }
@@ -1641,7 +1666,6 @@
         });
       }
 
-      // Title change dynamically for clarity
       if (isDateRangeActive) {
         document.getElementById('lblRangeTitle').innerText = "Date Range Sales Total";
       } else {
@@ -2363,8 +2387,8 @@
       let dailySalary = parseFloat(emp.dailySalary) || (baseSalary / 30);
       let dailyAllowance = parseFloat(emp.allowance) || 0;
 
-      let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && String(a.date).startsWith(monthStr) && a.status === 'Present').length;
-      let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && String(a.date).startsWith(monthStr) && a.status === 'Half Day').length;
+      let presentDays = attendanceGlobal.filter(a => a.employeeName === empName && normalizeEntryDate(a.date).startsWith(monthStr) && a.status === 'Present').length;
+      let halfDays = attendanceGlobal.filter(a => a.employeeName === empName && normalizeEntryDate(a.date).startsWith(monthStr) && a.status === 'Half Day').length;
       let totalEffectiveDays = presentDays + (halfDays * 0.5);
 
       let earnedBaseSalary = dailySalary * totalEffectiveDays;
@@ -2393,7 +2417,7 @@
             totalAdvanceDeductedOverall += advDep;
           }
 
-          if (p.date && String(p.date).startsWith(monthStr)) {
+          if (p.date && normalizeEntryDate(p.date).startsWith(monthStr)) {
             if (p.paymentDirection === "Payment Given" && p.paymentType !== "Advance Adjustment With Salary" && p.paymentType !== "Advance Payment") {
               totalPaidThisMonth += pAmt;
             }

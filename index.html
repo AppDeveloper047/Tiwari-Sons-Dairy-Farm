@@ -223,7 +223,7 @@
               <div class="form-group"><label>Quantity (Liters)</label><input type="number" step="0.01" id="quantity" oninput="calculateRateAndAmount()" required></div>
               <div class="form-group"><label>FAT %</label><input type="number" step="0.1" id="fat" oninput="calculateRateAndAmount()" required></div>
               <div class="form-group"><label>Fat Rate (₹)</label><input type="number" step="0.1" id="fatRate" placeholder="e.g. 7.5" oninput="calculateRateAndAmount()" required></div>
-              <div class="form-group"><label>SNF / CLR</label><input type="number" step="0.1" id="snfClr" required></div>
+              <div class="form-group"><label>SNF / CLR (Optional - Default 01)</label><input type="number" step="0.1" id="snfClr" value="01"></div>
               <div class="form-group"><label>Rate per Liter (Auto)</label><input type="number" id="ratePerLiter" readonly></div>
               <div class="form-group"><label>Total Amount (Auto)</label><input type="number" id="totalAmount" readonly></div>
               <div class="form-group"><label>Dairy / Party Name</label><select id="partySelect" onchange="handlePartyChange()" required><option value="">-- Select Party --</option><option value="ADD_NEW">+ Add New Dairy / Party</option></select></div>
@@ -1178,7 +1178,7 @@
       document.getElementById(pageId).classList.add('active');
 
       if (pageId === 'dashboard') document.getElementById('pageTitle').innerText = "Dashboard";
-      else if (pageId === 'bulkMilk') document.getElementById('pageTitle').innerText = "Bulk Selling Milk";
+      else if (pageId === 'bulkMilk') { document.getElementById('pageTitle').innerText = "Bulk Selling Milk"; if (!document.getElementById('snfClr').value) document.getElementById('snfClr').value = "01"; }
       else if (pageId === 'retailMilk') document.getElementById('pageTitle').innerText = "Retail Milk Sales";
       else if (pageId === 'cattleMgmt') document.getElementById('pageTitle').innerText = "Cattle Purchase & Sell Management";
       else if (pageId === 'cattleExpenses') document.getElementById('pageTitle').innerText = "Cattle Expenses & Maintenance";
@@ -1445,6 +1445,8 @@
       let partyNameVal = document.getElementById('partySelect').value;
       if (partyNameVal === "ADD_NEW") partyNameVal = document.getElementById('newPartyName').value.trim();
 
+      const snfClrVal = document.getElementById('snfClr').value.trim() || "01";
+
       const payload = {
         action: "addBulkMilk",
         date: document.getElementById('entryDate').value,
@@ -1453,7 +1455,7 @@
         quantity: document.getElementById('quantity').value,
         fat: document.getElementById('fat').value,
         fatRate: document.getElementById('fatRate').value,
-        snfClr: document.getElementById('snfClr').value,
+        snfClr: snfClrVal,
         ratePerLiter: document.getElementById('ratePerLiter').value,
         totalAmount: document.getElementById('totalAmount').value,
         partyName: partyNameVal,
@@ -1468,6 +1470,7 @@
           alert("Bulk Milk entry successfully saved to Sheet!");
           document.getElementById('bulkMilkForm').reset();
           document.getElementById('entryDate').value = getLocalDateString();
+          document.getElementById('snfClr').value = "01";
           document.getElementById('newPartyGroup').style.display = 'none';
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));

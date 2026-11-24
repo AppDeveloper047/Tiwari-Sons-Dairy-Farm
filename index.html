@@ -6,7 +6,7 @@
   <title>Tiwari & Sons Dairy Farm</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
-    body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; width: 100vw; }
+    body { display: flex; height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); overflow-x: hidden; width: 100%; }
     
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); display: none; z-index: 9; }
     .overlay.active { display: block; }
@@ -199,7 +199,7 @@
               <h4>Total Employee Advance Balance</h4>
               <p id="dashEmpAdvanceBalance"><span class="mini-spinner"></span></p>
             </div>
-            <div class="dash-card teal" style="grid-column: span auto;">
+            <div class="dash-card teal" style="grid-column: span 2;">
               <h4>Live Cattle Count</h4>
               <p id="dashCattleCount" style="font-size: 15px; font-weight: 600; line-height: 1.4;"><span class="mini-spinner"></span></p>
             </div>
@@ -315,8 +315,8 @@
               </div>
 
               <div id="purchaseFieldsContainer" style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
-                <div class="form-group"><label>Purchase Amount (₹):</label><input type="number" id="cattlePurchaseAmount" placeholder="e.g. 60000"></div>
-                <div class="form-group"><label>Selling Price (₹) [Future Sell]:</label><input type="number" id="cattleSellingPrice" placeholder="e.g. 70000"></div>
+                <div class="form-group"><label>Purchase Amount (₹):</label><input type="number" id="cattlePurchaseAmount" placeholder="e.g. 60000" required></div>
+                <div class="form-group"><label>Selling Price (₹) [Future Sell]:</label><input type="number" id="cattleSellingPrice" placeholder="e.g. 70000" required></div>
               </div>
 
               <div class="form-group" id="sellAmountGroup" style="display:none;"><label>Actual Selling Price (₹):</label><input type="number" id="cattleSellAmount" placeholder="e.g. 70000"></div>
@@ -1202,7 +1202,17 @@
     window.onload = function() { fetchDashboardData(); };
 
     function generateNextEmployeeId() {
-      let nextNum = employeesGlobal.length + 1;
+      let maxNum = 0;
+      employeesGlobal.forEach(em => {
+        if (em.employeeId) {
+          let match = String(em.employeeId).match(/(\d+)$/);
+          if (match) {
+            let num = parseInt(match[1], 10);
+            if (num > maxNum) maxNum = num;
+          }
+        }
+      });
+      let nextNum = Math.max(maxNum + 1, employeesGlobal.length + 1);
       let formattedId = "EMP-" + String(nextNum).padStart(3, '0');
       document.getElementById('empIdInput').value = formattedId;
     }
@@ -1274,7 +1284,7 @@
           let amt = parseFloat(r.totalAmount) || 0;
           let qty = parseFloat(r.quantity) || 0;
           let isDeposit = (r.amountStatus === "Deposit");
-          if (!isDeposit) { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus === "Pending") milkPending += amt; }
+          if (!isDeposit) { totalSales += amt; totalQty += qty; if (r.amountStatus && r.amountStatus.includes("Pending")) milkPending += amt; }
           else milkDeposited += amt;
         });
       }
@@ -1415,13 +1425,16 @@
     function handleCattleTagChange() {
       const tag = document.getElementById('cattleTagSelect').value;
       const grp = document.getElementById('newCattleTagGroup');
+      const newTagInput = document.getElementById('newCattleTag');
       const txType = document.getElementById('cattleTxType').value;
 
       if (tag === "ADD_NEW") {
         grp.style.display = "flex";
+        newTagInput.required = true;
         return;
       }
       grp.style.display = "none";
+      newTagInput.required = false;
 
       if (txType === "Sell" && tag && cattleMapData[tag]) {
         const c = cattleMapData[tag];
@@ -1472,9 +1485,16 @@
           document.getElementById('entryDate').value = getLocalDateString();
           document.getElementById('snfClr').value = "01";
           document.getElementById('newPartyGroup').style.display = 'none';
+          document.getElementById('newPartyName').required = false;
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        } else {
+          alert("Error saving entry: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        btn.innerText = "Submit Entry to Google Sheet"; btn.disabled = false;
+        alert("Network error while saving entry. Please try again.");
       });
     });
 
@@ -1506,9 +1526,16 @@
           document.getElementById('retailMilkForm').reset();
           document.getElementById('retailEntryDate').value = getLocalDateString();
           document.getElementById('newRetailCustomerGroup').style.display = 'none';
+          document.getElementById('newRetailCustomerName').required = false;
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        } else {
+          alert("Error saving retail entry: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        btn.innerText = "Submit Retail Entry"; btn.disabled = false;
+        alert("Network error while saving retail entry. Please try again.");
       });
     });
 
@@ -1550,9 +1577,20 @@
           alert("Cattle record successfully saved!");
           document.getElementById('cattleForm').reset();
           document.getElementById('cattleDate').value = getLocalDateString();
+          document.getElementById('newCattleTagGroup').style.display = 'none';
+          document.getElementById('newCattleTag').required = false;
+          document.getElementById('newCattlePartyGroup').style.display = 'none';
+          document.getElementById('newCattlePartyName').required = false;
+          handleCattleTxTypeChange();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        } else {
+          alert("Error saving cattle record: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        btn.innerText = "💾 Save Cattle Record"; btn.disabled = false;
+        alert("Network error while saving cattle record. Please try again.");
       });
     });
 
@@ -1591,9 +1629,21 @@
           alert("Cattle expense successfully saved!");
           document.getElementById('cattleExpenseForm').reset();
           document.getElementById('expDate').value = getLocalDateString();
+          document.getElementById('newExpProductGroup').style.display = 'none';
+          document.getElementById('newExpProductName').required = false;
+          document.getElementById('newExpUnitGroup').style.display = 'none';
+          document.getElementById('newExpUnitName').required = false;
+          document.getElementById('newExpVendorGroup').style.display = 'none';
+          document.getElementById('newExpVendorName').required = false;
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        } else {
+          alert("Error saving cattle expense: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        btn.innerText = "💾 Save Cattle Expense"; btn.disabled = false;
+        alert("Network error while saving cattle expense. Please try again.");
       });
     });
 
@@ -1701,7 +1751,12 @@
           document.getElementById('depositAmount').value = "";
           fetchDashboardData();
           setTimeout(() => loadLedgerForParty(), 1000);
+        } else {
+          alert("Error recording payment: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        alert("Network error while recording payment.");
       });
     }
 
@@ -1773,7 +1828,12 @@
           document.getElementById('retailDepositNote').value = "";
           fetchDashboardData();
           setTimeout(() => loadRetailLedgerForCustomer(), 1000);
+        } else {
+          alert("Error recording retail payment: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        alert("Network error while recording retail payment.");
       });
     }
 
@@ -1842,7 +1902,8 @@
         paymentDirection: direction,
         amount: amount,
         status: "Paid",
-        tagNumber: "PAYMENT"
+        tagNumber: "PAYMENT",
+        note: note || direction
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
@@ -1853,7 +1914,12 @@
           document.getElementById('cattlePayNote').value = "";
           fetchDashboardData();
           setTimeout(() => loadCattleLedger(), 1000);
+        } else {
+          alert("Error recording cattle payment: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        alert("Network error while recording cattle payment.");
       });
     }
 
@@ -1921,7 +1987,12 @@
           document.getElementById('expDepositNote').value = "";
           fetchDashboardData();
           setTimeout(() => loadCattleExpLedger(), 1000);
+        } else {
+          alert("Error recording vendor payment: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        alert("Network error while recording vendor payment.");
       });
     }
 
@@ -1972,10 +2043,17 @@
         });
       }
 
+      let displayedDebt = grandTotalDebt;
+      if (selected !== "ALL") {
+        let vObj = payablesMap[selected];
+        let vDiff = vObj ? (vObj.total - vObj.paid) : 0;
+        displayedDebt = vDiff > 0 ? vDiff : 0;
+      }
+
       let filtered = selected === "ALL" ? allRows : allRows.filter(r => r.vendor === selected);
       document.getElementById('lblDebtVendorName').innerText = selected === "ALL" ? "All Vendors & Dealers" : selected;
       document.getElementById('lblDebtVendorMobile').innerText = selected === "ALL" ? "-" : (payablesMap[selected]?.mobile || '-');
-      document.getElementById('lblDebtTotalAmount').innerText = "₹ " + grandTotalDebt.toFixed(2);
+      document.getElementById('lblDebtTotalAmount').innerText = "₹ " + displayedDebt.toFixed(2);
 
       if (filtered.length === 0) {
         tableHtml = '<tr><td colspan="6" style="text-align: center;">No debt or payable records found.</td></tr>';
@@ -2033,6 +2111,8 @@
       const btn = document.getElementById('empSubmitBtn');
       btn.innerText = "Saving Employee..."; btn.disabled = true;
 
+      const defaultTerms = `1. Work timing starts from 5:00 AM daily.\n2. Punctuality and careful handling of cattle is mandatory.\n3. Prior notice is required for any leave.`;
+
       const payload = {
         action: "addEmployee",
         joiningDate: document.getElementById('empJoiningDate').value,
@@ -2051,7 +2131,8 @@
         dailySalary: document.getElementById('empDailySalary').value || 0,
         monthlySalary: document.getElementById('empMonthlySalary').value || 0,
         yearlySalary: document.getElementById('empYearlySalary').value || 0,
-        allowance: document.getElementById('empAllowance').value || 0
+        allowance: document.getElementById('empAllowance').value || 0,
+        terms: document.getElementById('empTerms').value.trim() || defaultTerms
       };
 
       fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
@@ -2061,9 +2142,16 @@
           alert("Employee successfully registered!");
           document.getElementById('employeeForm').reset();
           document.getElementById('empJoiningDate').value = getLocalDateString();
+          document.getElementById('empTerms').value = defaultTerms;
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        } else {
+          alert("Error saving employee record: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        btn.innerText = "💾 Save Employee Record"; btn.disabled = false;
+        alert("Network error while saving employee record.");
       });
     });
 
@@ -2102,7 +2190,7 @@
       document.getElementById('agMonthlySal').innerText = parseFloat(emp.monthlySalary || 0).toFixed(2);
       document.getElementById('agYearlySal').innerText = parseFloat(emp.yearlySalary || 0).toFixed(2);
       document.getElementById('agAllowance').innerText = parseFloat(emp.allowance || 0).toFixed(2);
-      document.getElementById('agTerms').innerText = `1. Work timing starts from 5:00 AM daily.\n2. Punctuality and careful handling of cattle is mandatory.\n3. Prior notice is required for any leave.`;
+      document.getElementById('agTerms').innerText = emp.terms || `1. Work timing starts from 5:00 AM daily.\n2. Punctuality and careful handling of cattle is mandatory.\n3. Prior notice is required for any leave.`;
     }
 
     function populateAttendanceDropdowns() {
@@ -2151,7 +2239,13 @@
           document.getElementById('attDate').value = getLocalDateString();
           fetchDashboardData();
           setTimeout(() => renderAttendanceTable(), 1000);
+        } else {
+          alert("Error saving attendance: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        btn.innerText = "💾 Save Attendance Record"; btn.disabled = false;
+        alert("Network error while saving attendance.");
       });
     });
 
@@ -2300,7 +2394,13 @@
           document.getElementById('payDate').value = getLocalDateString();
           fetchDashboardData();
           switchPage('dashboard', document.querySelector('.sidebar-menu .menu-btn'));
+        } else {
+          alert("Error saving employee payment: " + (res.message || "Please try again."));
         }
+      })
+      .catch(err => {
+        btn.innerText = "💾 Save Employee Payment"; btn.disabled = false;
+        alert("Network error while saving employee payment.");
       });
     });
 
@@ -2426,7 +2526,6 @@
             }
             if (p.paymentType === "Advance Adjustment With Salary") {
               advanceDeductedThisMonth += advDep;
-              totalPaidThisMonth += pAmt;
             }
           }
         }
@@ -2521,24 +2620,30 @@
     function handleCattlePartyChange() {
       const sel = document.getElementById('cattlePartySelect').value;
       const grp = document.getElementById('newCattlePartyGroup');
+      const newPartyInput = document.getElementById('newCattlePartyName');
       const mob = document.getElementById('cattleMobile');
-      if (sel === "ADD_NEW") { grp.style.display = "flex"; mob.value = ""; mob.readOnly = false; }
-      else if (sel !== "") { grp.style.display = "none"; mob.value = cattlePartyData[sel] || ""; mob.readOnly = true; }
+      if (sel === "ADD_NEW") { grp.style.display = "flex"; newPartyInput.required = true; mob.value = ""; mob.readOnly = false; }
+      else if (sel !== "") { grp.style.display = "none"; newPartyInput.required = false; mob.value = cattlePartyData[sel] || ""; mob.readOnly = true; }
+      else { grp.style.display = "none"; newPartyInput.required = false; }
     }
     function handlePartyChange() {
       const partySelect = document.getElementById('partySelect').value;
       const newPartyGroup = document.getElementById('newPartyGroup');
+      const newPartyInput = document.getElementById('newPartyName');
       const mobileInput = document.getElementById('mobileNumber');
-      if (partySelect === "ADD_NEW") { newPartyGroup.style.display = "flex"; mobileInput.value = ""; mobileInput.readOnly = false; }
-      else if (partySelect !== "") { newPartyGroup.style.display = "none"; mobileInput.value = partyData[partySelect] || ""; mobileInput.readOnly = true; }
+      if (partySelect === "ADD_NEW") { newPartyGroup.style.display = "flex"; newPartyInput.required = true; mobileInput.value = ""; mobileInput.readOnly = false; }
+      else if (partySelect !== "") { newPartyGroup.style.display = "none"; newPartyInput.required = false; mobileInput.value = partyData[partySelect] || ""; mobileInput.readOnly = true; }
+      else { newPartyGroup.style.display = "none"; newPartyInput.required = false; }
     }
     function handleRetailCustomerChange() {
       const selected = document.getElementById('retailCustomerSelect').value;
       const group = document.getElementById('newRetailCustomerGroup');
+      const newCustInput = document.getElementById('newRetailCustomerName');
       const mob = document.getElementById('retailMobileNumber');
       const addr = document.getElementById('retailAddress');
-      if (selected === "ADD_NEW") { group.style.display = "flex"; mob.value = ""; mob.readOnly = false; addr.value = ""; addr.readOnly = false; }
-      else if (selected !== "") { group.style.display = "none"; mob.value = retailCustomerData[selected]?.mobile || ""; mob.readOnly = true; addr.value = retailCustomerData[selected]?.address || ""; addr.readOnly = true; }
+      if (selected === "ADD_NEW") { group.style.display = "flex"; newCustInput.required = true; mob.value = ""; mob.readOnly = false; addr.value = ""; addr.readOnly = false; }
+      else if (selected !== "") { group.style.display = "none"; newCustInput.required = false; mob.value = retailCustomerData[selected]?.mobile || ""; mob.readOnly = true; addr.value = retailCustomerData[selected]?.address || ""; addr.readOnly = true; }
+      else { group.style.display = "none"; newCustInput.required = false; }
     }
     function calculateRateAndAmount() {
       const qty = parseFloat(document.getElementById('quantity').value) || 0;
@@ -2560,19 +2665,23 @@
     function handleExpProductChange() {
       const val = document.getElementById('expProductSelect').value;
       const grp = document.getElementById('newExpProductGroup');
-      if (val === "ADD_NEW") grp.style.display = "flex"; else grp.style.display = "none";
+      const inp = document.getElementById('newExpProductName');
+      if (val === "ADD_NEW") { grp.style.display = "flex"; inp.required = true; } else { grp.style.display = "none"; inp.required = false; }
     }
     function handleExpUnitChange() {
       const val = document.getElementById('expUnitSelect').value;
       const grp = document.getElementById('newExpUnitGroup');
-      if (val === "ADD_NEW") grp.style.display = "flex"; else grp.style.display = "none";
+      const inp = document.getElementById('newExpUnitName');
+      if (val === "ADD_NEW") { grp.style.display = "flex"; inp.required = true; } else { grp.style.display = "none"; inp.required = false; }
     }
     function handleExpVendorChange() {
       const sel = document.getElementById('expVendorSelect').value;
       const grp = document.getElementById('newExpVendorGroup');
+      const inp = document.getElementById('newExpVendorName');
       const mob = document.getElementById('expVendorMobile');
-      if (sel === "ADD_NEW") { grp.style.display = "flex"; mob.value = ""; mob.readOnly = false; }
-      else if (sel !== "") { grp.style.display = "none"; mob.value = cattleVendorData[sel] || ""; mob.readOnly = true; }
+      if (sel === "ADD_NEW") { grp.style.display = "flex"; inp.required = true; mob.value = ""; mob.readOnly = false; }
+      else if (sel !== "") { grp.style.display = "none"; inp.required = false; mob.value = cattleVendorData[sel] || ""; mob.readOnly = true; }
+      else { grp.style.display = "none"; inp.required = false; }
     }
   </script>
 </body>
